@@ -94,7 +94,7 @@ export default function Home() {
                 <span className="text-white font-bold text-sm">RC</span>
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-surface dark:text-foreground">Resume Companion</h1>
+                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">CVisionAI</h1>
                 <p className="text-xs text-muted-foreground">AI-Powered Resume Analysis</p>
               </div>
             </div>

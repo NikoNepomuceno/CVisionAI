@@ -43,7 +43,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious }: Analysi
   return (
     <div className="space-y-6">
       <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-3xl font-bold text-foreground mb-2">AI Analysis & Insights</h1>
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white mb-2">AI Analysis & Insights</h1>
         <p className="text-muted-foreground">Here's what we found in your resume</p>
       </div>
 
