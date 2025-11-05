@@ -4,6 +4,7 @@ import type React from "react"
 
 import { useState } from "react"
 import { Upload, CheckCircle2, Sparkles, ArrowRight } from "lucide-react"
+import { toast } from "@/hooks/use-toast"
 
 interface UploadPageProps {
   onNext: (data: any) => void
@@ -13,6 +14,12 @@ export default function UploadPage({ onNext }: UploadPageProps) {
   const [isDragging, setIsDragging] = useState(false)
   const [file, setFile] = useState<File | null>(null)
   const [isLoading, setIsLoading] = useState(false)
+
+  const isValidFileType = (fileName: string): boolean => {
+    const validExtensions = ['.pdf', '.doc', '.docx']
+    const extension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'))
+    return validExtensions.includes(extension)
+  }
 
   const handleDragOver = (e: React.DragEvent) => {
     e.preventDefault()
@@ -28,13 +35,33 @@ export default function UploadPage({ onNext }: UploadPageProps) {
     setIsDragging(false)
     const files = e.dataTransfer.files
     if (files.length > 0) {
-      setFile(files[0])
+      const selectedFile = files[0]
+      if (!isValidFileType(selectedFile.name)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid file format",
+          description: "Please upload a PDF, DOC, or DOCX file.",
+        })
+        return
+      }
+      setFile(selectedFile)
     }
   }
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files.length > 0) {
-      setFile(e.target.files[0])
+      const selectedFile = e.target.files[0]
+      if (!isValidFileType(selectedFile.name)) {
+        toast({
+          variant: "destructive",
+          title: "Invalid file format",
+          description: "Please upload a PDF, DOC, or DOCX file.",
+        })
+        // Reset the input
+        e.target.value = ""
+        return
+      }
+      setFile(selectedFile)
     }
   }
 
@@ -47,6 +74,10 @@ export default function UploadPage({ onNext }: UploadPageProps) {
       const uploadRes = await fetch("/api/upload", { method: "POST", body: formData })
       if (!uploadRes.ok) throw new Error("Upload failed")
       const { text } = await uploadRes.json()
+      toast({
+        title: "File uploaded successfully",
+        description: file.name,
+      })
 
       const extractRes = await fetch("/api/extract", {
         method: "POST",
