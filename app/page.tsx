@@ -94,7 +94,7 @@ export default function Home() {
                 <img
                   src="/CVisionAI-Logo-Header.png"
                   alt="CV Logo"
-                  className="w-6 h-6 object-contain"
+                  className="w-8 h-8 object-contain"
                 />
               </div>
               <div>
