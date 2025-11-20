@@ -5,6 +5,21 @@ export type ExtractedResume = {
   summary?: string
 }
 
+export type AnalysisInsight = {
+  title: string
+  description: string
+  confidence?: number
+  tags?: string[]
+  category?: string
+}
+
+export type ResumeAnalysis = {
+  strengths: AnalysisInsight[]
+  weaknesses: AnalysisInsight[]
+  improvements: AnalysisInsight[]
+  summary?: string
+}
+
 interface ChatOptions {
   system?: string
   temperature?: number
@@ -72,6 +87,69 @@ export async function extractResumeFromText(resumeText: string): Promise<Extract
     skills: Array.isArray(parsed.skills) ? parsed.skills : [],
     experience: Array.isArray(parsed.experience) ? parsed.experience : [],
     education: Array.isArray(parsed.education) ? parsed.education : [],
+    summary: typeof parsed.summary === "string" ? parsed.summary : undefined,
+  }
+}
+
+function normalizeInsights(value: unknown): AnalysisInsight[] {
+  if (!Array.isArray(value)) return []
+
+  return value
+    .map((item) => {
+      if (typeof item !== "object" || item === null) return null
+      const insight = item as Record<string, unknown>
+      const confidence = typeof insight.confidence === "number" ? Math.max(0, Math.min(100, insight.confidence)) : undefined
+      const tags = Array.isArray(insight.tags) ? insight.tags.filter((tag) => typeof tag === "string") : undefined
+
+      return {
+        title: typeof insight.title === "string" ? insight.title : "",
+        description: typeof insight.description === "string" ? insight.description : "",
+        confidence,
+        tags,
+        category: typeof insight.category === "string" ? insight.category : undefined,
+      }
+    })
+    .filter((item) => item && item.title && item.description) as AnalysisInsight[]
+}
+
+export async function analyzeResume(resume: ExtractedResume): Promise<ResumeAnalysis> {
+  if (!resume) {
+    throw new Error("Missing resume data")
+  }
+
+  const system =
+    "You are an expert career coach analyzing resumes. Return structured JSON with strengths, weaknesses, and improvement tips. Insights must be specific, actionable, and job-market relevant."
+
+  const userPrompt = `Analyze the following structured resume data. Consider existing skills and experience. Incorporate any skills present in the data even if inferred.
+
+RESUME DATA:
+${JSON.stringify(resume, null, 2)}
+
+Desired JSON format:
+{
+  "strengths": [{ "title": string, "description": string, "confidence": 0-100?, "tags": string[]?, "category": string? }],
+  "weaknesses": [{ ...same shape... }],
+  "improvements": [{ ...same shape... }],
+  "summary": string?
+}
+
+Ensure arrays have at most 6 items each and focus on job-relevant insights.`
+
+  const content = await deepseekChat(userPrompt, { system, temperature: 0.15 })
+
+  const jsonStart = content.indexOf("{")
+  const jsonEnd = content.lastIndexOf("}")
+  if (jsonStart === -1 || jsonEnd === -1) {
+    throw new Error("Failed to parse JSON analysis from DeepSeek output")
+  }
+
+  const jsonText = content.slice(jsonStart, jsonEnd + 1)
+  const parsed = JSON.parse(jsonText)
+
+  return {
+    strengths: normalizeInsights(parsed.strengths),
+    weaknesses: normalizeInsights(parsed.weaknesses),
+    improvements: normalizeInsights(parsed.improvements),
     summary: typeof parsed.summary === "string" ? parsed.summary : undefined,
   }
 }

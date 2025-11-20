@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { Upload, CheckCircle2, Zap, BarChart3, Briefcase, ChevronRight, Settings } from "lucide-react"
 import UploadPage from "@/components/pages/upload-page"
 import ExtractionPage from "@/components/pages/extraction-page"
@@ -12,15 +12,44 @@ import KeywordPage from "@/components/pages/keyword-page"
 import ResultsPage from "@/components/pages/results-page"
 import RecommendationsPage from "@/components/pages/recommendations-page"
 import SettingsModal from "@/components/settings-modal"
+import type { ResumeAnalysis } from "@/lib/deepseek"
 
 type PageStep = "upload" | "extraction" | "analysis" | "feedback" | "keywords" | "results" | "recommendations"
 
-interface ResumeData {
-  file?: File
+type ExperienceItem = { company: string; role: string; duration?: string; description?: string }
+type EducationItem = { school: string; degree: string; year?: string }
+
+type ResumeSnapshot = {
   skills: string[]
-  experience: Array<{ company: string; role: string; duration: string }>
-  education: Array<{ school: string; degree: string }>
+  experience: ExperienceItem[]
+  education: EducationItem[]
   summary: string
+}
+
+interface ResumeData extends ResumeSnapshot {
+  file?: File
+  analysis?: ResumeAnalysis
+  lastAnalyzed?: ResumeSnapshot
+  lastAnalyzedKey?: string
+}
+
+function createSnapshot(data: ResumeSnapshot): { snapshot: ResumeSnapshot; key: string } {
+  const snapshot: ResumeSnapshot = {
+    skills: [...data.skills],
+    experience: data.experience.map((item) => ({ ...item })),
+    education: data.education.map((item) => ({ ...item })),
+    summary: data.summary,
+  }
+  return { snapshot, key: JSON.stringify(snapshot) }
+}
+
+function getSnapshotSource(data: ResumeSnapshot): ResumeSnapshot {
+  return {
+    skills: data.skills,
+    experience: data.experience,
+    education: data.education,
+    summary: data.summary,
+  }
 }
 
 const STEPS: { id: PageStep; label: string; icon: React.ReactNode }[] = [
@@ -40,6 +69,9 @@ export default function Home() {
     experience: [],
     education: [],
     summary: "",
+    analysis: undefined,
+    lastAnalyzed: undefined,
+    lastAnalyzedKey: undefined,
   })
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
@@ -52,7 +84,32 @@ export default function Home() {
 
   const handleNext = (data?: Partial<ResumeData>) => {
     if (data) {
-      setResumeData((prev) => ({ ...prev, ...data }))
+      setResumeData((prev) => {
+        const next = { ...prev, ...data }
+        const snapshotSource = getSnapshotSource(next)
+        const snapshotKey = JSON.stringify(snapshotSource)
+
+        if ("analysis" in data) {
+          if (data.analysis) {
+            const { snapshot, key } = createSnapshot(snapshotSource)
+            next.analysis = data.analysis
+            next.lastAnalyzed = snapshot
+            next.lastAnalyzedKey = key
+          } else {
+            next.analysis = undefined
+            next.lastAnalyzed = undefined
+            next.lastAnalyzedKey = undefined
+          }
+        } else if ("skills" in data || "experience" in data || "education" in data || "summary" in data) {
+          if (!prev.lastAnalyzedKey || prev.lastAnalyzedKey !== snapshotKey) {
+            next.analysis = undefined
+            next.lastAnalyzed = undefined
+            next.lastAnalyzedKey = undefined
+          }
+        }
+
+        return next
+      })
     }
     if (currentStepIndex < STEPS.length - 1) {
       setCurrentStep(STEPS[currentStepIndex + 1].id)
@@ -79,8 +136,40 @@ export default function Home() {
       experience: [],
       education: [],
       summary: "",
+      analysis: undefined,
+      lastAnalyzed: undefined,
+      lastAnalyzedKey: undefined,
     })
   }
+
+  const handleAnalysisPersist = useCallback((analysis?: ResumeAnalysis) => {
+    setResumeData((prev) => {
+      if (!analysis) {
+        if (!prev.analysis) {
+          return prev
+        }
+        return {
+          ...prev,
+          analysis: undefined,
+          lastAnalyzed: undefined,
+          lastAnalyzedKey: undefined,
+        }
+      }
+
+      const { snapshot, key } = createSnapshot(getSnapshotSource(prev))
+
+      if (prev.lastAnalyzedKey === key && JSON.stringify(prev.analysis) === JSON.stringify(analysis)) {
+        return prev
+      }
+
+      return {
+        ...prev,
+        analysis,
+        lastAnalyzed: snapshot,
+        lastAnalyzedKey: key,
+      }
+    })
+  }, [])
 
   if (!mounted) return null
 
@@ -156,7 +245,12 @@ export default function Home() {
             <ExtractionPage resumeData={resumeData} onNext={handleNext} onPrevious={handlePrevious} />
           )}
           {currentStep === "analysis" && (
-            <AnalysisPage resumeData={resumeData} onNext={handleNext} onPrevious={handlePrevious} />
+            <AnalysisPage
+              resumeData={resumeData}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+              onAnalysisPersist={handleAnalysisPersist}
+            />
           )}
           {currentStep === "feedback" && (
             <FeedbackPage resumeData={resumeData} onNext={handleNext} onPrevious={handlePrevious} />
