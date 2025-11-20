@@ -9,9 +9,17 @@ const _geist = Geist({ subsets: ["latin"] })
 const _geistMono = Geist_Mono({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "AI Resume Companion",
+  title: "CVisionAI",
   description: "Enhance your resume with AI-powered insights and analysis",
-  generator: "v0.app",
+  icons: {
+    icon: [
+      {
+        url: "/CVisionAI-Logo-Header.png",
+        type: "image/png",
+        sizes: "32x32",
+      },
+    ],
+  },
 }
 
 export default function RootLayout({
