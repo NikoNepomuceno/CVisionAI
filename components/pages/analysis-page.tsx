@@ -1,7 +1,8 @@
 "use client"
 
 import { useEffect, useMemo, useState } from "react"
-import { Zap, TrendingUp, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Loader2 } from "lucide-react"
+import type { JSX } from "react"
+import { Zap, TrendingUp, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Loader2, Download } from "lucide-react"
 import type { ResumeAnalysis, AnalysisInsight } from "@/lib/deepseek"
 
 interface AnalysisPageProps {
@@ -24,7 +25,7 @@ interface AnalysisPageProps {
 }
 
 const SECTION_CONFIG: Array<{
-  key: keyof ResumeAnalysis
+  key: Exclude<keyof ResumeAnalysis, "summary">
   title: string
   borderLeftClass: string
   topBorderClass: string
@@ -64,6 +65,191 @@ const SECTION_CONFIG: Array<{
     empty: "You’re in good shape! Consider tailoring your resume to specific job descriptions for finer adjustments.",
   },
 ]
+
+const PDF_CONFIG = {
+  width: 612, // 8.5in
+  height: 792, // 11in
+  margin: 64,
+  lineHeight: 16,
+  startY: 728,
+}
+const MAX_LINES_PER_PAGE = Math.floor((PDF_CONFIG.startY - PDF_CONFIG.margin) / PDF_CONFIG.lineHeight)
+
+function escapePdfText(text: string) {
+  return text.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)")
+}
+
+function createPdfBlob(lines: string[]): Blob {
+  const normalizedLines = lines.map((line) => line.replace(/\r/g, ""))
+
+  type PdfPage = { commands: string[]; lineCount: number }
+  const startPage = (): PdfPage => ({
+    commands: [
+      "BT",
+      "/F1 12 Tf",
+      `${PDF_CONFIG.lineHeight} TL`,
+      `1 0 0 1 ${PDF_CONFIG.margin} ${PDF_CONFIG.startY} Tm`,
+    ],
+    lineCount: 0,
+  })
+
+  const pages: PdfPage[] = [startPage()]
+  const addLineToPage = (line: string) => {
+    let current = pages[pages.length - 1]
+    if (current.lineCount >= MAX_LINES_PER_PAGE) {
+      current.commands.push("ET")
+      current = startPage()
+      pages.push(current)
+    }
+
+    const safeLine = escapePdfText(line || " ")
+    if (current.lineCount === 0) {
+      current.commands.push(`(${safeLine}) Tj`)
+    } else {
+      current.commands.push("T*")
+      current.commands.push(`(${safeLine}) Tj`)
+    }
+    current.lineCount += 1
+  }
+
+  normalizedLines.forEach((line) => {
+    addLineToPage(line)
+  })
+  pages[pages.length - 1].commands.push("ET")
+
+  const textEncoder = new TextEncoder()
+
+  type Chunk = Uint8Array
+  const chunks: Chunk[] = []
+  let length = 0
+
+  const pushString = (value: string) => {
+    const bytes = textEncoder.encode(value)
+    chunks.push(bytes)
+    length += bytes.length
+  }
+
+  const pushBytes = (bytes: Uint8Array) => {
+    chunks.push(bytes)
+    length += bytes.length
+  }
+
+  const offsets: number[] = [0]
+
+  pushString("%PDF-1.4\n")
+
+  const writeObject = (body: Array<string | Uint8Array>) => {
+    offsets.push(length)
+    body.forEach((part) => {
+      if (typeof part === "string") {
+        pushString(part)
+      } else {
+        pushBytes(part)
+      }
+    })
+  }
+
+  const pageCount = pages.length
+  const pageObjectNumbers: number[] = []
+  const contentObjectNumbers: number[] = []
+  let nextObjNumber = 3
+  for (let i = 0; i < pageCount; i++) {
+    pageObjectNumbers.push(nextObjNumber)
+    contentObjectNumbers.push(nextObjNumber + 1)
+    nextObjNumber += 2
+  }
+  const fontObjectNumber = nextObjNumber
+
+  writeObject(["1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"])
+
+  const kids = pageObjectNumbers.map((num) => `${num} 0 R`).join(" ")
+  writeObject([`2 0 obj\n<< /Type /Pages /Kids [${kids}] /Count ${pageCount} >>\nendobj\n`])
+
+  pages.forEach((page, index) => {
+    const contentBytes = textEncoder.encode(page.commands.join("\n"))
+    const contentNumber = contentObjectNumbers[index]
+    const pageNumber = pageObjectNumbers[index]
+
+    writeObject([
+      `${pageNumber} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PDF_CONFIG.width} ${PDF_CONFIG.height}] /Contents ${contentNumber} 0 R /Resources << /Font << /F1 ${fontObjectNumber} 0 R >> >> >>\nendobj\n`,
+    ])
+
+    writeObject([
+      `${contentNumber} 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`,
+      contentBytes,
+      "\nendstream\nendobj\n",
+    ])
+  })
+
+  writeObject([
+    `${fontObjectNumber} 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n`,
+  ])
+
+  const xrefStart = length
+  pushString(`xref\n0 ${offsets.length}\n`)
+  pushString("0000000000 65535 f \n")
+  for (let i = 1; i < offsets.length; i++) {
+    pushString(`${offsets[i].toString().padStart(10, "0")} 00000 n \n`)
+  }
+  pushString(`trailer\n<< /Size ${offsets.length} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`)
+
+  const pdfBuffer = new Uint8Array(length)
+  let cursor = 0
+  for (const chunk of chunks) {
+    pdfBuffer.set(chunk, cursor)
+    cursor += chunk.length
+  }
+
+  return new Blob([pdfBuffer], { type: "application/pdf" })
+}
+
+function wrapTextLines(lines: string[], maxWidth = 90): string[] {
+  const result: string[] = []
+
+  lines.forEach((line) => {
+    if (!line) {
+      result.push("")
+      return
+    }
+
+    const words = line.split(/\s+/).filter(Boolean)
+    let current = ""
+
+    words.forEach((word) => {
+      if (word.length > maxWidth) {
+        if (current) {
+          result.push(current)
+          current = ""
+        }
+        for (let i = 0; i < word.length; i += maxWidth) {
+          const chunk = word.slice(i, i + maxWidth)
+          if (chunk.length === maxWidth) {
+            result.push(chunk)
+          } else {
+            current = chunk
+          }
+        }
+        return
+      }
+
+      const candidate = current ? `${current} ${word}` : word
+      if (candidate.length > maxWidth) {
+        if (current) {
+          result.push(current)
+        }
+        current = word
+      } else {
+        current = candidate
+      }
+    })
+
+    if (current) {
+      result.push(current)
+    }
+  })
+
+  return result
+}
 
 export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysisPersist }: AnalysisPageProps) {
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(resumeData.analysis ?? null)
@@ -167,6 +353,53 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
     onNext(analysis ? { analysis } : {})
   }
 
+  const handleDownloadSummary = () => {
+    if (!analysis) return
+
+    const lines: string[] = []
+    const addSection = (title: string, insights: AnalysisInsight[]) => {
+      lines.push(`\n${title}`)
+      if (insights.length === 0) {
+        lines.push("- None")
+        return
+      }
+      insights.forEach((insight, index) => {
+        lines.push(`${index + 1}. ${insight.title}`)
+        lines.push(`   ${insight.description}`)
+        if (insight.tags && insight.tags.length > 0) {
+          lines.push(`   Tags: ${insight.tags.join(", ")}`)
+        }
+        if (typeof insight.confidence === "number") {
+          lines.push(`   Confidence: ${insight.confidence}%`)
+        }
+      })
+    }
+
+    lines.push("CVisionAI Analysis Summary")
+    lines.push(`Generated: ${new Date().toLocaleString()}`)
+    if (analysis.summary) {
+      lines.push("\nOverall Summary")
+      lines.push(analysis.summary)
+    }
+
+    addSection("Strengths", analysis.strengths || [])
+    lines.push("")
+    addSection("Weaknesses", analysis.weaknesses || [])
+    lines.push("")
+    addSection("Improvement Opportunities", analysis.improvements || [])
+
+    const pdfLines = wrapTextLines(lines)
+    const pdfBlob = createPdfBlob(pdfLines)
+    const url = URL.createObjectURL(pdfBlob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `cv-analysis-${new Date().toISOString().split("T")[0]}.pdf`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
+  }
+
   const renderInsights = (
     insights: AnalysisInsight[],
     borderLeftClass: string,
@@ -213,6 +446,16 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
       <div className="mb-8 animate-fade-in-up">
         <h1 className="text-3xl font-bold text-foreground mb-2">AI Analysis & Insights</h1>
         <p className="text-muted-foreground">We analyzed your resume to surface strengths, gaps, and next steps.</p>
+        <div className="mt-4">
+          <button
+            onClick={handleDownloadSummary}
+            disabled={!analysis || isLoading}
+            className="btn-secondary flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            Download Summary
+          </button>
+        </div>
       </div>
 
       {isLoading && (

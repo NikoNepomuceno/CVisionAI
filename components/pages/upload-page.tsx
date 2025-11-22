@@ -103,7 +103,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
             <span className="text-sm font-medium text-primary">AI-Powered Analysis</span>
           </div>
         </div>
-  <h1 className="text-5xl sm:text-6xl font-bold text-foreground leading-tight">Enhance Your Resume with AI</h1>
+        <h1 className="text-5xl sm:text-6xl font-bold text-foreground leading-tight">Enhance Your Resume with AI</h1>
         <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
           Upload your resume and get instant AI-powered insights to improve your chances of landing your dream job.
         </p>
@@ -114,11 +114,10 @@ export default function UploadPage({ onNext }: UploadPageProps) {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${
-            isDragging
+          className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${isDragging
               ? "border-primary bg-primary/5 scale-105 shadow-lg shadow-primary/20"
               : "border-border hover:border-primary/50 hover:bg-accent/5"
-          }`}
+            }`}
         >
           <input type="file" accept=".pdf,.doc,.docx" onChange={handleFileSelect} className="hidden" id="file-input" />
           <label htmlFor="file-input" className="cursor-pointer block">

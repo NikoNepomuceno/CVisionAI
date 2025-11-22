@@ -20,6 +20,14 @@ export type ResumeAnalysis = {
   summary?: string
 }
 
+export type FeedbackItem = {
+  id: string
+  category: "Clarity" | "Structure" | "Skills" | "Keywords" | "Content"
+  title: string
+  description: string
+  priority: "high" | "medium" | "low"
+}
+
 interface ChatOptions {
   system?: string
   temperature?: number
@@ -152,6 +160,101 @@ Ensure arrays have at most 6 items each and focus on job-relevant insights.`
     improvements: normalizeInsights(parsed.improvements),
     summary: typeof parsed.summary === "string" ? parsed.summary : undefined,
   }
+}
+
+function normalizeFeedback(value: unknown): FeedbackItem[] {
+  if (!Array.isArray(value)) return []
+
+  const validCategories = ["Clarity", "Structure", "Skills", "Keywords", "Content"]
+  const validPriorities = ["high", "medium", "low"]
+
+  return value
+    .map((item, index) => {
+      if (typeof item !== "object" || item === null) return null
+      const feedback = item as Record<string, unknown>
+
+      const category = typeof feedback.category === "string" && validCategories.includes(feedback.category)
+        ? feedback.category as FeedbackItem["category"]
+        : "Content"
+
+      const priority = typeof feedback.priority === "string" && validPriorities.includes(feedback.priority)
+        ? feedback.priority as FeedbackItem["priority"]
+        : "medium"
+
+      return {
+        id: typeof feedback.id === "string" ? feedback.id : `feedback-${index}`,
+        category,
+        title: typeof feedback.title === "string" ? feedback.title : "",
+        description: typeof feedback.description === "string" ? feedback.description : "",
+        priority,
+      }
+    })
+    .filter((item) => item && item.title && item.description) as FeedbackItem[]
+}
+
+export async function generateFeedback(
+  resume: ExtractedResume,
+  analysis?: ResumeAnalysis,
+): Promise<FeedbackItem[]> {
+  if (!resume) {
+    throw new Error("Missing resume data")
+  }
+
+  const system =
+    "You are an expert resume coach providing actionable feedback based on the actual resume content. Generate specific, implementable suggestions that reference the actual content in the resume."
+
+  let userPrompt = `Analyze the following resume data and provide actionable feedback. Reference specific companies, roles, skills, or sections when making suggestions.
+
+RESUME DATA:
+${JSON.stringify(resume, null, 2)}`
+
+  if (analysis) {
+    userPrompt += `\n\nPREVIOUS ANALYSIS:
+${JSON.stringify(analysis, null, 2)}`
+  }
+
+  userPrompt += `\n\nGenerate feedback items in this JSON format:
+{
+  "feedback": [
+    {
+      "id": "unique-id",
+      "category": "Clarity" | "Structure" | "Skills" | "Keywords" | "Content",
+      "title": "Brief, actionable title",
+      "description": "Specific description referencing actual resume content (e.g., 'Your experience at [Company] mentions [Role] but lacks quantifiable achievements. Consider adding metrics like...')",
+      "priority": "high" | "medium" | "low"
+    }
+  ]
+}
+
+Guidelines:
+- Generate 8-12 feedback items
+- Reference specific companies, roles, or skills from the resume
+- High priority = critical issues that significantly impact resume quality
+- Medium priority = important improvements
+- Low priority = nice-to-have enhancements
+- Be specific and actionable
+- Focus on what's actually in the resume, not generic advice
+
+Return ONLY valid JSON.`
+
+  const content = await deepseekChat(userPrompt, { system, temperature: 0.2 })
+
+  const jsonStart = content.indexOf("{")
+  const jsonEnd = content.lastIndexOf("}")
+  if (jsonStart === -1 || jsonEnd === -1) {
+    throw new Error("Failed to parse JSON feedback from DeepSeek output")
+  }
+
+  const jsonText = content.slice(jsonStart, jsonEnd + 1)
+  const parsed = JSON.parse(jsonText)
+
+  // Handle both { feedback: [...] } and [...] formats
+  const feedback = Array.isArray(parsed.feedback) 
+    ? parsed.feedback 
+    : Array.isArray(parsed) 
+      ? parsed 
+      : []
+  return normalizeFeedback(feedback)
 }
 
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { analyzeResume, type ExtractedResume } from "@/lib/deepseek"
+import { generateFeedback, type ExtractedResume, type ResumeAnalysis } from "@/lib/deepseek"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -40,13 +40,24 @@ function sanitizeEducation(value: unknown): ExtractedResume["education"] {
   return result
 }
 
+function sanitizeAnalysis(value: unknown): ResumeAnalysis | undefined {
+  if (!value || typeof value !== "object") return undefined
+  // Basic validation - we'll let generateFeedback handle the actual structure
+  return value as ResumeAnalysis
+}
+
 export async function POST(req: NextRequest) {
   try {
     const payload = await req.json().catch(() => null)
-    const resumeSource: unknown = payload?.resume ?? payload
+
+    if (!payload || typeof payload !== "object") {
+      return NextResponse.json({ error: "Missing payload" }, { status: 400 })
+    }
+
+    const resumeSource: unknown = payload.resume ?? payload
 
     if (!resumeSource || typeof resumeSource !== "object") {
-      return NextResponse.json({ error: "Missing resume payload" }, { status: 400 })
+      return NextResponse.json({ error: "Missing resume data" }, { status: 400 })
     }
 
     const resumeRecord = resumeSource as Record<string, unknown>
@@ -67,12 +78,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Resume data is empty" }, { status: 400 })
     }
 
-    const analysis = await analyzeResume(resume)
-    return NextResponse.json({ data: analysis })
+    const analysis = sanitizeAnalysis(payload.analysis)
+
+    const feedback = await generateFeedback(resume, analysis)
+    return NextResponse.json({ feedback })
   } catch (error: any) {
-    console.error("[api/analyze] error", error)
-    return NextResponse.json({ error: error?.message || "Analysis failed" }, { status: 500 })
+    console.error("[api/feedback] error", error)
+    return NextResponse.json({ error: error?.message || "Feedback generation failed" }, { status: 500 })
   }
 }
-
 

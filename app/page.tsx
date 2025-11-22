@@ -207,7 +207,7 @@ export default function Home() {
           <div className="w-full bg-muted dark:bg-muted rounded-full h-2 overflow-hidden">
             <div
               className="bg-gradient-to-r from-primary via-primary to-secondary h-2 rounded-full transition-all duration-700 ease-out shadow-lg shadow-primary/20"
-              style={{ width: `${((currentStepIndex + 1) / STEPS.length) * 100}%` }}
+              style={{ width: `${(currentStepIndex / STEPS.length) * 100}%` }}
             />
           </div>
 
