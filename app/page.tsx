@@ -12,7 +12,7 @@ import KeywordPage from "@/components/pages/keyword-page"
 import ResultsPage from "@/components/pages/results-page"
 import RecommendationsPage from "@/components/pages/recommendations-page"
 import SettingsModal from "@/components/settings-modal"
-import type { ResumeAnalysis } from "@/lib/deepseek"
+import type { ResumeAnalysis, KeywordAnalysis } from "@/lib/deepseek"
 
 type PageStep = "upload" | "extraction" | "analysis" | "feedback" | "keywords" | "results" | "recommendations"
 
@@ -29,6 +29,7 @@ type ResumeSnapshot = {
 interface ResumeData extends ResumeSnapshot {
   file?: File
   analysis?: ResumeAnalysis
+  keywordAnalysis?: KeywordAnalysis
   lastAnalyzed?: ResumeSnapshot
   lastAnalyzedKey?: string
 }
@@ -70,6 +71,7 @@ export default function Home() {
     education: [],
     summary: "",
     analysis: undefined,
+    keywordAnalysis: undefined,
     lastAnalyzed: undefined,
     lastAnalyzedKey: undefined,
   })
@@ -137,6 +139,7 @@ export default function Home() {
       education: [],
       summary: "",
       analysis: undefined,
+      keywordAnalysis: undefined,
       lastAnalyzed: undefined,
       lastAnalyzedKey: undefined,
     })

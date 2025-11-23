@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server"
 import { analyzeKeywordMatch, type ExtractedResume } from "@/lib/deepseek"
+import { resumeCache } from "@/lib/cache"
+import crypto from "crypto"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -81,8 +83,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Resume data is empty" }, { status: 400 })
     }
 
+    // Generate cache key (include job description hash)
+    const jobDescHash = crypto.createHash("sha256").update(jobDescription.trim().toLowerCase()).digest("hex").slice(0, 16)
+    const cacheKey = `keywords:${resumeCache.generateKey(resume)}:${jobDescHash}`
+
+    // Check cache first
+    const cached = resumeCache.get(cacheKey)
+    if (cached) {
+      return NextResponse.json({ data: cached, cached: true })
+    }
+
+    // Generate analysis
     const analysis = await analyzeKeywordMatch(resume, jobDescription)
-    return NextResponse.json({ data: analysis })
+
+    // Store in cache
+    resumeCache.set(cacheKey, analysis)
+
+    return NextResponse.json({ data: analysis, cached: false })
   } catch (error: any) {
     console.error("[api/keywords] error", error)
     return NextResponse.json({ error: error?.message || "Keyword analysis failed" }, { status: 500 })

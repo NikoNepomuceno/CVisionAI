@@ -2,8 +2,10 @@
 
 import { useEffect, useMemo, useState } from "react"
 import type { JSX } from "react"
-import { Zap, TrendingUp, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Loader2, Download } from "lucide-react"
+import { Zap, TrendingUp, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Loader2, Download, LayoutGrid, BarChart3 } from "lucide-react"
 import type { ResumeAnalysis, AnalysisInsight } from "@/lib/deepseek"
+import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Cell } from "recharts"
 
 interface AnalysisPageProps {
   resumeData: {
@@ -256,6 +258,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
   const [isLoading, setIsLoading] = useState<boolean>(!resumeData.analysis)
   const [error, setError] = useState<string | null>(null)
   const [fetchVersion, setFetchVersion] = useState(0)
+  const [viewMode, setViewMode] = useState<"cards" | "graph">("cards")
   const [lastFetchedKey, setLastFetchedKey] = useState<string | null>(() =>
     resumeData.lastAnalyzed ? JSON.stringify(resumeData.lastAnalyzed) : null,
   )
@@ -277,6 +280,70 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
     () => (resumeData.lastAnalyzed ? JSON.stringify(resumeData.lastAnalyzed) : null),
     [resumeData.lastAnalyzed],
   )
+
+  // Get theme colors for chart
+  const [themeColors, setThemeColors] = useState({
+    success: "#10b981",
+    error: "#ef4444",
+    secondary: "#f1ac20",
+  })
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const root = document.documentElement
+      const computedStyle = getComputedStyle(root)
+      setThemeColors({
+        success: computedStyle.getPropertyValue("--success").trim() || "#10b981",
+        error: computedStyle.getPropertyValue("--error").trim() || "#ef4444",
+        secondary: computedStyle.getPropertyValue("--secondary").trim() || "#f1ac20",
+      })
+    }
+  }, [])
+
+  // Transform analysis data for chart visualization
+  const chartData = useMemo(() => {
+    if (!analysis) return []
+
+    const categories = [
+      { 
+        key: "strengths" as const, 
+        label: "Strengths", 
+        color: themeColors.success, 
+        dataKey: "strengths" 
+      },
+      { 
+        key: "weaknesses" as const, 
+        label: "Weaknesses", 
+        color: themeColors.error, 
+        dataKey: "weaknesses" 
+      },
+      { 
+        key: "improvements" as const, 
+        label: "Improvements", 
+        color: themeColors.secondary, 
+        dataKey: "improvements" 
+      },
+    ]
+
+    return categories.map(({ key, label, color, dataKey }) => {
+      const insights = analysis[key] || []
+      const count = insights.length
+      const confidences = insights
+        .map((insight) => insight.confidence)
+        .filter((conf): conf is number => typeof conf === "number")
+      const avgConfidence = confidences.length > 0
+        ? Math.round(confidences.reduce((sum, conf) => sum + conf, 0) / confidences.length)
+        : 0
+
+      return {
+        category: label,
+        count,
+        avgConfidence,
+        color,
+        dataKey,
+      }
+    })
+  }, [analysis, themeColors])
 
   useEffect(() => {
     if (resumeData.analysis) {
@@ -444,9 +511,37 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
   return (
     <div className="space-y-6">
       <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-3xl font-bold text-foreground mb-2">AI Analysis & Insights</h1>
-        <p className="text-muted-foreground">We analyzed your resume to surface strengths, gaps, and next steps.</p>
-        <div className="mt-4">
+        <div className="flex items-center justify-between mb-2">
+          <div>
+            <h1 className="text-3xl font-bold text-foreground mb-2">AI Analysis & Insights</h1>
+            <p className="text-muted-foreground">We analyzed your resume to surface strengths, gaps, and next steps.</p>
+          </div>
+        </div>
+        <div className="mt-4 flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+            <button
+              onClick={() => setViewMode("cards")}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                viewMode === "cards"
+                  ? "bg-primary text-white shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <LayoutGrid className="w-4 h-4" />
+              Cards
+            </button>
+            <button
+              onClick={() => setViewMode("graph")}
+              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+                viewMode === "graph"
+                  ? "bg-primary text-white shadow-md"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <BarChart3 className="w-4 h-4" />
+              Graph
+            </button>
+          </div>
           <button
             onClick={handleDownloadSummary}
             disabled={!analysis || isLoading}
@@ -488,30 +583,154 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
             </div>
           )}
 
-          {SECTION_CONFIG.map(({ key, title, borderLeftClass, topBorderClass, iconWrapperClass, metricClass, icon, empty }) => {
-            const insights = analysis[key] || []
-            return (
-              <div
-                key={key}
-                className={`card-base animate-fade-in-up border-t-4 ${topBorderClass}`}
-                style={{ animationDelay: "150ms" }}
-              >
-                <div className="flex items-center justify-between mb-4">
-                  <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                  <span className={`inline-flex items-center gap-1 text-sm ${metricClass}`}>
-                    {icon}
-                    {insights.length} items
-                  </span>
-                </div>
+          {viewMode === "cards" && (
+            <>
+              {SECTION_CONFIG.map(({ key, title, borderLeftClass, topBorderClass, iconWrapperClass, metricClass, icon, empty }) => {
+                const insights = analysis[key] || []
+                return (
+                  <div
+                    key={key}
+                    className={`card-base animate-fade-in-up border-t-4 ${topBorderClass}`}
+                    style={{ animationDelay: "150ms" }}
+                  >
+                    <div className="flex items-center justify-between mb-4">
+                      <h2 className="text-lg font-semibold text-foreground">{title}</h2>
+                      <span className={`inline-flex items-center gap-1 text-sm ${metricClass}`}>
+                        {icon}
+                        {insights.length} items
+                      </span>
+                    </div>
 
-                {insights.length > 0 ? (
-                  <div className="space-y-3">{renderInsights(insights, borderLeftClass, iconWrapperClass, icon)}</div>
-                ) : (
-                  <p className="text-sm text-muted-foreground">{empty}</p>
-                )}
+                    {insights.length > 0 ? (
+                      <div className="space-y-3">{renderInsights(insights, borderLeftClass, iconWrapperClass, icon)}</div>
+                    ) : (
+                      <p className="text-sm text-muted-foreground">{empty}</p>
+                    )}
+                  </div>
+                )
+              })}
+            </>
+          )}
+
+          {viewMode === "graph" && chartData.length > 0 && (
+            <div className="card-base animate-fade-in-up border-t-4 border-t-primary">
+              <h2 className="text-lg font-semibold text-foreground mb-6">Analysis Overview</h2>
+              <ChartContainer
+                config={{
+                  strengthsCount: {
+                    label: "Strengths - Count",
+                    color: "hsl(var(--success))",
+                  },
+                  strengthsConfidence: {
+                    label: "Strengths - Confidence",
+                    color: "hsl(var(--success))",
+                  },
+                  weaknessesCount: {
+                    label: "Weaknesses - Count",
+                    color: "hsl(var(--error))",
+                  },
+                  weaknessesConfidence: {
+                    label: "Weaknesses - Confidence",
+                    color: "hsl(var(--error))",
+                  },
+                  improvementsCount: {
+                    label: "Improvements - Count",
+                    color: "hsl(var(--secondary))",
+                  },
+                  improvementsConfidence: {
+                    label: "Improvements - Confidence",
+                    color: "hsl(var(--secondary))",
+                  },
+                }}
+                className="h-[400px] w-full"
+              >
+                <BarChart data={chartData}>
+                  <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
+                  <XAxis
+                    dataKey="category"
+                    className="text-xs"
+                    tick={{ fill: "hsl(var(--muted-foreground))" }}
+                  />
+                  <YAxis
+                    yAxisId="left"
+                    label={{ value: "Count", angle: -90, position: "insideLeft", className: "text-xs fill-muted-foreground" }}
+                    className="text-xs"
+                    tick={{ fill: "hsl(var(--muted-foreground))" }}
+                  />
+                  <YAxis
+                    yAxisId="right"
+                    orientation="right"
+                    domain={[0, 100]}
+                    label={{ value: "Confidence %", angle: 90, position: "insideRight", className: "text-xs fill-muted-foreground" }}
+                    className="text-xs"
+                    tick={{ fill: "hsl(var(--muted-foreground))" }}
+                  />
+                  <ChartTooltip 
+                    content={<ChartTooltipContent 
+                      formatter={(value, name) => {
+                        const nameStr = String(name || "")
+                        if (nameStr.includes("Count") || nameStr === "count") {
+                          return [`${value}`, "Insight Count"]
+                        }
+                        if (nameStr.includes("Confidence") || nameStr === "avgConfidence") {
+                          return [`${value}%`, "Avg Confidence (%)"]
+                        }
+                        return [value, name]
+                      }}
+                    />} 
+                  />
+                  <Legend />
+                  <Bar
+                    yAxisId="left"
+                    dataKey="count"
+                    name="Insight Count"
+                    radius={[4, 4, 0, 0]}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-count-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                  <Bar
+                    yAxisId="right"
+                    dataKey="avgConfidence"
+                    name="Avg Confidence (%)"
+                    radius={[4, 4, 0, 0]}
+                  >
+                    {chartData.map((entry, index) => (
+                      <Cell key={`cell-confidence-${index}`} fill={entry.color} />
+                    ))}
+                  </Bar>
+                </BarChart>
+              </ChartContainer>
+              <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+                {chartData.map((item) => (
+                  <div
+                    key={item.category}
+                    className="p-4 rounded-lg border border-border bg-muted/30"
+                  >
+                    <div className="flex items-center gap-2 mb-2">
+                      <div
+                        className="w-3 h-3 rounded-full"
+                        style={{ backgroundColor: item.color }}
+                      />
+                      <h3 className="font-semibold text-foreground text-sm">{item.category}</h3>
+                    </div>
+                    <div className="space-y-1 text-xs text-muted-foreground">
+                      <p>Count: <span className="text-foreground font-medium">{item.count}</span></p>
+                      <p>Avg Confidence: <span className="text-foreground font-medium">{item.avgConfidence}%</span></p>
+                    </div>
+                  </div>
+                ))}
               </div>
-            )
-          })}
+            </div>
+          )}
+
+          {viewMode === "graph" && chartData.length === 0 && (
+            <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground">
+              <p className="font-medium mb-2">No data available for graph view.</p>
+              <p className="text-sm">Switch to cards view to see detailed insights.</p>
+            </div>
+          )}
         </div>
       )}
 

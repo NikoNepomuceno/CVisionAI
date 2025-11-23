@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server"
-import { analyzeResume, type ExtractedResume } from "@/lib/deepseek"
+import { generateJobRecommendations, type ExtractedResume, type KeywordAnalysis } from "@/lib/deepseek"
 import { resumeCache } from "@/lib/cache"
 
 export const runtime = "nodejs"
@@ -41,13 +41,24 @@ function sanitizeEducation(value: unknown): ExtractedResume["education"] {
   return result
 }
 
+function sanitizeKeywordAnalysis(value: unknown): KeywordAnalysis | undefined {
+  if (!value || typeof value !== "object") return undefined
+  // Basic validation - we'll let generateJobRecommendations handle the actual structure
+  return value as KeywordAnalysis
+}
+
 export async function POST(req: NextRequest) {
   try {
     const payload = await req.json().catch(() => null)
-    const resumeSource: unknown = payload?.resume ?? payload
+
+    if (!payload || typeof payload !== "object") {
+      return NextResponse.json({ error: "Missing payload" }, { status: 400 })
+    }
+
+    const resumeSource: unknown = payload.resume ?? payload
 
     if (!resumeSource || typeof resumeSource !== "object") {
-      return NextResponse.json({ error: "Missing resume payload" }, { status: 400 })
+      return NextResponse.json({ error: "Missing resume data" }, { status: 400 })
     }
 
     const resumeRecord = resumeSource as Record<string, unknown>
@@ -68,8 +79,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Resume data is empty" }, { status: 400 })
     }
 
-    // Generate cache key from resume content
-    const cacheKey = `analyze:${resumeCache.generateKey(resume)}`
+    const keywordAnalysis = sanitizeKeywordAnalysis(payload.keywordAnalysis)
+
+    // Generate cache key (include keyword analysis if provided)
+    const keywordKey = keywordAnalysis ? JSON.stringify(keywordAnalysis.matchPercentage) : ""
+    const cacheKey = `recommendations:${resumeCache.generateKey(resume)}:${keywordKey}`
 
     // Check cache first
     const cached = resumeCache.get(cacheKey)
@@ -77,17 +91,16 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ data: cached, cached: true })
     }
 
-    // Generate analysis
-    const analysis = await analyzeResume(resume)
+    // Generate recommendations
+    const recommendations = await generateJobRecommendations(resume, keywordAnalysis)
 
     // Store in cache
-    resumeCache.set(cacheKey, analysis)
+    resumeCache.set(cacheKey, recommendations)
 
-    return NextResponse.json({ data: analysis, cached: false })
+    return NextResponse.json({ data: recommendations, cached: false })
   } catch (error: any) {
-    console.error("[api/analyze] error", error)
-    return NextResponse.json({ error: error?.message || "Analysis failed" }, { status: 500 })
+    console.error("[api/recommendations] error", error)
+    return NextResponse.json({ error: error?.message || "Job recommendations generation failed" }, { status: 500 })
   }
 }
-
 

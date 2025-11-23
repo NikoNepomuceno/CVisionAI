@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server"
 import { generateFeedback, type ExtractedResume, type ResumeAnalysis } from "@/lib/deepseek"
+import { resumeCache } from "@/lib/cache"
 
 export const runtime = "nodejs"
 export const dynamic = "force-dynamic"
@@ -80,8 +81,23 @@ export async function POST(req: NextRequest) {
 
     const analysis = sanitizeAnalysis(payload.analysis)
 
+    // Generate cache key (include analysis in key if provided)
+    const analysisKey = analysis ? JSON.stringify(analysis) : ""
+    const cacheKey = `feedback:${resumeCache.generateKey(resume)}:${analysisKey}`
+
+    // Check cache first
+    const cached = resumeCache.get(cacheKey)
+    if (cached) {
+      return NextResponse.json({ feedback: cached, cached: true })
+    }
+
+    // Generate feedback
     const feedback = await generateFeedback(resume, analysis)
-    return NextResponse.json({ feedback })
+
+    // Store in cache
+    resumeCache.set(cacheKey, feedback)
+
+    return NextResponse.json({ feedback, cached: false })
   } catch (error: any) {
     console.error("[api/feedback] error", error)
     return NextResponse.json({ error: error?.message || "Feedback generation failed" }, { status: 500 })

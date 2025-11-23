@@ -49,6 +49,19 @@ export type KeywordAnalysis = {
   suggestions: string[]
 }
 
+export type JobRecommendation = {
+  id: string
+  title: string
+  company: string
+  match: number // 0-100 percentage
+  skills: string[] // Matched skills from resume
+  location: string
+  salary?: string
+  description?: string
+  type?: "full-time" | "part-time" | "contract" | "remote" | "hybrid"
+  category?: "best-match" | "trending" | "remote" | "other"
+}
+
 interface ChatOptions {
   system?: string
   temperature?: number
@@ -381,6 +394,104 @@ Return ONLY valid JSON.`
     missingKeywords,
     suggestions,
   }
+}
+
+function normalizeJobRecommendations(value: unknown): JobRecommendation[] {
+  if (!Array.isArray(value)) return []
+
+  return value
+    .map((item, index) => {
+      if (typeof item !== "object" || item === null) return null
+      const job = item as Record<string, unknown>
+
+      const skills = Array.isArray(job.skills)
+        ? job.skills.filter((s: any) => typeof s === "string" && s.length > 0)
+        : []
+
+      const match = typeof job.match === "number" ? Math.max(0, Math.min(100, job.match)) : 0
+
+      return {
+        id: typeof job.id === "string" ? job.id : `job-${index}`,
+        title: typeof job.title === "string" ? job.title : "",
+        company: typeof job.company === "string" ? job.company : "",
+        match,
+        skills,
+        location: typeof job.location === "string" ? job.location : "Location not specified",
+        salary: typeof job.salary === "string" ? job.salary : undefined,
+        description: typeof job.description === "string" ? job.description : undefined,
+        type: typeof job.type === "string" ? (job.type as JobRecommendation["type"]) : undefined,
+        category: typeof job.category === "string" ? (job.category as JobRecommendation["category"]) : "other",
+      }
+    })
+    .filter((item) => item && item.title && item.company) as JobRecommendation[]
+}
+
+export async function generateJobRecommendations(
+  resume: ExtractedResume,
+  keywordAnalysis?: KeywordAnalysis,
+): Promise<JobRecommendation[]> {
+  if (!resume) {
+    throw new Error("Missing resume data")
+  }
+
+  const system =
+    "You are an expert job matching assistant. Generate realistic job recommendations based on resume data. Return structured JSON with job listings that match the candidate's skills and experience."
+
+  let userPrompt = `Generate 8-12 job recommendations based on the following resume data. Consider the candidate's skills, experience, and education.
+
+RESUME DATA:
+${JSON.stringify(resume, null, 2)}`
+
+  if (keywordAnalysis) {
+    userPrompt += `\n\nKEYWORD ANALYSIS:
+Match Percentage: ${keywordAnalysis.matchPercentage}%
+Matched Skills: ${keywordAnalysis.yourSkills.filter((s) => s.foundInJob).map((s) => s.skill).join(", ")}
+Missing Keywords: ${keywordAnalysis.missingKeywords.join(", ")}`
+  }
+
+  userPrompt += `\n\nReturn a JSON array of job recommendations in this format:
+[
+  {
+    "id": "unique-id",
+    "title": "Job Title",
+    "company": "Company Name",
+    "match": 0-100 (match percentage based on skills/experience alignment),
+    "skills": ["skill1", "skill2", "skill3"] (skills from resume that match this job),
+    "location": "City, State or Remote",
+    "salary": "Salary range (optional, e.g., '$100K - $130K')",
+    "description": "Brief job description (optional)",
+    "type": "full-time" | "part-time" | "contract" | "remote" | "hybrid" (optional),
+    "category": "best-match" | "trending" | "remote" | "other"
+  }
+]
+
+Guidelines:
+- Generate realistic job titles and company names
+- Match percentage should reflect how well the job aligns with the resume (consider skills, experience level, education)
+- Include 3-5 matched skills per job (skills that appear in both resume and job requirements)
+- Vary locations (include some remote options)
+- Include salary ranges when appropriate
+- Categorize jobs: "best-match" for highest match scores (80%+), "remote" for remote positions, "trending" for popular/in-demand roles
+- Ensure diversity in job titles and companies
+- Match percentage should be realistic based on actual skill alignment
+
+Return ONLY valid JSON array.`
+
+  const content = await deepseekChat(userPrompt, { system, temperature: 0.3 })
+
+  const jsonStart = content.indexOf("[")
+  const jsonEnd = content.lastIndexOf("]")
+  if (jsonStart === -1 || jsonEnd === -1) {
+    throw new Error("Failed to parse JSON job recommendations from DeepSeek output")
+  }
+
+  const jsonText = content.slice(jsonStart, jsonEnd + 1)
+  const parsed = JSON.parse(jsonText)
+
+  const recommendations = normalizeJobRecommendations(parsed)
+
+  // Sort by match percentage (highest first)
+  return recommendations.sort((a, b) => b.match - a.match)
 }
 
 
