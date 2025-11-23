@@ -28,6 +28,27 @@ export type FeedbackItem = {
   priority: "high" | "medium" | "low"
 }
 
+export type KeywordMatch = {
+  keyword: string
+  frequency: number
+  matched: boolean
+  category?: "skill" | "technology" | "tool" | "certification" | "other"
+}
+
+export type SkillMatch = {
+  skill: string
+  match: number // 0-100 percentage
+  foundInJob: boolean
+}
+
+export type KeywordAnalysis = {
+  yourSkills: SkillMatch[]
+  jobKeywords: KeywordMatch[]
+  matchPercentage: number
+  missingKeywords: string[]
+  suggestions: string[]
+}
+
 interface ChatOptions {
   system?: string
   temperature?: number
@@ -255,6 +276,111 @@ Return ONLY valid JSON.`
       ? parsed 
       : []
   return normalizeFeedback(feedback)
+}
+
+export async function analyzeKeywordMatch(
+  resume: ExtractedResume,
+  jobDescription: string
+): Promise<KeywordAnalysis> {
+  if (!resume || !jobDescription) {
+    throw new Error("Missing resume data or job description")
+  }
+
+  const system =
+    "You are an expert at analyzing resumes and job descriptions. Extract keywords, match skills, and provide actionable insights."
+
+  const userPrompt = `Analyze keyword matching between this resume and job description.
+
+RESUME DATA:
+${JSON.stringify(resume, null, 2)}
+
+JOB DESCRIPTION:
+${jobDescription}
+
+Return a JSON object with this structure:
+{
+  "yourSkills": [
+    {
+      "skill": "string (from resume)",
+      "match": 0-100 (how relevant this skill is to the job),
+      "foundInJob": boolean (if skill appears in job description)
+    }
+  ],
+  "jobKeywords": [
+    {
+      "keyword": "string (important keyword from job description)",
+      "frequency": number (how many times it appears),
+      "matched": boolean (if it exists in resume),
+      "category": "skill" | "technology" | "tool" | "certification" | "other"
+    }
+  ],
+  "missingKeywords": ["string array of important keywords not in resume"],
+  "suggestions": ["string array of actionable suggestions to improve match"]
+}
+
+Guidelines:
+- Extract 10-15 most important keywords from the job description
+- Calculate match percentage for each resume skill (0-100)
+- Identify missing critical keywords
+- Provide 3-5 specific, actionable suggestions
+- Focus on technical skills, tools, and technologies
+- Consider synonyms and related terms when matching
+
+Return ONLY valid JSON.`
+
+  const content = await deepseekChat(userPrompt, { system, temperature: 0.2 })
+
+  const jsonStart = content.indexOf("{")
+  const jsonEnd = content.lastIndexOf("}")
+  if (jsonStart === -1 || jsonEnd === -1) {
+    throw new Error("Failed to parse JSON keyword analysis from DeepSeek output")
+  }
+
+  const jsonText = content.slice(jsonStart, jsonEnd + 1)
+  const parsed = JSON.parse(jsonText)
+
+  // Normalize and validate the response
+  const yourSkills: SkillMatch[] = Array.isArray(parsed.yourSkills)
+    ? parsed.yourSkills
+        .map((item: any) => ({
+          skill: typeof item.skill === "string" ? item.skill : "",
+          match: typeof item.match === "number" ? Math.max(0, Math.min(100, item.match)) : 0,
+          foundInJob: typeof item.foundInJob === "boolean" ? item.foundInJob : false,
+        }))
+        .filter((item: SkillMatch) => item.skill.length > 0)
+    : []
+
+  const jobKeywords: KeywordMatch[] = Array.isArray(parsed.jobKeywords)
+    ? parsed.jobKeywords
+        .map((item: any) => ({
+          keyword: typeof item.keyword === "string" ? item.keyword : "",
+          frequency: typeof item.frequency === "number" ? Math.max(0, item.frequency) : 0,
+          matched: typeof item.matched === "boolean" ? item.matched : false,
+          category: typeof item.category === "string" ? item.category : "other",
+        }))
+        .filter((item: KeywordMatch) => item.keyword.length > 0)
+    : []
+
+  const missingKeywords: string[] = Array.isArray(parsed.missingKeywords)
+    ? parsed.missingKeywords.filter((kw: any) => typeof kw === "string" && kw.length > 0)
+    : []
+
+  const suggestions: string[] = Array.isArray(parsed.suggestions)
+    ? parsed.suggestions.filter((s: any) => typeof s === "string" && s.length > 0)
+    : []
+
+  // Calculate overall match percentage
+  const matchedKeywords = jobKeywords.filter((k) => k.matched).length
+  const matchPercentage =
+    jobKeywords.length > 0 ? Math.round((matchedKeywords / jobKeywords.length) * 100) : 0
+
+  return {
+    yourSkills,
+    jobKeywords,
+    matchPercentage,
+    missingKeywords,
+    suggestions,
+  }
 }
 
 
