@@ -28,7 +28,7 @@ const PDF_CONFIG = {
 const MAX_LINES_PER_PAGE = Math.floor((PDF_CONFIG.startY - PDF_CONFIG.margin) / PDF_CONFIG.lineHeight)
 
 function escapePdfText(text: string) {
-  return text.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)")
+  return text.replace(/\\/g, "\\\\").replace(/$$/g, "\\(").replace(/$$/g, "\\)")
 }
 
 function createPdfBlob(lines: string[]): Blob {
@@ -133,9 +133,7 @@ function createPdfBlob(lines: string[]): Blob {
     ])
   })
 
-  writeObject([
-    `${fontObjectNumber} 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n`,
-  ])
+  writeObject([`${fontObjectNumber} 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n`])
 
   const xrefStart = length
   pushString(`xref\n0 ${offsets.length}\n`)
@@ -225,15 +223,17 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
 
     // Calculate average match for skills found in job
     const matchedSkills = keywordAnalysis.yourSkills.filter((s) => s.foundInJob)
-    const avgMatch = matchedSkills.length > 0
-      ? Math.round(matchedSkills.reduce((sum, s) => sum + s.match, 0) / matchedSkills.length)
-      : 0
+    const avgMatch =
+      matchedSkills.length > 0
+        ? Math.round(matchedSkills.reduce((sum, s) => sum + s.match, 0) / matchedSkills.length)
+        : 0
 
     // Calculate keyword match percentage
     const matchedKeywords = keywordAnalysis.jobKeywords.filter((k) => k.matched).length
-    const keywordMatch = keywordAnalysis.jobKeywords.length > 0
-      ? Math.round((matchedKeywords / keywordAnalysis.jobKeywords.length) * 100)
-      : 0
+    const keywordMatch =
+      keywordAnalysis.jobKeywords.length > 0
+        ? Math.round((matchedKeywords / keywordAnalysis.jobKeywords.length) * 100)
+        : 0
 
     return [
       { label: "Technical", value: avgMatch },
@@ -372,39 +372,41 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
 
   return (
     <div className="space-y-6">
-      <div className="text-center space-y-4 mb-8 animate-fade-in-up">
+      <div className="text-center space-y-3 sm:space-y-4 mb-6 sm:mb-8 animate-fade-in-up">
         <div className="flex justify-center">
-          <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center animate-pulse-glow">
-            <CheckCircle2 className="w-12 h-12 text-success" />
+          <div className="w-16 sm:w-20 h-16 sm:h-20 bg-success/10 rounded-full flex items-center justify-center animate-pulse-glow">
+            <CheckCircle2 className="w-8 sm:w-12 h-8 sm:h-12 text-success" />
           </div>
         </div>
-        <h1 className="text-4xl font-bold text-foreground">Your Resume is Ready!</h1>
-        <p className="text-lg text-muted-foreground">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">Your Resume is Ready!</h1>
+        <p className="text-base sm:text-lg text-muted-foreground">
           {improvementsCount > 0
             ? `You've identified ${improvementsCount} key areas to improve. Time to apply!`
             : "Your resume analysis is complete. Time to apply!"}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
         {/* Match Score */}
         <div className="card-base hover:shadow-lg transition-all duration-300 animate-fade-in-up border-t-4 border-t-primary">
-          <h3 className="text-sm font-medium text-muted-foreground mb-2">Overall Match Score</h3>
-          <div className="flex items-end gap-4">
-            <div className="text-5xl font-bold text-primary">{matchPercentage}%</div>
+          <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Overall Match Score</h3>
+          <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-4">
+            <div className="text-3xl sm:text-5xl font-bold text-primary">{matchPercentage}%</div>
             {keywordAnalysis && matchPercentage > 0 && (
-              <div className="flex items-center gap-1 text-success mb-2">
-                <TrendingUp className="w-4 h-4" />
-                <span className="text-sm font-medium">
-                  {matchPercentage >= 80 ? "Excellent match" : matchPercentage >= 60 ? "Good match" : "Needs improvement"}
+              <div className="flex items-center gap-1 text-success">
+                <TrendingUp className="w-4 h-4 flex-shrink-0" />
+                <span className="text-xs sm:text-sm font-medium">
+                  {matchPercentage >= 80
+                    ? "Excellent match"
+                    : matchPercentage >= 60
+                      ? "Good match"
+                      : "Needs improvement"}
                 </span>
               </div>
             )}
           </div>
           {!keywordAnalysis && (
-            <p className="text-xs text-muted-foreground mt-2">
-              Complete keyword analysis to see your match score
-            </p>
+            <p className="text-xs text-muted-foreground mt-2">Complete keyword analysis to see your match score</p>
           )}
         </div>
 
@@ -413,17 +415,17 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
           className="card-base hover:shadow-lg transition-all duration-300 animate-fade-in-up border-t-4 border-t-secondary"
           style={{ animationDelay: "100ms" }}
         >
-          <h3 className="text-sm font-medium text-muted-foreground mb-4">Top Strengths</h3>
+          <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-4">Top Strengths</h3>
           <div className="space-y-2">
             {topStrengths.length > 0 ? (
               topStrengths.map((strength, i) => (
                 <div key={i} className="flex items-center gap-2">
                   <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />
-                  <span className="text-sm text-foreground">{strength}</span>
+                  <span className="text-xs sm:text-sm text-foreground">{strength}</span>
                 </div>
               ))
             ) : (
-              <p className="text-sm text-muted-foreground">Complete analysis to see your strengths</p>
+              <p className="text-xs sm:text-sm text-muted-foreground">Complete analysis to see your strengths</p>
             )}
           </div>
         </div>
@@ -433,13 +435,13 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
           className="card-base hover:shadow-lg transition-all duration-300 animate-fade-in-up border-t-4 border-t-accent"
           style={{ animationDelay: "200ms" }}
         >
-          <h3 className="text-sm font-medium text-muted-foreground mb-4">Skills Breakdown</h3>
+          <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-4">Skills Breakdown</h3>
           <div className="space-y-3">
             {skillsBreakdown.map((item, i) => (
               <div key={i}>
                 <div className="flex justify-between items-center mb-1">
-                  <span className="text-sm font-medium text-foreground">{item.label}</span>
-                  <span className="text-sm text-muted-foreground">{item.value}%</span>
+                  <span className="text-xs sm:text-sm font-medium text-foreground">{item.label}</span>
+                  <span className="text-xs sm:text-sm text-muted-foreground">{item.value}%</span>
                 </div>
                 <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
                   <div
@@ -457,10 +459,10 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
           className="card-base hover:shadow-lg transition-all duration-300 animate-fade-in-up border-t-4 border-t-primary"
           style={{ animationDelay: "300ms" }}
         >
-          <h3 className="text-sm font-medium text-muted-foreground mb-4">Next Steps</h3>
+          <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-4">Next Steps</h3>
           <div className="space-y-2">
             {nextSteps.map((step, i) => (
-              <div key={i} className="text-sm text-foreground">
+              <div key={i} className="text-xs sm:text-sm text-foreground">
                 {step}
               </div>
             ))}
@@ -468,31 +470,33 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
         </div>
       </div>
 
-      <div className="flex flex-col sm:flex-row gap-4 mt-8 animate-fade-in-up" style={{ animationDelay: "400ms" }}>
-        <button
-          onClick={handleDownloadPDF}
-          className="flex-1 btn-secondary flex items-center justify-center gap-2 hover:shadow-md transition-all"
-        >
-          <Download className="w-4 h-4" />
-          Download PDF
-        </button>
-        <button
-          onClick={handleShareReport}
-          className="flex-1 btn-secondary flex items-center justify-center gap-2 hover:shadow-md transition-all"
-        >
-          <Share2 className="w-4 h-4" />
-          Share Report
-        </button>
-        <button onClick={() => onNext()} className="flex-1 btn-primary flex items-center justify-center gap-2">
+      <div className="flex flex-col gap-3 mt-6 sm:mt-8 animate-fade-in-up" style={{ animationDelay: "400ms" }}>
+        <div className="flex flex-col sm:flex-row gap-3">
+          <button
+            onClick={handleDownloadPDF}
+            className="flex-1 btn-secondary flex items-center justify-center gap-2 hover:shadow-md transition-all text-sm"
+          >
+            <Download className="w-4 h-4" />
+            Download PDF
+          </button>
+          <button
+            onClick={handleShareReport}
+            className="flex-1 btn-secondary flex items-center justify-center gap-2 hover:shadow-md transition-all text-sm"
+          >
+            <Share2 className="w-4 h-4" />
+            Share Report
+          </button>
+        </div>
+        <button onClick={() => onNext()} className="w-full btn-primary flex items-center justify-center gap-2 text-sm">
           <Sparkles className="w-4 h-4" />
           View Job Recommendations
         </button>
       </div>
 
-      <div className="flex justify-between gap-4 mt-8">
-        <button onClick={onPrevious} className="btn-secondary flex items-center gap-2">
+      <div className="flex justify-between gap-3 mt-6 sm:mt-8">
+        <button onClick={onPrevious} className="btn-secondary flex items-center gap-2 text-sm flex-1 sm:flex-none">
           <ArrowLeft className="w-4 h-4" />
-          Previous
+          <span className="hidden sm:inline">Previous</span>
         </button>
       </div>
     </div>

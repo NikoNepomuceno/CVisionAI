@@ -16,8 +16,8 @@ export default function UploadPage({ onNext }: UploadPageProps) {
   const [isLoading, setIsLoading] = useState(false)
 
   const isValidFileType = (fileName: string): boolean => {
-    const validExtensions = ['.pdf', '.doc', '.docx']
-    const extension = fileName.toLowerCase().substring(fileName.lastIndexOf('.'))
+    const validExtensions = [".pdf", ".doc", ".docx"]
+    const extension = fileName.toLowerCase().substring(fileName.lastIndexOf("."))
     return validExtensions.includes(extension)
   }
 
@@ -103,8 +103,10 @@ export default function UploadPage({ onNext }: UploadPageProps) {
             <span className="text-sm font-medium text-primary">AI-Powered Analysis</span>
           </div>
         </div>
-        <h1 className="text-5xl sm:text-6xl font-bold text-foreground leading-tight">Enhance Your Resume with AI</h1>
-        <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
+        <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground leading-tight">
+          Enhance Your Resume with AI
+        </h1>
+        <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto">
           Upload your resume and get instant AI-powered insights to improve your chances of landing your dream job.
         </p>
       </div>
@@ -114,34 +116,37 @@ export default function UploadPage({ onNext }: UploadPageProps) {
           onDragOver={handleDragOver}
           onDragLeave={handleDragLeave}
           onDrop={handleDrop}
-          className={`relative border-2 border-dashed rounded-2xl p-12 text-center transition-all duration-300 ${isDragging
+          className={`relative border-2 border-dashed rounded-2xl p-6 sm:p-8 md:p-12 text-center transition-all duration-300 ${
+            isDragging
               ? "border-primary bg-primary/5 scale-105 shadow-lg shadow-primary/20"
               : "border-border hover:border-primary/50 hover:bg-accent/5"
-            }`}
+          }`}
         >
           <input type="file" accept=".pdf,.doc,.docx" onChange={handleFileSelect} className="hidden" id="file-input" />
           <label htmlFor="file-input" className="cursor-pointer block">
-            <div className="flex justify-center mb-4">
+            <div className="flex justify-center mb-3 sm:mb-4">
               {file ? (
                 <div className="relative">
-                  <CheckCircle2 className="w-16 h-16 text-primary animate-pulse" />
+                  <CheckCircle2 className="w-12 sm:w-16 h-12 sm:h-16 text-primary animate-pulse" />
                 </div>
               ) : (
                 <div className="relative">
-                  <Upload className="w-16 h-16 text-primary" />
+                  <Upload className="w-12 sm:w-16 h-12 sm:h-16 text-primary" />
                 </div>
               )}
             </div>
-            <h3 className="text-xl font-semibold text-foreground mb-2">
+            <h3 className="text-lg sm:text-xl font-semibold text-foreground mb-1 sm:mb-2">
               {file ? "File Selected" : "Drop your resume here"}
             </h3>
-            <p className="text-muted-foreground mb-4">{file ? file.name : "or click to browse (PDF, DOC, DOCX)"}</p>
-            {!file && <p className="text-sm text-muted-foreground">Max file size: 10MB</p>}
+            <p className="text-sm sm:text-base text-muted-foreground mb-2 sm:mb-4 break-words">
+              {file ? file.name : "or click to browse (PDF, DOC, DOCX)"}
+            </p>
+            {!file && <p className="text-xs sm:text-sm text-muted-foreground">Max file size: 10MB</p>}
           </label>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto mt-12">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-4xl mx-auto mt-8 sm:mt-12">
         {[
           { name: "Sarah Chen", role: "Product Manager", quote: "Improved my resume in 10 minutes!" },
           { name: "James Wilson", role: "Software Engineer", quote: "Got 3 interviews after using this." },
@@ -152,18 +157,18 @@ export default function UploadPage({ onNext }: UploadPageProps) {
             className="card-base text-center hover:shadow-lg transition-all duration-300 animate-fade-in-up border-t-4 border-t-secondary"
             style={{ animationDelay: `${i * 100}ms` }}
           >
-            <p className="text-muted-foreground mb-4 italic">"{testimonial.quote}"</p>
-            <p className="font-semibold text-foreground">{testimonial.name}</p>
-            <p className="text-sm text-muted-foreground">{testimonial.role}</p>
+            <p className="text-sm sm:text-base text-muted-foreground mb-4 italic">"{testimonial.quote}"</p>
+            <p className="font-semibold text-foreground text-sm sm:text-base">{testimonial.name}</p>
+            <p className="text-xs sm:text-sm text-muted-foreground">{testimonial.role}</p>
           </div>
         ))}
       </div>
 
-      <div className="flex justify-center mt-12">
+      <div className="flex justify-center mt-8 sm:mt-12">
         <button
           onClick={handleUpload}
           disabled={!file || isLoading}
-          className="btn-primary text-lg px-8 py-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 group"
+          className="btn-primary text-base sm:text-lg px-6 sm:px-8 py-2.5 sm:py-3 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 group"
         >
           {isLoading ? (
             <>

@@ -122,8 +122,8 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
   return (
     <div className="space-y-6">
       <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Recommended Jobs</h1>
-        <p className="text-muted-foreground">Based on your resume and skills</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Recommended Jobs</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">Based on your resume and skills</p>
       </div>
 
       {isLoading && (
@@ -149,7 +149,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
 
       {!isLoading && !error && (
         <>
-          <div className="flex gap-2 overflow-x-auto pb-2 animate-slide-in-right">
+          <div className="flex gap-2 overflow-x-auto pb-2 animate-slide-in-right -mx-3 sm:mx-0 px-3 sm:px-0">
             {[
               { label: "All", count: groupedJobs.all.length },
               { label: "Best Match", count: groupedJobs.bestMatch.length },
@@ -159,7 +159,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
               <button
                 key={filter.label}
                 onClick={() => setActiveFilter(filter.label === "All" ? "all" : filter.label)}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 ${
+                className={`px-3 sm:px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 text-xs sm:text-sm flex-shrink-0 ${
                   (activeFilter === "all" && filter.label === "All") ||
                   (activeFilter === filter.label && filter.label !== "All")
                     ? "bg-primary text-white shadow-lg shadow-primary/30"
@@ -172,7 +172,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
           </div>
 
           {filteredJobs.length > 0 ? (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
               {filteredJobs.map((job, i) => (
                 <div
                   key={job.id}
@@ -180,15 +180,15 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                   style={{ animationDelay: `${i * 50}ms` }}
                 >
                   <div className="mb-4">
-                    <h3 className="text-lg font-semibold text-foreground">{job.title}</h3>
-                    <p className="text-sm text-muted-foreground">{job.company}</p>
+                    <h3 className="text-base sm:text-lg font-semibold text-foreground">{job.title}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{job.company}</p>
                   </div>
 
                   {/* Match Score */}
                   <div className="mb-4 p-3 bg-primary/5 rounded-lg border-2 border-primary/10">
                     <div className="flex items-center justify-between">
-                      <span className="text-sm font-medium text-foreground">Match Score</span>
-                      <span className={`text-2xl font-bold ${getMatchColor(job.match)}`}>{job.match}%</span>
+                      <span className="text-xs sm:text-sm font-medium text-foreground">Match Score</span>
+                      <span className={`text-xl sm:text-2xl font-bold ${getMatchColor(job.match)}`}>{job.match}%</span>
                     </div>
                   </div>
 
@@ -196,7 +196,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                   <div className="mb-4">
                     <p className="text-xs font-medium text-muted-foreground mb-2">Matched Skills</p>
                     {job.skills.length > 0 ? (
-                      <div className="flex flex-wrap gap-2">
+                      <div className="flex flex-wrap gap-1.5 sm:gap-2">
                         {job.skills.map((skill, i) => (
                           <span
                             key={i}
@@ -212,20 +212,20 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                   </div>
 
                   {/* Location & Salary */}
-                  <div className="space-y-2 mb-4 pb-4 border-b border-border">
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="space-y-1.5 sm:space-y-2 mb-4 pb-4 border-b border-border">
+                    <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                       <MapPin className="w-4 h-4 flex-shrink-0" />
-                      {job.location}
+                      <span className="truncate">{job.location}</span>
                     </div>
                     {job.salary && (
-                      <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <div className="flex items-center gap-2 text-xs sm:text-sm text-muted-foreground">
                         <DollarSign className="w-4 h-4 flex-shrink-0" />
-                        {job.salary}
+                        <span className="truncate">{job.salary}</span>
                       </div>
                     )}
                     {job.type && (
                       <div className="flex items-center gap-2">
-                        <span className="text-xs bg-secondary/10 text-secondary px-2 py-1 rounded-full">
+                        <span className="text-xs bg-secondary/10 text-secondary px-2 py-1 rounded-full flex-shrink-0">
                           {job.type}
                         </span>
                       </div>
@@ -241,10 +241,11 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                           description: "This would open the job posting in a new tab.",
                         })
                       }}
-                      className="flex-1 btn-primary text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all"
+                      className="flex-1 btn-primary text-xs sm:text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all"
                     >
                       <ExternalLink className="w-4 h-4" />
-                      View Job
+                      <span className="hidden sm:inline">View Job</span>
+                      <span className="sm:hidden">View</span>
                     </button>
                     <button
                       onClick={() => {
@@ -267,18 +268,21 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
             <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground text-center py-8">
               <AlertCircle className="w-12 h-12 mx-auto mb-4 text-muted-foreground/50" />
               <p className="font-medium mb-2">No jobs found for this filter.</p>
-              <p className="text-sm">Try selecting a different filter or check back later.</p>
+              <p className="text-xs sm:text-sm">Try selecting a different filter or check back later.</p>
             </div>
           )}
         </>
       )}
 
-      <div className="flex justify-between gap-4 mt-8">
-        <button onClick={onPrevious} className="btn-secondary flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between mt-8">
+        <button
+          onClick={onPrevious}
+          className="btn-secondary flex items-center justify-center gap-2 order-2 sm:order-1"
+        >
           <ArrowLeft className="w-4 h-4" />
           Previous
         </button>
-        <button onClick={onReset} className="btn-primary flex items-center gap-2">
+        <button onClick={onReset} className="btn-primary flex items-center justify-center gap-2 order-1 sm:order-2">
           <Sparkles className="w-4 h-4" />
           Start Over
         </button>

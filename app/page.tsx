@@ -12,6 +12,7 @@ import KeywordPage from "@/components/pages/keyword-page"
 import ResultsPage from "@/components/pages/results-page"
 import RecommendationsPage from "@/components/pages/recommendations-page"
 import SettingsModal from "@/components/settings-modal"
+import LandingPage from "@/components/pages/landing-page"
 import type { ResumeAnalysis, KeywordAnalysis } from "@/lib/deepseek"
 
 type PageStep = "upload" | "extraction" | "analysis" | "feedback" | "keywords" | "results" | "recommendations"
@@ -64,6 +65,7 @@ const STEPS: { id: PageStep; label: string; icon: React.ReactNode }[] = [
 ]
 
 export default function Home() {
+  const [showLanding, setShowLanding] = useState(true)
   const [currentStep, setCurrentStep] = useState<PageStep>("upload")
   const [resumeData, setResumeData] = useState<ResumeData>({
     skills: [],
@@ -176,21 +178,21 @@ export default function Home() {
 
   if (!mounted) return null
 
+  if (showLanding) {
+    return <LandingPage onGetStarted={() => setShowLanding(false)} />
+  }
+
   return (
-    <div className="min-h-screen bg-gradient-to-br from-background via-background to-accent/10 dark:from-background dark:via-background dark:to-accent/5">
-      <header className="sticky top-0 z-40 bg-white/80 dark:bg-card/80 backdrop-blur-md border-b border-border shadow-sm">
+    <div className="min-h-screen">
+      <header className="sticky top-0 z-40 bg-background/95 dark:bg-background/95 backdrop-blur-md border-b border-border shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
-                <img
-                  src="/CVisionAI-Logo-Header.png"
-                  alt="CV Logo"
-                  className="w-8 h-8 object-contain"
-                />
+                <img src="/CVisionAI-Logo-Header.png" alt="CV Logo" className="w-8 h-8 object-contain" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-gray-900 dark:text-white">CVisionAI</h1>
+                <h1 className="text-2xl font-bold text-foreground">CVisionAI</h1>
                 <p className="text-xs text-muted-foreground">AI-Powered Resume Analysis</p>
               </div>
             </div>
@@ -214,15 +216,15 @@ export default function Home() {
             />
           </div>
 
-          <div className="flex items-center gap-1 mt-4 overflow-x-auto pb-2 scrollbar-hide">
+          <div className="flex items-center gap-0.5 sm:gap-1 mt-4 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
             {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center gap-1 flex-shrink-0">
+              <div key={step.id} className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
                 <button
                   onClick={() => handleJumpToStep(step.id)}
                   disabled={index > currentStepIndex}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${
+                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
                     step.id === currentStep
-                      ? "bg-primary text-white shadow-lg shadow-primary/30 scale-105"
+                      ? "bg-primary text-white shadow-lg shadow-primary/30 scale-100"
                       : index <= currentStepIndex
                         ? "bg-accent/30 text-primary hover:bg-accent/50 cursor-pointer dark:bg-accent/20 dark:text-accent"
                         : "bg-muted text-muted-foreground cursor-not-allowed opacity-50 dark:bg-muted"
@@ -232,7 +234,7 @@ export default function Home() {
                   <span className="hidden sm:inline">{step.label}</span>
                 </button>
                 {index < STEPS.length - 1 && (
-                  <ChevronRight className="w-4 h-4 text-border hidden sm:block flex-shrink-0 dark:text-border" />
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-border hidden sm:block flex-shrink-0 dark:text-border" />
                 )}
               </div>
             ))}
@@ -241,8 +243,8 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="animate-fade-in-up">
+      <main className="w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+        <div className="max-w-7xl mx-auto animate-fade-in-up">
           {currentStep === "upload" && <UploadPage onNext={handleNext} />}
           {currentStep === "extraction" && (
             <ExtractionPage resumeData={resumeData} onNext={handleNext} onPrevious={handlePrevious} />
