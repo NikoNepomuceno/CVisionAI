@@ -58,6 +58,7 @@ export type JobRecommendation = {
   location: string
   salary?: string
   description?: string
+  url?: string
   type?: "full-time" | "part-time" | "contract" | "remote" | "hybrid"
   category?: "best-match" | "trending" | "remote" | "other"
 }
@@ -419,6 +420,7 @@ function normalizeJobRecommendations(value: unknown): JobRecommendation[] {
         location: typeof job.location === "string" ? job.location : "Location not specified",
         salary: typeof job.salary === "string" ? job.salary : undefined,
         description: typeof job.description === "string" ? job.description : undefined,
+        url: typeof job.url === "string" ? job.url : undefined,
         type: typeof job.type === "string" ? (job.type as JobRecommendation["type"]) : undefined,
         category: typeof job.category === "string" ? (job.category as JobRecommendation["category"]) : "other",
       }

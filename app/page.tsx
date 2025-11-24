@@ -30,8 +30,57 @@ interface ResumeData extends ResumeSnapshot {
   file?: File
   analysis?: ResumeAnalysis
   keywordAnalysis?: KeywordAnalysis
+  keywordJobDescription?: string
   lastAnalyzed?: ResumeSnapshot
   lastAnalyzedKey?: string
+}
+
+function mergeResumeData(prev: ResumeData, data: Partial<ResumeData>): ResumeData {
+  if (!data || Object.keys(data).length === 0) {
+    return prev
+  }
+
+  const next: ResumeData = { ...prev, ...data }
+
+  const resumeFieldsChanged =
+    "skills" in data || "experience" in data || "education" in data || "summary" in data
+  const fileChanged = "file" in data
+
+  if ("analysis" in data) {
+    if (data.analysis) {
+      const { snapshot, key } = createSnapshot(getSnapshotSource(next))
+      next.analysis = data.analysis
+      next.lastAnalyzed = snapshot
+      next.lastAnalyzedKey = key
+    } else {
+      next.analysis = undefined
+      next.lastAnalyzed = undefined
+      next.lastAnalyzedKey = undefined
+    }
+  } else if (resumeFieldsChanged || fileChanged) {
+    next.analysis = undefined
+    next.lastAnalyzed = undefined
+    next.lastAnalyzedKey = undefined
+  }
+
+  if ("keywordAnalysis" in data) {
+    next.keywordAnalysis = data.keywordAnalysis ?? undefined
+  } else if (resumeFieldsChanged || fileChanged) {
+    next.keywordAnalysis = undefined
+  }
+
+  if ("keywordJobDescription" in data) {
+    next.keywordJobDescription = data.keywordJobDescription ?? ""
+  } else if (resumeFieldsChanged || fileChanged) {
+    next.keywordJobDescription = ""
+  }
+
+  if (fileChanged && !data.file) {
+    next.file = undefined
+  }
+
+  const changed = (Object.keys(next) as Array<keyof ResumeData>).some((key) => next[key] !== prev[key])
+  return changed ? next : prev
 }
 
 function createSnapshot(data: ResumeSnapshot): { snapshot: ResumeSnapshot; key: string } {
@@ -70,11 +119,14 @@ export default function Home() {
     experience: [],
     education: [],
     summary: "",
+    file: undefined,
     analysis: undefined,
     keywordAnalysis: undefined,
+    keywordJobDescription: "",
     lastAnalyzed: undefined,
     lastAnalyzedKey: undefined,
   })
+  const [furthestStepIndex, setFurthestStepIndex] = useState(0)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
 
@@ -83,35 +135,16 @@ export default function Home() {
   }, [])
 
   const currentStepIndex = STEPS.findIndex((s) => s.id === currentStep)
+  useEffect(() => {
+    setFurthestStepIndex((prev) => (currentStepIndex > prev ? currentStepIndex : prev))
+  }, [currentStepIndex])
+  const applyResumeUpdate = useCallback((data: Partial<ResumeData>) => {
+    setResumeData((prev) => mergeResumeData(prev, data))
+  }, [])
 
   const handleNext = (data?: Partial<ResumeData>) => {
     if (data) {
-      setResumeData((prev) => {
-        const next = { ...prev, ...data }
-        const snapshotSource = getSnapshotSource(next)
-        const snapshotKey = JSON.stringify(snapshotSource)
-
-        if ("analysis" in data) {
-          if (data.analysis) {
-            const { snapshot, key } = createSnapshot(snapshotSource)
-            next.analysis = data.analysis
-            next.lastAnalyzed = snapshot
-            next.lastAnalyzedKey = key
-          } else {
-            next.analysis = undefined
-            next.lastAnalyzed = undefined
-            next.lastAnalyzedKey = undefined
-          }
-        } else if ("skills" in data || "experience" in data || "education" in data || "summary" in data) {
-          if (!prev.lastAnalyzedKey || prev.lastAnalyzedKey !== snapshotKey) {
-            next.analysis = undefined
-            next.lastAnalyzed = undefined
-            next.lastAnalyzedKey = undefined
-          }
-        }
-
-        return next
-      })
+      applyResumeUpdate(data)
     }
     if (currentStepIndex < STEPS.length - 1) {
       setCurrentStep(STEPS[currentStepIndex + 1].id)
@@ -126,53 +159,53 @@ export default function Home() {
 
   const handleJumpToStep = (stepId: PageStep) => {
     const stepIndex = STEPS.findIndex((s) => s.id === stepId)
-    if (stepIndex <= currentStepIndex) {
+    if (stepIndex === -1) return
+    if (stepIndex <= furthestStepIndex) {
       setCurrentStep(stepId)
     }
   }
 
   const handleReset = () => {
     setCurrentStep("upload")
+    setFurthestStepIndex(0)
     setResumeData({
       skills: [],
       experience: [],
       education: [],
       summary: "",
+      file: undefined,
       analysis: undefined,
       keywordAnalysis: undefined,
+      keywordJobDescription: "",
       lastAnalyzed: undefined,
       lastAnalyzedKey: undefined,
     })
   }
 
   const handleAnalysisPersist = useCallback((analysis?: ResumeAnalysis) => {
-    setResumeData((prev) => {
-      if (!analysis) {
-        if (!prev.analysis) {
-          return prev
-        }
-        return {
-          ...prev,
-          analysis: undefined,
-          lastAnalyzed: undefined,
-          lastAnalyzedKey: undefined,
-        }
-      }
+    if (!analysis) {
+      applyResumeUpdate({ analysis: undefined })
+      return
+    }
 
-      const { snapshot, key } = createSnapshot(getSnapshotSource(prev))
+    applyResumeUpdate({ analysis })
+  }, [applyResumeUpdate])
 
-      if (prev.lastAnalyzedKey === key && JSON.stringify(prev.analysis) === JSON.stringify(analysis)) {
-        return prev
+  const handleKeywordPersist = useCallback(
+    (data: { keywordAnalysis?: KeywordAnalysis | null; keywordJobDescription?: string }) => {
+      const next: Partial<ResumeData> = {}
+      if ("keywordAnalysis" in data) {
+        next.keywordAnalysis = data.keywordAnalysis ?? undefined
       }
-
-      return {
-        ...prev,
-        analysis,
-        lastAnalyzed: snapshot,
-        lastAnalyzedKey: key,
+      if (typeof data.keywordJobDescription === "string") {
+        next.keywordJobDescription = data.keywordJobDescription
       }
-    })
-  }, [])
+      if (Object.keys(next).length > 0) {
+        applyResumeUpdate(next)
+      }
+    },
+    [applyResumeUpdate],
+  )
 
   if (!mounted) return null
 
@@ -219,13 +252,13 @@ export default function Home() {
               <div key={step.id} className="flex items-center gap-1 flex-shrink-0">
                 <button
                   onClick={() => handleJumpToStep(step.id)}
-                  disabled={index > currentStepIndex}
+                disabled={index > furthestStepIndex}
                   className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${
                     step.id === currentStep
-                      ? "bg-primary text-white shadow-lg shadow-primary/30 scale-105"
-                      : index <= currentStepIndex
-                        ? "bg-accent/30 text-primary hover:bg-accent/50 cursor-pointer dark:bg-accent/20 dark:text-accent"
-                        : "bg-muted text-muted-foreground cursor-not-allowed opacity-50 dark:bg-muted"
+                    ? "bg-primary text-white shadow-lg shadow-primary/30 scale-105"
+                    : index <= furthestStepIndex
+                      ? "bg-accent/30 text-primary hover:bg-accent/50 cursor-pointer dark:bg-accent/20 dark:text-accent"
+                      : "bg-muted text-muted-foreground cursor-not-allowed opacity-50 dark:bg-muted"
                   }`}
                 >
                   {step.icon}
@@ -243,7 +276,7 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="animate-fade-in-up">
-          {currentStep === "upload" && <UploadPage onNext={handleNext} />}
+          {currentStep === "upload" && <UploadPage onNext={handleNext} initialFile={resumeData.file} />}
           {currentStep === "extraction" && (
             <ExtractionPage resumeData={resumeData} onNext={handleNext} onPrevious={handlePrevious} />
           )}
@@ -259,7 +292,12 @@ export default function Home() {
             <FeedbackPage resumeData={resumeData} onNext={handleNext} onPrevious={handlePrevious} />
           )}
           {currentStep === "keywords" && (
-            <KeywordPage resumeData={resumeData} onNext={handleNext} onPrevious={handlePrevious} />
+            <KeywordPage
+              resumeData={resumeData}
+              onNext={handleNext}
+              onPrevious={handlePrevious}
+              onPersist={handleKeywordPersist}
+            />
           )}
           {currentStep === "results" && (
             <ResultsPage resumeData={resumeData} onNext={handleNext} onPrevious={handlePrevious} />

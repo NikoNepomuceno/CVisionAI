@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Copy, Check, TrendingUp, ArrowRight, ArrowLeft, Loader2, Sparkles, AlertCircle } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import type { KeywordAnalysis } from "@/lib/deepseek"
@@ -11,16 +11,31 @@ interface KeywordPageProps {
     experience: Array<{ company: string; role: string; duration?: string; description?: string }>
     education: Array<{ school: string; degree: string; year?: string }>
     summary?: string
+    keywordAnalysis?: KeywordAnalysis
+    keywordJobDescription?: string
   }
   onNext: (data: any) => void
   onPrevious: () => void
+  onPersist: (data: { keywordAnalysis?: KeywordAnalysis | null; keywordJobDescription?: string }) => void
 }
 
-export default function KeywordPage({ resumeData, onNext, onPrevious }: KeywordPageProps) {
-  const [jobDescription, setJobDescription] = useState("")
+export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist }: KeywordPageProps) {
+  const [jobDescription, setJobDescription] = useState(resumeData.keywordJobDescription || "")
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysis, setAnalysis] = useState<KeywordAnalysis | null>(null)
+  const [analysis, setAnalysis] = useState<KeywordAnalysis | null>(resumeData.keywordAnalysis || null)
+
+  useEffect(() => {
+    setJobDescription(resumeData.keywordJobDescription || "")
+  }, [resumeData.keywordJobDescription])
+
+  useEffect(() => {
+    setAnalysis(resumeData.keywordAnalysis || null)
+  }, [resumeData.keywordAnalysis])
+
+  useEffect(() => {
+    onPersist({ keywordJobDescription: jobDescription })
+  }, [jobDescription, onPersist])
 
   const handleAnalyze = async () => {
     if (!jobDescription.trim() || jobDescription.trim().length < 10) {
@@ -50,6 +65,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious }: KeywordP
 
       const result = await response.json()
       setAnalysis(result.data)
+      onPersist({ keywordAnalysis: result.data, keywordJobDescription: jobDescription.trim() })
       toast({
         title: "Analysis complete",
         description: "Keyword matching analysis is ready.",
@@ -73,6 +89,11 @@ export default function KeywordPage({ resumeData, onNext, onPrevious }: KeywordP
       title: "Copied!",
       description: "Keyword copied to clipboard.",
     })
+  }
+
+  const handleProceed = () => {
+    if (!analysis) return
+    onNext({ keywordAnalysis: analysis, keywordJobDescription: jobDescription.trim() })
   }
 
   // Use real data if analysis exists, otherwise show placeholder with actual resume skills
@@ -247,7 +268,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious }: KeywordP
           Previous
         </button>
         <button
-          onClick={() => onNext({ keywordAnalysis: analysis })}
+          onClick={handleProceed}
           disabled={!analysis}
           className="btn-primary flex items-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
         >

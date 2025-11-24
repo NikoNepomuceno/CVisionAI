@@ -2,18 +2,23 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Upload, CheckCircle2, Sparkles, ArrowRight } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
 interface UploadPageProps {
   onNext: (data: any) => void
+  initialFile?: File | null
 }
 
-export default function UploadPage({ onNext }: UploadPageProps) {
+export default function UploadPage({ onNext, initialFile = null }: UploadPageProps) {
   const [isDragging, setIsDragging] = useState(false)
-  const [file, setFile] = useState<File | null>(null)
+  const [file, setFile] = useState<File | null>(initialFile)
   const [isLoading, setIsLoading] = useState(false)
+
+  useEffect(() => {
+    setFile(initialFile)
+  }, [initialFile])
 
   const isValidFileType = (fileName: string): boolean => {
     const validExtensions = ['.pdf', '.doc', '.docx']

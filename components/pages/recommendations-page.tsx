@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useMemo } from "react"
 import { ExternalLink, Share2, MapPin, DollarSign, Sparkles, ArrowLeft, Loader2, AlertCircle } from "lucide-react"
+import { JobDetailsDialog } from "@/components/jobs/job-details-dialog"
 import type { JobRecommendation } from "@/lib/deepseek"
 import { toast } from "@/hooks/use-toast"
 
@@ -23,6 +24,8 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
   const [isLoading, setIsLoading] = useState<boolean>(true)
   const [error, setError] = useState<string | null>(null)
   const [fetchVersion, setFetchVersion] = useState(0)
+  const [selectedJob, setSelectedJob] = useState<JobRecommendation | null>(null)
+  const [isJobDialogOpen, setIsJobDialogOpen] = useState(false)
 
   const payload = useMemo(
     () => ({
@@ -119,9 +122,19 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
     setFetchVersion((version) => version + 1)
   }
 
+  const handleViewJob = (job: JobRecommendation) => {
+    if (job.url) {
+      window.open(job.url, "_blank", "noopener,noreferrer")
+      return
+    }
+    setSelectedJob(job)
+    setIsJobDialogOpen(true)
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="mb-8 animate-fade-in-up">
+    <>
+      <div className="space-y-6">
+        <div className="mb-8 animate-fade-in-up">
         <h1 className="text-3xl font-bold text-foreground mb-2">Recommended Jobs</h1>
         <p className="text-muted-foreground">Based on your resume and skills</p>
       </div>
@@ -235,12 +248,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                   {/* Action Buttons */}
                   <div className="flex gap-2">
                     <button
-                      onClick={() => {
-                        toast({
-                          title: "Job link",
-                          description: "This would open the job posting in a new tab.",
-                        })
-                      }}
+                      onClick={() => handleViewJob(job)}
                       className="flex-1 btn-primary text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all"
                     >
                       <ExternalLink className="w-4 h-4" />
@@ -284,5 +292,16 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
         </button>
       </div>
     </div>
+      <JobDetailsDialog
+        job={selectedJob}
+        open={isJobDialogOpen}
+        onOpenChange={(open) => {
+          setIsJobDialogOpen(open)
+          if (!open) {
+            setSelectedJob(null)
+          }
+        }}
+      />
+    </>
   )
 }
