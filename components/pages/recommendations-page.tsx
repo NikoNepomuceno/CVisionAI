@@ -132,19 +132,12 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
   }
 
   return (
-<<<<<<< HEAD
     <>
       <div className="space-y-6">
         <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Recommended Jobs</h1>
-        <p className="text-muted-foreground">Based on your resume and skills</p>
-=======
-    <div className="space-y-6">
-      <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Recommended Jobs</h1>
-        <p className="text-sm sm:text-base text-muted-foreground">Based on your resume and skills</p>
->>>>>>> UIStructure
-      </div>
+          <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Recommended Jobs</h1>
+          <p className="text-sm sm:text-base text-muted-foreground">Based on your resume and skills</p>
+        </div>
 
       {isLoading && (
         <div className="card-base animate-fade-in-up border border-dashed border-primary/40 bg-primary/5 flex items-center gap-3 py-6 px-4">
@@ -255,18 +248,8 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                   {/* Action Buttons */}
                   <div className="flex gap-2">
                     <button
-<<<<<<< HEAD
                       onClick={() => handleViewJob(job)}
-                      className="flex-1 btn-primary text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all"
-=======
-                      onClick={() => {
-                        toast({
-                          title: "Job link",
-                          description: "This would open the job posting in a new tab.",
-                        })
-                      }}
                       className="flex-1 btn-primary text-xs sm:text-sm flex items-center justify-center gap-2 hover:shadow-lg transition-all"
->>>>>>> UIStructure
                     >
                       <ExternalLink className="w-4 h-4" />
                       <span className="hidden sm:inline">View Job</span>
