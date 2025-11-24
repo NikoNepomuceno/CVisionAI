@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState } from "react"
 import type { JSX } from "react"
-import { Zap, TrendingUp, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Loader2, Download, LayoutGrid, BarChart3 } from "lucide-react"
+import { Zap, TrendingUp, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Loader2, Download, LayoutGrid, BarChart3, Sparkles, Target, AlertTriangle, Lightbulb } from "lucide-react"
 import type { ResumeAnalysis, AnalysisInsight } from "@/lib/deepseek"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Cell } from "recharts"
@@ -44,7 +44,7 @@ const SECTION_CONFIG: Array<{
     iconWrapperClass: "bg-success/10 text-success",
     metricClass: "text-success",
     icon: <CheckCircle2 className="w-5 h-5" />,
-    empty: "We couldn’t spot clear strengths yet. Try highlighting your impact and core expertise.",
+    empty: "We couldn't spot clear strengths yet. Try highlighting your impact and core expertise.",
   },
   {
     key: "weaknesses",
@@ -54,7 +54,7 @@ const SECTION_CONFIG: Array<{
     iconWrapperClass: "bg-error/10 text-error",
     metricClass: "text-error",
     icon: <AlertCircle className="w-5 h-5" />,
-    empty: "No obvious gaps detected. Double-check that your resume addresses the target role’s requirements.",
+    empty: "No obvious gaps detected. Double-check that your resume addresses the target role's requirements.",
   },
   {
     key: "improvements",
@@ -64,194 +64,11 @@ const SECTION_CONFIG: Array<{
     iconWrapperClass: "bg-secondary/10 text-secondary",
     metricClass: "text-secondary",
     icon: <TrendingUp className="w-5 h-5" />,
-    empty: "You’re in good shape! Consider tailoring your resume to specific job descriptions for finer adjustments.",
+    empty: "You're in good shape! Consider tailoring your resume to specific job descriptions for finer adjustments.",
   },
 ]
 
-const PDF_CONFIG = {
-  width: 612, // 8.5in
-  height: 792, // 11in
-  margin: 64,
-  lineHeight: 16,
-  startY: 728,
-}
-const MAX_LINES_PER_PAGE = Math.floor((PDF_CONFIG.startY - PDF_CONFIG.margin) / PDF_CONFIG.lineHeight)
-
-function escapePdfText(text: string) {
-  return text.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)")
-}
-
-function createPdfBlob(lines: string[]): Blob {
-  const normalizedLines = lines.map((line) => line.replace(/\r/g, ""))
-
-  type PdfPage = { commands: string[]; lineCount: number }
-  const startPage = (): PdfPage => ({
-    commands: [
-      "BT",
-      "/F1 12 Tf",
-      `${PDF_CONFIG.lineHeight} TL`,
-      `1 0 0 1 ${PDF_CONFIG.margin} ${PDF_CONFIG.startY} Tm`,
-    ],
-    lineCount: 0,
-  })
-
-  const pages: PdfPage[] = [startPage()]
-  const addLineToPage = (line: string) => {
-    let current = pages[pages.length - 1]
-    if (current.lineCount >= MAX_LINES_PER_PAGE) {
-      current.commands.push("ET")
-      current = startPage()
-      pages.push(current)
-    }
-
-    const safeLine = escapePdfText(line || " ")
-    if (current.lineCount === 0) {
-      current.commands.push(`(${safeLine}) Tj`)
-    } else {
-      current.commands.push("T*")
-      current.commands.push(`(${safeLine}) Tj`)
-    }
-    current.lineCount += 1
-  }
-
-  normalizedLines.forEach((line) => {
-    addLineToPage(line)
-  })
-  pages[pages.length - 1].commands.push("ET")
-
-  const textEncoder = new TextEncoder()
-
-  type Chunk = Uint8Array
-  const chunks: Chunk[] = []
-  let length = 0
-
-  const pushString = (value: string) => {
-    const bytes = textEncoder.encode(value)
-    chunks.push(bytes)
-    length += bytes.length
-  }
-
-  const pushBytes = (bytes: Uint8Array) => {
-    chunks.push(bytes)
-    length += bytes.length
-  }
-
-  const offsets: number[] = [0]
-
-  pushString("%PDF-1.4\n")
-
-  const writeObject = (body: Array<string | Uint8Array>) => {
-    offsets.push(length)
-    body.forEach((part) => {
-      if (typeof part === "string") {
-        pushString(part)
-      } else {
-        pushBytes(part)
-      }
-    })
-  }
-
-  const pageCount = pages.length
-  const pageObjectNumbers: number[] = []
-  const contentObjectNumbers: number[] = []
-  let nextObjNumber = 3
-  for (let i = 0; i < pageCount; i++) {
-    pageObjectNumbers.push(nextObjNumber)
-    contentObjectNumbers.push(nextObjNumber + 1)
-    nextObjNumber += 2
-  }
-  const fontObjectNumber = nextObjNumber
-
-  writeObject(["1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"])
-
-  const kids = pageObjectNumbers.map((num) => `${num} 0 R`).join(" ")
-  writeObject([`2 0 obj\n<< /Type /Pages /Kids [${kids}] /Count ${pageCount} >>\nendobj\n`])
-
-  pages.forEach((page, index) => {
-    const contentBytes = textEncoder.encode(page.commands.join("\n"))
-    const contentNumber = contentObjectNumbers[index]
-    const pageNumber = pageObjectNumbers[index]
-
-    writeObject([
-      `${pageNumber} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PDF_CONFIG.width} ${PDF_CONFIG.height}] /Contents ${contentNumber} 0 R /Resources << /Font << /F1 ${fontObjectNumber} 0 R >> >> >>\nendobj\n`,
-    ])
-
-    writeObject([
-      `${contentNumber} 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`,
-      contentBytes,
-      "\nendstream\nendobj\n",
-    ])
-  })
-
-  writeObject([
-    `${fontObjectNumber} 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n`,
-  ])
-
-  const xrefStart = length
-  pushString(`xref\n0 ${offsets.length}\n`)
-  pushString("0000000000 65535 f \n")
-  for (let i = 1; i < offsets.length; i++) {
-    pushString(`${offsets[i].toString().padStart(10, "0")} 00000 n \n`)
-  }
-  pushString(`trailer\n<< /Size ${offsets.length} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`)
-
-  const pdfBuffer = new Uint8Array(length)
-  let cursor = 0
-  for (const chunk of chunks) {
-    pdfBuffer.set(chunk, cursor)
-    cursor += chunk.length
-  }
-
-  return new Blob([pdfBuffer], { type: "application/pdf" })
-}
-
-function wrapTextLines(lines: string[], maxWidth = 90): string[] {
-  const result: string[] = []
-
-  lines.forEach((line) => {
-    if (!line) {
-      result.push("")
-      return
-    }
-
-    const words = line.split(/\s+/).filter(Boolean)
-    let current = ""
-
-    words.forEach((word) => {
-      if (word.length > maxWidth) {
-        if (current) {
-          result.push(current)
-          current = ""
-        }
-        for (let i = 0; i < word.length; i += maxWidth) {
-          const chunk = word.slice(i, i + maxWidth)
-          if (chunk.length === maxWidth) {
-            result.push(chunk)
-          } else {
-            current = chunk
-          }
-        }
-        return
-      }
-
-      const candidate = current ? `${current} ${word}` : word
-      if (candidate.length > maxWidth) {
-        if (current) {
-          result.push(current)
-        }
-        current = word
-      } else {
-        current = candidate
-      }
-    })
-
-    if (current) {
-      result.push(current)
-    }
-  })
-
-  return result
-}
+// ... (keep all your existing PDF functions: createPdfBlob, escapePdfText, wrapTextLines)
 
 export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysisPersist }: AnalysisPageProps) {
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(resumeData.analysis ?? null)
@@ -476,27 +293,27 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
     return insights.map((insight, index) => (
       <div
         key={`${borderLeftClass}-${index}`}
-        className={`card-base border-l-4 hover:shadow-lg transition-all duration-300 animate-fade-in-up ${borderLeftClass}`}
+        className={`card-base border-l-4 hover:shadow-lg transition-all duration-300 animate-fade-in-up group hover:scale-[1.02] ${borderLeftClass}`}
         style={{ animationDelay: `${index * 100}ms` }}
       >
         <div className="flex gap-4">
-          <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${iconWrapperClass}`}>
+          <div className={`flex-shrink-0 w-12 h-12 rounded-xl flex items-center justify-center ${iconWrapperClass} group-hover:scale-110 transition-transform duration-300`}>
             {icon}
           </div>
-          <div className="flex-1">
-            <div className="flex items-start justify-between mb-1">
-              <h3 className="font-semibold text-foreground">{insight.title}</h3>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-start justify-between mb-2 gap-3">
+              <h3 className="font-semibold text-foreground text-base leading-tight">{insight.title}</h3>
               {typeof insight.confidence === "number" && (
-                <span className="text-xs font-medium text-muted-foreground bg-muted px-2 py-1 rounded">
+                <span className="text-xs font-medium text-muted-foreground bg-muted px-3 py-1.5 rounded-full whitespace-nowrap flex-shrink-0">
                   {insight.confidence}% confidence
                 </span>
               )}
             </div>
-            <p className="text-sm text-muted-foreground">{insight.description}</p>
+            <p className="text-sm text-muted-foreground leading-relaxed mb-3">{insight.description}</p>
             {insight.tags && insight.tags.length > 0 && (
-              <div className="flex flex-wrap gap-2 mt-3">
+              <div className="flex flex-wrap gap-2">
                 {insight.tags.map((tag, i) => (
-                  <span key={i} className="text-xs font-medium bg-muted px-2 py-1 rounded-full text-muted-foreground">
+                  <span key={i} className="text-xs font-medium bg-muted px-2.5 py-1 rounded-full text-muted-foreground border border-border">
                     {tag}
                   </span>
                 ))}
@@ -509,112 +326,145 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
   }
 
   return (
-    <div className="space-y-6">
-      <div className="mb-8 animate-fade-in-up">
-        <div className="flex items-center justify-between mb-2">
-          <div>
-            <h1 className="text-3xl font-bold text-foreground mb-2">AI Analysis & Insights</h1>
-            <p className="text-muted-foreground">We analyzed your resume to surface strengths, gaps, and next steps.</p>
-          </div>
+    <div className="space-y-6 max-w-6xl mx-auto">
+      {/* Enhanced Header */}
+      <div className="mb-8 text-center animate-fade-in-up">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20 mb-4">
+          <Sparkles className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium text-primary">AI-Powered Analysis</span>
         </div>
-        <div className="mt-4 flex items-center gap-3">
-          <div className="flex items-center gap-2 bg-muted rounded-lg p-1">
+        <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">AI Analysis & Insights</h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          We analyzed your resume to surface strengths, gaps, and actionable next steps.
+        </p>
+      </div>
+
+      {/* View Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-6 animate-fade-in-up">
+        <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 bg-muted rounded-lg p-1 border border-border">
             <button
               onClick={() => setViewMode("cards")}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                 viewMode === "cards"
                   ? "bg-primary text-white shadow-md"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <LayoutGrid className="w-4 h-4" />
-              Cards
+              Cards View
             </button>
             <button
               onClick={() => setViewMode("graph")}
-              className={`px-3 py-1.5 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
+              className={`px-4 py-2 rounded-md text-sm font-medium transition-all duration-200 flex items-center gap-2 ${
                 viewMode === "graph"
                   ? "bg-primary text-white shadow-md"
                   : "text-muted-foreground hover:text-foreground"
               }`}
             >
               <BarChart3 className="w-4 h-4" />
-              Graph
+              Graph View
             </button>
           </div>
-          <button
-            onClick={handleDownloadSummary}
-            disabled={!analysis || isLoading}
-            className="btn-secondary flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
-          >
-            <Download className="w-4 h-4" />
-            Download Summary
-          </button>
         </div>
+        <button
+          onClick={handleDownloadSummary}
+          disabled={!analysis || isLoading}
+          className="btn-secondary flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 transition-transform"
+        >
+          <Download className="w-4 h-4" />
+          Download Summary
+        </button>
       </div>
 
+      {/* Loading State */}
       {isLoading && (
-        <div className="card-base animate-fade-in-up border border-dashed border-primary/40 bg-primary/5 flex items-center gap-3 py-6 px-4">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-          <div>
-            <p className="font-medium text-foreground">Generating insights…</p>
-            <p className="text-sm text-muted-foreground">We’re reviewing your skills, experience, and summary.</p>
+        <div className="card-base animate-fade-in-up border border-dashed border-primary/40 bg-primary/5 flex items-center gap-4 py-8 px-6 rounded-xl">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <div className="flex-1">
+            <p className="font-semibold text-foreground text-lg mb-1">Generating AI Insights...</p>
+            <p className="text-sm text-muted-foreground">We're analyzing your skills, experience, and qualifications to provide personalized recommendations.</p>
           </div>
         </div>
       )}
 
+      {/* Error State */}
       {!isLoading && error && (
-        <div className="card-base animate-fade-in-up border border-error/40 bg-error/5 text-error">
-          <p className="font-semibold mb-2">We couldn’t analyze your resume.</p>
-          <p className="text-sm text-error/80 mb-4">{error}</p>
-          <button onClick={handleRetry} className="btn-secondary text-sm flex items-center gap-2">
+        <div className="card-base animate-fade-in-up border-l-4 border-l-error bg-error/5 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <AlertTriangle className="w-6 h-6 text-error" />
+            <h3 className="font-semibold text-foreground text-lg">Analysis Failed</h3>
+          </div>
+          <p className="text-error/80 mb-4">{error}</p>
+          <button onClick={handleRetry} className="btn-secondary flex items-center gap-2 hover:scale-105 transition-transform">
             <Zap className="w-4 h-4" />
             Try Again
           </button>
         </div>
       )}
 
+      {/* Analysis Content */}
       {!isLoading && !error && analysis && (
-        <div className="space-y-4">
+        <div className="space-y-6">
+          {/* Summary Section */}
           {analysis.summary && (
-            <div className="card-base animate-fade-in-up border-t-4 border-t-primary bg-primary/5">
-              <h2 className="text-lg font-semibold text-foreground mb-2">Summary</h2>
-              <p className="text-sm text-muted-foreground leading-relaxed">{analysis.summary}</p>
+            <div className="card-base animate-fade-in-up border-t-4 border-t-primary bg-primary/5 rounded-xl p-6 hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center gap-3 mb-4">
+                <Target className="w-6 h-6 text-primary" />
+                <h2 className="text-xl font-bold text-foreground">Executive Summary</h2>
+              </div>
+              <p className="text-muted-foreground leading-relaxed text-base">{analysis.summary}</p>
             </div>
           )}
 
+          {/* Cards View */}
           {viewMode === "cards" && (
-            <>
+            <div className="grid gap-6">
               {SECTION_CONFIG.map(({ key, title, borderLeftClass, topBorderClass, iconWrapperClass, metricClass, icon, empty }) => {
                 const insights = analysis[key] || []
                 return (
                   <div
                     key={key}
-                    className={`card-base animate-fade-in-up border-t-4 ${topBorderClass}`}
+                    className={`card-base animate-fade-in-up border-t-4 rounded-xl p-6 hover:shadow-lg transition-all duration-300 ${topBorderClass}`}
                     style={{ animationDelay: "150ms" }}
                   >
-                    <div className="flex items-center justify-between mb-4">
-                      <h2 className="text-lg font-semibold text-foreground">{title}</h2>
-                      <span className={`inline-flex items-center gap-1 text-sm ${metricClass}`}>
-                        {icon}
+                    <div className="flex items-center justify-between mb-6">
+                      <div className="flex items-center gap-3">
+                        <div className={`w-10 h-10 rounded-xl flex items-center justify-center ${iconWrapperClass}`}>
+                          {icon}
+                        </div>
+                        <div>
+                          <h2 className="text-xl font-bold text-foreground">{title}</h2>
+                          <p className="text-sm text-muted-foreground">{insights.length} insights found</p>
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center gap-1 text-sm font-medium ${metricClass} bg-muted px-3 py-1.5 rounded-full`}>
                         {insights.length} items
                       </span>
                     </div>
 
                     {insights.length > 0 ? (
-                      <div className="space-y-3">{renderInsights(insights, borderLeftClass, iconWrapperClass, icon)}</div>
+                      <div className="space-y-4">{renderInsights(insights, borderLeftClass, iconWrapperClass, icon)}</div>
                     ) : (
-                      <p className="text-sm text-muted-foreground">{empty}</p>
+                      <div className="text-center py-8 text-muted-foreground">
+                        <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                        <p className="text-base">{empty}</p>
+                      </div>
                     )}
                   </div>
                 )
               })}
-            </>
+            </div>
           )}
 
+          {/* Graph View */}
           {viewMode === "graph" && chartData.length > 0 && (
-            <div className="card-base animate-fade-in-up border-t-4 border-t-primary">
-              <h2 className="text-lg font-semibold text-foreground mb-6">Analysis Overview</h2>
+            <div className="card-base animate-fade-in-up border-t-4 border-t-primary rounded-xl p-6 hover:shadow-lg transition-all duration-300">
+              <div className="flex items-center gap-3 mb-6">
+                <BarChart3 className="w-6 h-6 text-primary" />
+                <h2 className="text-xl font-bold text-foreground">Analysis Overview</h2>
+              </div>
+              
               <ChartContainer
                 config={{
                   strengthsCount: {
@@ -702,22 +552,29 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                   </Bar>
                 </BarChart>
               </ChartContainer>
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-3 gap-4">
+              
+              <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                 {chartData.map((item) => (
                   <div
                     key={item.category}
-                    className="p-4 rounded-lg border border-border bg-muted/30"
+                    className="p-4 rounded-xl border border-border bg-muted/30 hover:shadow-md transition-all duration-300"
                   >
-                    <div className="flex items-center gap-2 mb-2">
+                    <div className="flex items-center gap-3 mb-3">
                       <div
-                        className="w-3 h-3 rounded-full"
+                        className="w-4 h-4 rounded-full"
                         style={{ backgroundColor: item.color }}
                       />
-                      <h3 className="font-semibold text-foreground text-sm">{item.category}</h3>
+                      <h3 className="font-semibold text-foreground">{item.category}</h3>
                     </div>
-                    <div className="space-y-1 text-xs text-muted-foreground">
-                      <p>Count: <span className="text-foreground font-medium">{item.count}</span></p>
-                      <p>Avg Confidence: <span className="text-foreground font-medium">{item.avgConfidence}%</span></p>
+                    <div className="space-y-2 text-sm">
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Insight Count:</span>
+                        <span className="font-semibold text-foreground">{item.count}</span>
+                      </div>
+                      <div className="flex justify-between items-center">
+                        <span className="text-muted-foreground">Avg Confidence:</span>
+                        <span className="font-semibold text-foreground">{item.avgConfidence}%</span>
+                      </div>
                     </div>
                   </div>
                 ))}
@@ -726,32 +583,39 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
           )}
 
           {viewMode === "graph" && chartData.length === 0 && (
-            <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground">
-              <p className="font-medium mb-2">No data available for graph view.</p>
-              <p className="text-sm">Switch to cards view to see detailed insights.</p>
+            <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground rounded-xl p-8 text-center">
+              <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
+              <p className="font-medium text-lg mb-2">No data available for graph view</p>
+              <p className="text-sm">Switch to cards view to see detailed insights and recommendations.</p>
             </div>
           )}
         </div>
       )}
 
+      {/* No Analysis State */}
       {!isLoading && !error && !analysis && (
-        <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground">
-          <p className="font-medium mb-2">No insights available yet.</p>
+        <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground rounded-xl p-8 text-center">
+          <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <p className="font-medium text-lg mb-2">No insights available yet</p>
           <p className="text-sm">
-            We need more details in your resume to generate meaningful analysis. Try expanding your experience or skills.
+            We need more details in your resume to generate meaningful analysis. Try expanding your experience or skills sections.
           </p>
         </div>
       )}
 
-      <div className="flex justify-between gap-4 mt-8">
-        <button onClick={onPrevious} className="btn-secondary flex items-center gap-2">
+      {/* Enhanced Navigation */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between mt-8 pt-6 border-t border-border">
+        <button 
+          onClick={onPrevious} 
+          className="btn-secondary flex items-center justify-center gap-2 order-2 sm:order-1 hover:scale-105 transition-transform"
+        >
           <ArrowLeft className="w-4 h-4" />
-          Previous
+          Back to Extraction
         </button>
         <button
           onClick={handleContinue}
           disabled={isLoading || (!!error && !analysis)}
-          className="btn-primary flex items-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
+          className="btn-primary flex items-center justify-center gap-2 order-1 sm:order-2 hover:scale-105 transition-transform disabled:opacity-60 disabled:cursor-not-allowed"
         >
           View Detailed Feedback
           <ArrowRight className="w-4 h-4" />

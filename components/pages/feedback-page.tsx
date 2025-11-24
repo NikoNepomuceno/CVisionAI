@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { Copy, Check, ArrowRight, ArrowLeft, Download, Loader2, Zap, Eye } from "lucide-react"
+import { Copy, Check, ArrowRight, ArrowLeft, Download, Loader2, Zap, Eye, Sparkles, Target, AlertTriangle, Lightbulb, Filter } from "lucide-react"
 import type { FeedbackItem } from "@/lib/deepseek"
 import FeedbackModal from "@/components/feedback-modal"
 
@@ -17,190 +17,7 @@ interface FeedbackPageProps {
   onPrevious: () => void
 }
 
-const PDF_CONFIG = {
-  width: 612,
-  height: 792,
-  margin: 64,
-  lineHeight: 16,
-  startY: 728,
-}
-const MAX_LINES_PER_PAGE = Math.floor((PDF_CONFIG.startY - PDF_CONFIG.margin) / PDF_CONFIG.lineHeight)
-
-function escapePdfText(text: string) {
-  return text.replace(/\\/g, "\\\\").replace(/\(/g, "\\(").replace(/\)/g, "\\)")
-}
-
-function createPdfBlob(lines: string[]): Blob {
-  const normalizedLines = lines.map((line) => line.replace(/\r/g, ""))
-
-  type PdfPage = { commands: string[]; lineCount: number }
-  const startPage = (): PdfPage => ({
-    commands: [
-      "BT",
-      "/F1 12 Tf",
-      `${PDF_CONFIG.lineHeight} TL`,
-      `1 0 0 1 ${PDF_CONFIG.margin} ${PDF_CONFIG.startY} Tm`,
-    ],
-    lineCount: 0,
-  })
-
-  const pages: PdfPage[] = [startPage()]
-  const addLineToPage = (line: string) => {
-    let current = pages[pages.length - 1]
-    if (current.lineCount >= MAX_LINES_PER_PAGE) {
-      current.commands.push("ET")
-      current = startPage()
-      pages.push(current)
-    }
-
-    const safeLine = escapePdfText(line || " ")
-    if (current.lineCount === 0) {
-      current.commands.push(`(${safeLine}) Tj`)
-    } else {
-      current.commands.push("T*")
-      current.commands.push(`(${safeLine}) Tj`)
-    }
-    current.lineCount += 1
-  }
-
-  normalizedLines.forEach((line) => {
-    addLineToPage(line)
-  })
-  pages[pages.length - 1].commands.push("ET")
-
-  const textEncoder = new TextEncoder()
-
-  type Chunk = Uint8Array
-  const chunks: Chunk[] = []
-  let length = 0
-
-  const pushString = (value: string) => {
-    const bytes = textEncoder.encode(value)
-    chunks.push(bytes)
-    length += bytes.length
-  }
-
-  const pushBytes = (bytes: Uint8Array) => {
-    chunks.push(bytes)
-    length += bytes.length
-  }
-
-  const offsets: number[] = [0]
-
-  pushString("%PDF-1.4\n")
-
-  const writeObject = (body: Array<string | Uint8Array>) => {
-    offsets.push(length)
-    body.forEach((part) => {
-      if (typeof part === "string") {
-        pushString(part)
-      } else {
-        pushBytes(part)
-      }
-    })
-  }
-
-  const pageCount = pages.length
-  const pageObjectNumbers: number[] = []
-  const contentObjectNumbers: number[] = []
-  let nextObjNumber = 3
-  for (let i = 0; i < pageCount; i++) {
-    pageObjectNumbers.push(nextObjNumber)
-    contentObjectNumbers.push(nextObjNumber + 1)
-    nextObjNumber += 2
-  }
-  const fontObjectNumber = nextObjNumber
-
-  writeObject(["1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"])
-
-  const kids = pageObjectNumbers.map((num) => `${num} 0 R`).join(" ")
-  writeObject([`2 0 obj\n<< /Type /Pages /Kids [${kids}] /Count ${pageCount} >>\nendobj\n`])
-
-  pages.forEach((page, index) => {
-    const contentBytes = textEncoder.encode(page.commands.join("\n"))
-    const contentNumber = contentObjectNumbers[index]
-    const pageNumber = pageObjectNumbers[index]
-
-    writeObject([
-      `${pageNumber} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PDF_CONFIG.width} ${PDF_CONFIG.height}] /Contents ${contentNumber} 0 R /Resources << /Font << /F1 ${fontObjectNumber} 0 R >> >> >>\nendobj\n`,
-    ])
-
-    writeObject([
-      `${contentNumber} 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`,
-      contentBytes,
-      "\nendstream\nendobj\n",
-    ])
-  })
-
-  writeObject([
-    `${fontObjectNumber} 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n`,
-  ])
-
-  const xrefStart = length
-  pushString(`xref\n0 ${offsets.length}\n`)
-  pushString("0000000000 65535 f \n")
-  for (let i = 1; i < offsets.length; i++) {
-    pushString(`${offsets[i].toString().padStart(10, "0")} 00000 n \n`)
-  }
-  pushString(`trailer\n<< /Size ${offsets.length} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`)
-
-  const pdfBuffer = new Uint8Array(length)
-  let cursor = 0
-  for (const chunk of chunks) {
-    pdfBuffer.set(chunk, cursor)
-    cursor += chunk.length
-  }
-
-  return new Blob([pdfBuffer], { type: "application/pdf" })
-}
-
-function wrapTextLines(lines: string[], maxWidth = 90): string[] {
-  const result: string[] = []
-
-  lines.forEach((line) => {
-    if (!line) {
-      result.push("")
-      return
-    }
-
-    const words = line.split(/\s+/).filter(Boolean)
-    let current = ""
-
-    words.forEach((word) => {
-      if (word.length > maxWidth) {
-        if (current) {
-          result.push(current)
-          current = ""
-        }
-        for (let i = 0; i < word.length; i += maxWidth) {
-          const chunk = word.slice(i, i + maxWidth)
-          if (chunk.length === maxWidth) {
-            result.push(chunk)
-          } else {
-            current = chunk
-          }
-        }
-        return
-      }
-
-      const candidate = current ? `${current} ${word}` : word
-      if (candidate.length > maxWidth) {
-        if (current) {
-          result.push(current)
-        }
-        current = word
-      } else {
-        current = candidate
-      }
-    })
-
-    if (current) {
-      result.push(current)
-    }
-  })
-
-  return result
-}
+// ... (keep all your existing PDF functions: createPdfBlob, escapePdfText, wrapTextLines)
 
 export default function FeedbackPage({ resumeData, onNext, onPrevious }: FeedbackPageProps) {
   const [feedbackItems, setFeedbackItems] = useState<FeedbackItem[]>([])
@@ -333,136 +150,200 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
     URL.revokeObjectURL(url)
   }
 
+  const getPriorityColor = (priority: string) => {
+    switch (priority) {
+      case "high":
+        return "bg-error/10 text-error border-error/20"
+      case "medium":
+        return "bg-secondary/10 text-secondary border-secondary/20"
+      case "low":
+        return "bg-primary/10 text-primary border-primary/20"
+      default:
+        return "bg-muted text-muted-foreground border-border"
+    }
+  }
+
   return (
-    <div className="space-y-6">
-      <div className="mb-8 animate-fade-in-up">
-        <div className="flex items-center justify-between mb-2">
-          <h1 className="text-3xl font-bold text-foreground">Feedback & Suggestions</h1>
-          <div className="flex gap-2">
-            <button
-              onClick={() => setIsModalOpen(true)}
-              className="btn-secondary flex items-center gap-2 text-sm"
-            >
-              <Eye className="w-4 h-4" />
-              View in Popup
-            </button>
-            <button
-              onClick={handleDownloadFeedback}
-              disabled={feedbackItems.length === 0 || isLoading}
-              className="btn-secondary flex items-center gap-2 text-sm disabled:opacity-60 disabled:cursor-not-allowed"
-            >
-              <Download className="w-4 h-4" />
-              Download
-            </button>
+    <div className="space-y-6 max-w-6xl mx-auto">
+      {/* Enhanced Header */}
+      <div className="mb-8 text-center animate-fade-in-up">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-primary/10 rounded-full border border-primary/20 mb-4">
+          <Sparkles className="w-4 h-4 text-primary" />
+          <span className="text-sm font-medium text-primary">Actionable Feedback</span>
+        </div>
+        <h1 className="text-3xl sm:text-4xl font-bold text-foreground mb-3">Feedback & Suggestions</h1>
+        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+          Personalized recommendations to enhance your resume and boost your job search success.
+        </p>
+      </div>
+
+      {/* Stats and Controls */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between items-start sm:items-center mb-6 animate-fade-in-up">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 bg-muted rounded-lg px-3 py-2 border border-border">
+            <Filter className="w-4 h-4 text-muted-foreground" />
+            <span className="text-sm font-medium text-foreground">{filtered.length} items</span>
           </div>
+          <div className="hidden sm:flex items-center gap-2">
+            <div className="w-2 h-2 bg-error rounded-full"></div>
+            <span className="text-xs text-muted-foreground">High Priority</span>
+            <div className="w-2 h-2 bg-secondary rounded-full"></div>
+            <span className="text-xs text-muted-foreground">Medium Priority</span>
+            <div className="w-2 h-2 bg-primary rounded-full"></div>
+            <span className="text-xs text-muted-foreground">Low Priority</span>
+          </div>
+        </div>
+        
+        <div className="flex gap-3">
+          <button
+            onClick={() => setIsModalOpen(true)}
+            className="btn-secondary flex items-center gap-2 hover:scale-105 transition-transform"
+            disabled={feedbackItems.length === 0}
+          >
+            <Eye className="w-4 h-4" />
+            Popup View
+          </button>
+          <button
+            onClick={handleDownloadFeedback}
+            disabled={feedbackItems.length === 0 || isLoading}
+            className="btn-primary flex items-center gap-2 hover:scale-105 transition-transform disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <Download className="w-4 h-4" />
+            Download PDF
+          </button>
         </div>
       </div>
 
+      {/* Loading State */}
       {isLoading && (
-        <div className="card-base animate-fade-in-up border border-dashed border-primary/40 bg-primary/5 flex items-center gap-3 py-6 px-4">
-          <Loader2 className="w-6 h-6 animate-spin text-primary" />
-          <div>
-            <p className="font-medium text-foreground">Generating feedback…</p>
-            <p className="text-sm text-muted-foreground">We're analyzing your resume to provide actionable suggestions.</p>
+        <div className="card-base animate-fade-in-up border border-dashed border-primary/40 bg-primary/5 rounded-xl p-8 flex items-center gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <div className="flex-1">
+            <p className="font-semibold text-foreground text-lg mb-1">Generating Feedback...</p>
+            <p className="text-sm text-muted-foreground">We're analyzing your resume to provide actionable suggestions and improvements.</p>
           </div>
         </div>
       )}
 
+      {/* Error State */}
       {!isLoading && error && (
-        <div className="card-base animate-fade-in-up border border-error/40 bg-error/5 text-error">
-          <p className="font-semibold mb-2">We couldn't generate feedback.</p>
-          <p className="text-sm text-error/80 mb-4">{error}</p>
-          <button onClick={handleRetry} className="btn-secondary text-sm flex items-center gap-2">
+        <div className="card-base animate-fade-in-up border-l-4 border-l-error bg-error/5 rounded-xl p-6">
+          <div className="flex items-center gap-3 mb-3">
+            <AlertTriangle className="w-6 h-6 text-error" />
+            <h3 className="font-semibold text-foreground text-lg">Feedback Generation Failed</h3>
+          </div>
+          <p className="text-error/80 mb-4">{error}</p>
+          <button onClick={handleRetry} className="btn-secondary flex items-center gap-2 hover:scale-105 transition-transform">
             <Zap className="w-4 h-4" />
             Try Again
           </button>
         </div>
       )}
 
+      {/* Filter Tabs */}
       {!isLoading && !error && feedbackItems.length > 0 && (
-        <>
-          <div className="flex gap-2 overflow-x-auto pb-2 animate-slide-in-right">
+        <div className="animate-fade-in-up">
+          <div className="flex gap-2 overflow-x-auto pb-4 scrollbar-hide">
             {categories.map((filter) => (
               <button
                 key={filter}
                 onClick={() => setActiveFilter(filter)}
-                className={`px-4 py-2 rounded-lg font-medium whitespace-nowrap transition-all duration-200 ${
+                className={`px-5 py-3 rounded-xl font-medium whitespace-nowrap transition-all duration-200 flex items-center gap-2 ${
                   activeFilter === filter
-                    ? "bg-primary text-white shadow-lg shadow-primary/30"
+                    ? "bg-primary text-white shadow-lg shadow-primary/30 scale-105"
                     : "bg-muted text-foreground hover:bg-border hover:shadow-md"
                 }`}
               >
-                {filter.charAt(0).toUpperCase() + filter.slice(1)}
+                {filter === "all" ? (
+                  <>
+                    <Target className="w-4 h-4" />
+                    All Feedback
+                  </>
+                ) : (
+                  filter.charAt(0).toUpperCase() + filter.slice(1)
+                )}
               </button>
             ))}
           </div>
 
-          <div className="space-y-3">
+          {/* Feedback Items */}
+          <div className="space-y-4 mt-4">
             {filtered.map((item, i) => (
               <div
                 key={item.id}
-                className={`card-base border-l-4 transition-all duration-300 animate-fade-in-up ${
-                  item.priority === "high" ? "border-l-error" : "border-l-secondary"
+                className={`card-base border-l-4 rounded-xl p-6 hover:shadow-lg transition-all duration-300 animate-fade-in-up group hover:scale-[1.02] ${
+                  item.priority === "high" 
+                    ? "border-l-error bg-error/5" 
+                    : item.priority === "medium"
+                    ? "border-l-secondary bg-secondary/5"
+                    : "border-l-primary bg-primary/5"
                 }`}
                 style={{ animationDelay: `${i * 50}ms` }}
               >
                 <div className="flex gap-4">
-                  <div className="flex-1">
-                    <div className="flex items-start justify-between mb-1">
-                      <div>
-                        <h3 className="font-semibold text-foreground">{item.title}</h3>
-                        <p className="text-xs text-muted-foreground mt-1">{item.category}</p>
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-start justify-between mb-3 gap-4">
+                      <div className="flex-1">
+                        <h3 className="font-bold text-foreground text-lg mb-2 leading-tight">{item.title}</h3>
+                        <div className="flex items-center gap-3">
+                          <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full border border-primary/20">
+                            {item.category}
+                          </span>
+                          <span className={`text-xs font-medium px-3 py-1.5 rounded-full border ${getPriorityColor(item.priority)}`}>
+                            {item.priority} priority
+                          </span>
+                        </div>
                       </div>
-                      <span
-                        className={`text-xs font-medium px-2 py-1 rounded ${
-                          item.priority === "high" ? "bg-error/10 text-error" : "bg-secondary/10 text-secondary"
-                        }`}
-                      >
-                        {item.priority}
-                      </span>
-                    </div>
-                    <p className="text-sm text-muted-foreground mt-2">{item.description}</p>
-                    <div className="flex gap-2 mt-3">
                       <button
                         onClick={() => handleCopy(item.id)}
-                        className="flex items-center gap-1 text-xs text-primary hover:opacity-70 transition-opacity"
+                        className="flex items-center gap-2 text-sm text-primary hover:text-primary/80 transition-colors bg-background/80 backdrop-blur-sm rounded-lg px-3 py-2 border border-border hover:border-primary/30 hover:scale-105 transition-transform"
                       >
                         {copiedId === item.id ? (
                           <>
-                            <Check className="w-3 h-3" />
-                            Copied
+                            <Check className="w-4 h-4" />
+                            Copied!
                           </>
                         ) : (
                           <>
-                            <Copy className="w-3 h-3" />
+                            <Copy className="w-4 h-4" />
                             Copy
                           </>
                         )}
                       </button>
                     </div>
+                    <p className="text-muted-foreground leading-relaxed text-base">{item.description}</p>
                   </div>
                 </div>
               </div>
             ))}
           </div>
-        </>
+        </div>
       )}
 
+      {/* Empty State */}
       {!isLoading && !error && feedbackItems.length === 0 && (
-        <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground">
-          <p className="font-medium mb-2">No feedback available yet.</p>
-          <p className="text-sm">
-            We need more details in your resume to generate meaningful feedback. Try expanding your experience or skills.
+        <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground rounded-xl p-8 text-center">
+          <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
+          <p className="font-medium text-lg mb-2">No feedback available yet</p>
+          <p className="text-sm max-w-md mx-auto">
+            We need more details in your resume to generate meaningful feedback. Try expanding your experience or skills sections.
           </p>
         </div>
       )}
 
-      <div className="flex justify-between gap-4 mt-8">
-        <button onClick={onPrevious} className="btn-secondary flex items-center gap-2">
+      {/* Enhanced Navigation */}
+      <div className="flex flex-col sm:flex-row gap-4 justify-between mt-8 pt-6 border-t border-border">
+        <button 
+          onClick={onPrevious} 
+          className="btn-secondary flex items-center justify-center gap-2 order-2 sm:order-1 hover:scale-105 transition-transform"
+        >
           <ArrowLeft className="w-4 h-4" />
-          Previous
+          Back to Analysis
         </button>
-        <button onClick={() => onNext()} className="btn-primary flex items-center gap-2">
+        <button 
+          onClick={() => onNext()} 
+          className="btn-primary flex items-center justify-center gap-2 order-1 sm:order-2 hover:scale-105 transition-transform"
+        >
           Check Keywords
           <ArrowRight className="w-4 h-4" />
         </button>
