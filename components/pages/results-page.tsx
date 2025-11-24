@@ -1,7 +1,7 @@
 "use client"
 
 import { useMemo } from "react"
-import { CheckCircle2, TrendingUp, Download, Share2, Sparkles, ArrowLeft } from "lucide-react"
+import { CheckCircle2, TrendingUp, Download, Share2, Sparkles, ArrowLeft, Target, Zap, BarChart3, Rocket, Award, Star } from "lucide-react"
 import type { KeywordAnalysis, ResumeAnalysis } from "@/lib/deepseek"
 import { toast } from "@/hooks/use-toast"
 
@@ -18,188 +18,7 @@ interface ResultsPageProps {
   onPrevious: () => void
 }
 
-const PDF_CONFIG = {
-  width: 612,
-  height: 792,
-  margin: 64,
-  lineHeight: 16,
-  startY: 728,
-}
-const MAX_LINES_PER_PAGE = Math.floor((PDF_CONFIG.startY - PDF_CONFIG.margin) / PDF_CONFIG.lineHeight)
-
-function escapePdfText(text: string) {
-  return text.replace(/\\/g, "\\\\").replace(/$$/g, "\\(").replace(/$$/g, "\\)")
-}
-
-function createPdfBlob(lines: string[]): Blob {
-  const normalizedLines = lines.map((line) => line.replace(/\r/g, ""))
-
-  type PdfPage = { commands: string[]; lineCount: number }
-  const startPage = (): PdfPage => ({
-    commands: [
-      "BT",
-      "/F1 12 Tf",
-      `${PDF_CONFIG.lineHeight} TL`,
-      `1 0 0 1 ${PDF_CONFIG.margin} ${PDF_CONFIG.startY} Tm`,
-    ],
-    lineCount: 0,
-  })
-
-  const pages: PdfPage[] = [startPage()]
-  const addLineToPage = (line: string) => {
-    let current = pages[pages.length - 1]
-    if (current.lineCount >= MAX_LINES_PER_PAGE) {
-      current.commands.push("ET")
-      current = startPage()
-      pages.push(current)
-    }
-
-    const safeLine = escapePdfText(line || " ")
-    if (current.lineCount === 0) {
-      current.commands.push(`(${safeLine}) Tj`)
-    } else {
-      current.commands.push("T*")
-      current.commands.push(`(${safeLine}) Tj`)
-    }
-    current.lineCount += 1
-  }
-
-  normalizedLines.forEach((line) => {
-    addLineToPage(line)
-  })
-  pages[pages.length - 1].commands.push("ET")
-
-  const textEncoder = new TextEncoder()
-
-  type Chunk = Uint8Array
-  const chunks: Chunk[] = []
-  let length = 0
-
-  const pushString = (value: string) => {
-    const bytes = textEncoder.encode(value)
-    chunks.push(bytes)
-    length += bytes.length
-  }
-
-  const pushBytes = (bytes: Uint8Array) => {
-    chunks.push(bytes)
-    length += bytes.length
-  }
-
-  const offsets: number[] = [0]
-
-  pushString("%PDF-1.4\n")
-
-  const writeObject = (body: Array<string | Uint8Array>) => {
-    offsets.push(length)
-    body.forEach((part) => {
-      if (typeof part === "string") {
-        pushString(part)
-      } else {
-        pushBytes(part)
-      }
-    })
-  }
-
-  const pageCount = pages.length
-  const pageObjectNumbers: number[] = []
-  const contentObjectNumbers: number[] = []
-  let nextObjNumber = 3
-  for (let i = 0; i < pageCount; i++) {
-    pageObjectNumbers.push(nextObjNumber)
-    contentObjectNumbers.push(nextObjNumber + 1)
-    nextObjNumber += 2
-  }
-  const fontObjectNumber = nextObjNumber
-
-  writeObject(["1 0 obj\n<< /Type /Catalog /Pages 2 0 R >>\nendobj\n"])
-
-  const kids = pageObjectNumbers.map((num) => `${num} 0 R`).join(" ")
-  writeObject([`2 0 obj\n<< /Type /Pages /Kids [${kids}] /Count ${pageCount} >>\nendobj\n`])
-
-  pages.forEach((page, index) => {
-    const contentBytes = textEncoder.encode(page.commands.join("\n"))
-    const contentNumber = contentObjectNumbers[index]
-    const pageNumber = pageObjectNumbers[index]
-
-    writeObject([
-      `${pageNumber} 0 obj\n<< /Type /Page /Parent 2 0 R /MediaBox [0 0 ${PDF_CONFIG.width} ${PDF_CONFIG.height}] /Contents ${contentNumber} 0 R /Resources << /Font << /F1 ${fontObjectNumber} 0 R >> >> >>\nendobj\n`,
-    ])
-
-    writeObject([
-      `${contentNumber} 0 obj\n<< /Length ${contentBytes.length} >>\nstream\n`,
-      contentBytes,
-      "\nendstream\nendobj\n",
-    ])
-  })
-
-  writeObject([`${fontObjectNumber} 0 obj\n<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>\nendobj\n`])
-
-  const xrefStart = length
-  pushString(`xref\n0 ${offsets.length}\n`)
-  pushString("0000000000 65535 f \n")
-  for (let i = 1; i < offsets.length; i++) {
-    pushString(`${offsets[i].toString().padStart(10, "0")} 00000 n \n`)
-  }
-  pushString(`trailer\n<< /Size ${offsets.length} /Root 1 0 R >>\nstartxref\n${xrefStart}\n%%EOF`)
-
-  const pdfBuffer = new Uint8Array(length)
-  let cursor = 0
-  for (const chunk of chunks) {
-    pdfBuffer.set(chunk, cursor)
-    cursor += chunk.length
-  }
-
-  return new Blob([pdfBuffer], { type: "application/pdf" })
-}
-
-function wrapTextLines(lines: string[], maxWidth = 90): string[] {
-  const result: string[] = []
-
-  lines.forEach((line) => {
-    if (!line) {
-      result.push("")
-      return
-    }
-
-    const words = line.split(/\s+/).filter(Boolean)
-    let current = ""
-
-    words.forEach((word) => {
-      if (word.length > maxWidth) {
-        if (current) {
-          result.push(current)
-          current = ""
-        }
-        for (let i = 0; i < word.length; i += maxWidth) {
-          const chunk = word.slice(i, i + maxWidth)
-          if (chunk.length === maxWidth) {
-            result.push(chunk)
-          } else {
-            current = chunk
-          }
-        }
-        return
-      }
-
-      const candidate = current ? `${current} ${word}` : word
-      if (candidate.length > maxWidth) {
-        if (current) {
-          result.push(current)
-        }
-        current = word
-      } else {
-        current = candidate
-      }
-    })
-
-    if (current) {
-      result.push(current)
-    }
-  })
-
-  return result
-}
+// ... (keep all your existing PDF functions: createPdfBlob, escapePdfText, wrapTextLines)
 
 export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsPageProps) {
   const keywordAnalysis = resumeData.keywordAnalysis
@@ -257,6 +76,20 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
     if (keywordAnalysis?.suggestions) return keywordAnalysis.suggestions.length
     return 0
   }, [analysis, keywordAnalysis])
+
+  const getMatchColor = (percentage: number) => {
+    if (percentage >= 80) return "text-success"
+    if (percentage >= 60) return "text-secondary"
+    if (percentage >= 40) return "text-primary"
+    return "text-error"
+  }
+
+  const getMatchLabel = (percentage: number) => {
+    if (percentage >= 80) return "Excellent Match"
+    if (percentage >= 60) return "Good Match"
+    if (percentage >= 40) return "Fair Match"
+    return "Needs Improvement"
+  }
 
   const handleDownloadPDF = () => {
     const lines: string[] = []
@@ -371,81 +204,106 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
   }
 
   return (
-    <div className="space-y-6">
-      <div className="text-center space-y-3 sm:space-y-4 mb-6 sm:mb-8 animate-fade-in-up">
+    <div className="space-y-6 max-w-6xl mx-auto">
+      {/* Enhanced Header */}
+      <div className="text-center space-y-4 mb-8 animate-fade-in-up">
+        <div className="inline-flex items-center gap-2 px-4 py-2 bg-success/10 rounded-full border border-success/20 mb-4">
+          <Award className="w-4 h-4 text-success" />
+          <span className="text-sm font-medium text-success">Analysis Complete</span>
+        </div>
         <div className="flex justify-center">
-          <div className="w-16 sm:w-20 h-16 sm:h-20 bg-success/10 rounded-full flex items-center justify-center animate-pulse-glow">
-            <CheckCircle2 className="w-8 sm:w-12 h-8 sm:h-12 text-success" />
+          <div className="w-24 h-24 bg-gradient-to-br from-success/20 to-success/10 rounded-full flex items-center justify-center animate-pulse border-2 border-success/30">
+            <CheckCircle2 className="w-12 h-12 text-success" />
           </div>
         </div>
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">Your Resume is Ready!</h1>
-        <p className="text-base sm:text-lg text-muted-foreground">
+        <h1 className="text-4xl sm:text-5xl font-bold text-foreground">Your Resume is Ready!</h1>
+        <p className="text-xl text-muted-foreground max-w-2xl mx-auto leading-relaxed">
           {improvementsCount > 0
             ? `You've identified ${improvementsCount} key areas to improve. Time to apply!`
             : "Your resume analysis is complete. Time to apply!"}
         </p>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-        {/* Match Score */}
-        <div className="card-base hover:shadow-lg transition-all duration-300 animate-fade-in-up border-t-4 border-t-primary">
-          <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-2">Overall Match Score</h3>
-          <div className="flex flex-col sm:flex-row sm:items-end gap-3 sm:gap-4">
-            <div className="text-3xl sm:text-5xl font-bold text-primary">{matchPercentage}%</div>
+      {/* Main Metrics Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Match Score Card */}
+        <div className="card-base hover:shadow-xl transition-all duration-300 animate-fade-in-up border-t-4 border-t-primary rounded-xl p-6 bg-gradient-to-br from-primary/5 to-primary/10">
+          <div className="flex items-center gap-3 mb-6">
+            <Target className="w-8 h-8 text-primary" />
+            <div>
+              <h3 className="text-xl font-bold text-foreground">Overall Match Score</h3>
+              <p className="text-sm text-muted-foreground">Your resume compatibility</p>
+            </div>
+          </div>
+          <div className="flex flex-col items-center text-center">
+            <div className="text-7xl lg:text-8xl font-bold text-primary mb-4">{matchPercentage}%</div>
             {keywordAnalysis && matchPercentage > 0 && (
-              <div className="flex items-center gap-1 text-success">
-                <TrendingUp className="w-4 h-4 flex-shrink-0" />
-                <span className="text-xs sm:text-sm font-medium">
-                  {matchPercentage >= 80
-                    ? "Excellent match"
-                    : matchPercentage >= 60
-                      ? "Good match"
-                      : "Needs improvement"}
+              <div className="flex items-center gap-2 bg-background/80 backdrop-blur-sm rounded-full px-4 py-2 border border-border">
+                <TrendingUp className="w-5 h-5 text-success" />
+                <span className={`text-lg font-semibold ${getMatchColor(matchPercentage)}`}>
+                  {getMatchLabel(matchPercentage)}
                 </span>
               </div>
             )}
           </div>
           {!keywordAnalysis && (
-            <p className="text-xs text-muted-foreground mt-2">Complete keyword analysis to see your match score</p>
+            <p className="text-center text-muted-foreground mt-4">Complete keyword analysis to see your match score</p>
           )}
         </div>
 
-        {/* Top Strengths */}
+        {/* Top Strengths Card */}
         <div
-          className="card-base hover:shadow-lg transition-all duration-300 animate-fade-in-up border-t-4 border-t-secondary"
+          className="card-base hover:shadow-xl transition-all duration-300 animate-fade-in-up border-t-4 border-t-secondary rounded-xl p-6"
           style={{ animationDelay: "100ms" }}
         >
-          <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-4">Top Strengths</h3>
-          <div className="space-y-2">
+          <div className="flex items-center gap-3 mb-6">
+            <Star className="w-8 h-8 text-secondary" />
+            <div>
+              <h3 className="text-xl font-bold text-foreground">Top Strengths</h3>
+              <p className="text-sm text-muted-foreground">Your competitive advantages</p>
+            </div>
+          </div>
+          <div className="space-y-4">
             {topStrengths.length > 0 ? (
               topStrengths.map((strength, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <CheckCircle2 className="w-4 h-4 text-success flex-shrink-0" />
-                  <span className="text-xs sm:text-sm text-foreground">{strength}</span>
+                <div key={i} className="flex items-center gap-4 p-3 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors group">
+                  <div className="w-8 h-8 bg-success/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                    <CheckCircle2 className="w-4 h-4 text-success" />
+                  </div>
+                  <span className="text-foreground font-medium leading-relaxed">{strength}</span>
                 </div>
               ))
             ) : (
-              <p className="text-xs sm:text-sm text-muted-foreground">Complete analysis to see your strengths</p>
+              <div className="text-center py-8 text-muted-foreground">
+                <Star className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                <p>Complete analysis to see your strengths</p>
+              </div>
             )}
           </div>
         </div>
 
-        {/* Skills Breakdown */}
+        {/* Skills Breakdown Card */}
         <div
-          className="card-base hover:shadow-lg transition-all duration-300 animate-fade-in-up border-t-4 border-t-accent"
+          className="card-base hover:shadow-xl transition-all duration-300 animate-fade-in-up border-t-4 border-t-accent rounded-xl p-6"
           style={{ animationDelay: "200ms" }}
         >
-          <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-4">Skills Breakdown</h3>
-          <div className="space-y-3">
+          <div className="flex items-center gap-3 mb-6">
+            <BarChart3 className="w-8 h-8 text-accent" />
+            <div>
+              <h3 className="text-xl font-bold text-foreground">Skills Breakdown</h3>
+              <p className="text-sm text-muted-foreground">Detailed performance metrics</p>
+            </div>
+          </div>
+          <div className="space-y-6">
             {skillsBreakdown.map((item, i) => (
-              <div key={i}>
-                <div className="flex justify-between items-center mb-1">
-                  <span className="text-xs sm:text-sm font-medium text-foreground">{item.label}</span>
-                  <span className="text-xs sm:text-sm text-muted-foreground">{item.value}%</span>
+              <div key={i} className="group">
+                <div className="flex justify-between items-center mb-3">
+                  <span className="font-semibold text-foreground group-hover:text-primary transition-colors">{item.label}</span>
+                  <span className={`text-lg font-bold ${getMatchColor(item.value)}`}>{item.value}%</span>
                 </div>
-                <div className="w-full h-2 bg-muted rounded-full overflow-hidden">
+                <div className="w-full h-3 bg-muted rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-primary to-primary/70 transition-all"
+                    className="h-full bg-gradient-to-r from-primary to-primary/70 transition-all duration-1000 ease-out group-hover:from-primary/80 group-hover:to-primary/60"
                     style={{ width: `${item.value}%` }}
                   />
                 </div>
@@ -454,49 +312,64 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
           </div>
         </div>
 
-        {/* Next Steps */}
+        {/* Next Steps Card */}
         <div
-          className="card-base hover:shadow-lg transition-all duration-300 animate-fade-in-up border-t-4 border-t-primary"
+          className="card-base hover:shadow-xl transition-all duration-300 animate-fade-in-up border-t-4 border-t-primary rounded-xl p-6"
           style={{ animationDelay: "300ms" }}
         >
-          <h3 className="text-xs sm:text-sm font-medium text-muted-foreground mb-4">Next Steps</h3>
-          <div className="space-y-2">
+          <div className="flex items-center gap-3 mb-6">
+            <Rocket className="w-8 h-8 text-primary" />
+            <div>
+              <h3 className="text-xl font-bold text-foreground">Next Steps</h3>
+              <p className="text-sm text-muted-foreground">Your action plan</p>
+            </div>
+          </div>
+          <div className="space-y-3">
             {nextSteps.map((step, i) => (
-              <div key={i} className="text-xs sm:text-sm text-foreground">
-                {step}
+              <div key={i} className="flex items-center gap-3 p-3 rounded-lg bg-primary/5 hover:bg-primary/10 transition-colors group">
+                <div className="w-6 h-6 bg-success/10 rounded-full flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform">
+                  <CheckCircle2 className="w-3 h-3 text-success" />
+                </div>
+                <span className="text-foreground leading-relaxed">{step.replace("✓ ", "")}</span>
               </div>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 mt-6 sm:mt-8 animate-fade-in-up" style={{ animationDelay: "400ms" }}>
-        <div className="flex flex-col sm:flex-row gap-3">
-          <button
-            onClick={handleDownloadPDF}
-            className="flex-1 btn-secondary flex items-center justify-center gap-2 hover:shadow-md transition-all text-sm"
-          >
-            <Download className="w-4 h-4" />
-            Download PDF
-          </button>
-          <button
-            onClick={handleShareReport}
-            className="flex-1 btn-secondary flex items-center justify-center gap-2 hover:shadow-md transition-all text-sm"
-          >
-            <Share2 className="w-4 h-4" />
-            Share Report
-          </button>
-        </div>
-        <button onClick={() => onNext()} className="w-full btn-primary flex items-center justify-center gap-2 text-sm">
-          <Sparkles className="w-4 h-4" />
+      {/* Action Buttons */}
+      <div className="flex flex-col sm:flex-row gap-4 mt-8 animate-fade-in-up" style={{ animationDelay: "400ms" }}>
+        <button
+          onClick={handleDownloadPDF}
+          className="flex-1 btn-secondary flex items-center justify-center gap-3 px-6 py-4 text-base font-medium hover:scale-105 transition-transform rounded-xl"
+        >
+          <Download className="w-5 h-5" />
+          Download PDF Report
+        </button>
+        <button
+          onClick={handleShareReport}
+          className="flex-1 btn-secondary flex items-center justify-center gap-3 px-6 py-4 text-base font-medium hover:scale-105 transition-transform rounded-xl"
+        >
+          <Share2 className="w-5 h-5" />
+          Share Results
+        </button>
+        <button 
+          onClick={() => onNext()} 
+          className="flex-1 btn-primary flex items-center justify-center gap-3 px-6 py-4 text-base font-medium hover:scale-105 transition-transform rounded-xl"
+        >
+          <Sparkles className="w-5 h-5" />
           View Job Recommendations
         </button>
       </div>
 
-      <div className="flex justify-between gap-3 mt-6 sm:mt-8">
-        <button onClick={onPrevious} className="btn-secondary flex items-center gap-2 text-sm flex-1 sm:flex-none">
+      {/* Navigation */}
+      <div className="flex justify-between mt-8 pt-6 border-t border-border">
+        <button 
+          onClick={onPrevious} 
+          className="btn-secondary flex items-center gap-2 hover:scale-105 transition-transform"
+        >
           <ArrowLeft className="w-4 h-4" />
-          <span className="hidden sm:inline">Previous</span>
+          Back to Keywords
         </button>
       </div>
     </div>
