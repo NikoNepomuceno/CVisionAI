@@ -93,14 +93,16 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
   return (
     <div className="space-y-6">
       <div className="mb-8 animate-fade-in-up">
-        <h1 className="text-3xl font-bold text-foreground mb-2">Extraction Summary</h1>
-        <p className="text-muted-foreground">Review and edit the extracted information from your resume</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground mb-2">Extraction Summary</h1>
+        <p className="text-sm sm:text-base text-muted-foreground">
+          Review and edit the extracted information from your resume
+        </p>
       </div>
 
       {/* Skills Section */}
       <div className="card-base animate-fade-in-up border-t-4 border-t-primary">
         <button onClick={() => toggleSection("skills")} className="w-full flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Skills</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground">Skills</h2>
           <ChevronDown
             className={`w-5 h-5 text-primary transition-transform duration-300 ${expandedSections.skills ? "rotate-180" : ""}`}
           />
@@ -111,25 +113,25 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
               {skills.map((skill, i) => (
                 <div
                   key={i}
-                  className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium flex items-center gap-2 hover:bg-primary/20 transition-all duration-200 border border-primary/20"
+                  className="bg-primary/10 text-primary px-2.5 sm:px-3 py-1 rounded-full text-xs sm:text-sm font-medium flex items-center gap-1.5 hover:bg-primary/20 transition-all duration-200 border border-primary/20"
                 >
-                  {skill}
-                  <button onClick={() => removeSkill(i)} className="hover:opacity-70">
+                  <span className="truncate">{skill}</span>
+                  <button onClick={() => removeSkill(i)} className="hover:opacity-70 flex-shrink-0">
                     <Trash2 className="w-3 h-3" />
                   </button>
                 </div>
               ))}
             </div>
-            <div className="flex gap-2 mt-4">
+            <div className="flex gap-2 mt-4 flex-col sm:flex-row">
               <input
                 type="text"
                 value={newSkill}
                 onChange={(e) => setNewSkill(e.target.value)}
                 onKeyPress={(e) => e.key === "Enter" && addSkill()}
                 placeholder="Add a new skill..."
-                className="input-base text-sm flex-1"
+                className="input-base text-sm flex-1 min-w-0"
               />
-              <button onClick={addSkill} className="btn-primary text-sm px-3">
+              <button onClick={addSkill} className="btn-primary text-sm px-3 flex-shrink-0">
                 <Plus className="w-4 h-4" />
               </button>
             </div>
@@ -140,7 +142,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
       {/* Experience Section */}
       <div className="card-base animate-fade-in-up border-t-4 border-t-secondary" style={{ animationDelay: "100ms" }}>
         <button onClick={() => toggleSection("experience")} className="w-full flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Experience</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground">Experience</h2>
           <ChevronDown
             className={`w-5 h-5 text-secondary transition-transform duration-300 ${expandedSections.experience ? "rotate-180" : ""}`}
           />
@@ -150,32 +152,32 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
             {experience.map((exp, i) => (
               <div
                 key={i}
-                className="border-2 border-border rounded-lg p-4 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
+                className="border-2 border-border rounded-lg p-3 sm:p-4 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
               >
-                <div className="flex justify-between items-start mb-2">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">{exp.role}</h3>
-                    <p className="text-sm text-muted-foreground">{exp.company}</p>
+                <div className="flex justify-between items-start mb-2 gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">{exp.role}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate">{exp.company}</p>
                   </div>
                   <button
                     onClick={() => removeExperience(i)}
-                    className="text-muted-foreground hover:text-error transition-colors"
+                    className="text-muted-foreground hover:text-error transition-colors flex-shrink-0"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                <p className="text-sm text-muted-foreground">{exp.duration}</p>
-                {exp.description && <p className="text-sm text-foreground mt-2">{exp.description}</p>}
+                <p className="text-xs sm:text-sm text-muted-foreground">{exp.duration}</p>
+                {exp.description && <p className="text-xs sm:text-sm text-foreground mt-2">{exp.description}</p>}
               </div>
             ))}
 
             {showAddExperience ? (
-              <div className="border-2 border-primary/30 rounded-lg p-4 bg-primary/5 space-y-3">
+              <div className="border-2 border-primary/30 rounded-lg p-3 sm:p-4 bg-primary/5 space-y-3">
                 <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-semibold text-foreground">Add New Experience</h3>
+                  <h3 className="font-semibold text-foreground text-sm sm:text-base">Add New Experience</h3>
                   <button
                     onClick={() => setShowAddExperience(false)}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground flex-shrink-0"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -220,7 +222,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
             ) : (
               <button
                 onClick={() => setShowAddExperience(true)}
-                className="flex items-center gap-2 text-primary hover:opacity-70 text-sm font-medium"
+                className="flex items-center gap-2 text-primary hover:opacity-70 text-xs sm:text-sm font-medium"
               >
                 <Plus className="w-4 h-4" />
                 Add Experience
@@ -233,7 +235,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
       {/* Education Section */}
       <div className="card-base animate-fade-in-up border-t-4 border-t-accent" style={{ animationDelay: "200ms" }}>
         <button onClick={() => toggleSection("education")} className="w-full flex items-center justify-between">
-          <h2 className="text-xl font-semibold text-foreground">Education</h2>
+          <h2 className="text-lg sm:text-xl font-semibold text-foreground">Education</h2>
           <ChevronDown
             className={`w-5 h-5 text-accent transition-transform duration-300 ${expandedSections.education ? "rotate-180" : ""}`}
           />
@@ -243,31 +245,31 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
             {education.map((edu, i) => (
               <div
                 key={i}
-                className="border-2 border-border rounded-lg p-4 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
+                className="border-2 border-border rounded-lg p-3 sm:p-4 hover:border-primary/50 hover:bg-primary/5 transition-all duration-200"
               >
-                <div className="flex justify-between items-start">
-                  <div className="flex-1">
-                    <h3 className="font-semibold text-foreground">{edu.degree}</h3>
-                    <p className="text-sm text-muted-foreground">{edu.school}</p>
+                <div className="flex justify-between items-start gap-2">
+                  <div className="flex-1 min-w-0">
+                    <h3 className="font-semibold text-foreground text-sm sm:text-base truncate">{edu.degree}</h3>
+                    <p className="text-xs sm:text-sm text-muted-foreground truncate">{edu.school}</p>
                   </div>
                   <button
                     onClick={() => removeEducation(i)}
-                    className="text-muted-foreground hover:text-error transition-colors"
+                    className="text-muted-foreground hover:text-error transition-colors flex-shrink-0"
                   >
                     <Trash2 className="w-4 h-4" />
                   </button>
                 </div>
-                {edu.year && <p className="text-sm text-muted-foreground mt-2">{edu.year}</p>}
+                {edu.year && <p className="text-xs sm:text-sm text-muted-foreground mt-2">{edu.year}</p>}
               </div>
             ))}
 
             {showAddEducation ? (
-              <div className="border-2 border-primary/30 rounded-lg p-4 bg-primary/5 space-y-3">
+              <div className="border-2 border-primary/30 rounded-lg p-3 sm:p-4 bg-primary/5 space-y-3">
                 <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-semibold text-foreground">Add New Education</h3>
+                  <h3 className="font-semibold text-foreground text-sm sm:text-base">Add New Education</h3>
                   <button
                     onClick={() => setShowAddEducation(false)}
-                    className="text-muted-foreground hover:text-foreground"
+                    className="text-muted-foreground hover:text-foreground flex-shrink-0"
                   >
                     <X className="w-4 h-4" />
                   </button>
@@ -305,7 +307,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
             ) : (
               <button
                 onClick={() => setShowAddEducation(true)}
-                className="flex items-center gap-2 text-primary hover:opacity-70 text-sm font-medium"
+                className="flex items-center gap-2 text-primary hover:opacity-70 text-xs sm:text-sm font-medium"
               >
                 <Plus className="w-4 h-4" />
                 Add Education
@@ -315,12 +317,15 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
         )}
       </div>
 
-      <div className="flex justify-between gap-4 mt-8">
-        <button onClick={onPrevious} className="btn-secondary flex items-center gap-2">
+      <div className="flex flex-col sm:flex-row gap-3 justify-between mt-8">
+        <button
+          onClick={onPrevious}
+          className="btn-secondary flex items-center justify-center gap-2 order-2 sm:order-1"
+        >
           <ArrowLeft className="w-4 h-4" />
           Previous
         </button>
-        <button onClick={handleNext} className="btn-primary flex items-center gap-2">
+        <button onClick={handleNext} className="btn-primary flex items-center justify-center gap-2 order-1 sm:order-2">
           Continue to Analysis
           <ArrowRight className="w-4 h-4" />
         </button>
