@@ -254,23 +254,13 @@ export default function Home() {
               <div key={step.id} className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
                 <button
                   onClick={() => handleJumpToStep(step.id)}
-<<<<<<< HEAD
-                disabled={index > furthestStepIndex}
-                  className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-sm font-medium transition-all duration-300 ${
-                    step.id === currentStep
-                    ? "bg-primary text-white shadow-lg shadow-primary/30 scale-105"
-                    : index <= furthestStepIndex
-                      ? "bg-accent/30 text-primary hover:bg-accent/50 cursor-pointer dark:bg-accent/20 dark:text-accent"
-                      : "bg-muted text-muted-foreground cursor-not-allowed opacity-50 dark:bg-muted"
-=======
-                  disabled={index > currentStepIndex}
+                  disabled={index > furthestStepIndex}
                   className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
                     step.id === currentStep
                       ? "bg-primary text-white shadow-lg shadow-primary/30 scale-100"
-                      : index <= currentStepIndex
+                      : index <= furthestStepIndex
                         ? "bg-accent/30 text-primary hover:bg-accent/50 cursor-pointer dark:bg-accent/20 dark:text-accent"
                         : "bg-muted text-muted-foreground cursor-not-allowed opacity-50 dark:bg-muted"
->>>>>>> UIStructure
                   }`}
                 >
                   {step.icon}
@@ -286,15 +276,9 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-<<<<<<< HEAD
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        <div className="animate-fade-in-up">
-          {currentStep === "upload" && <UploadPage onNext={handleNext} initialFile={resumeData.file} />}
-=======
       <main className="w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto animate-fade-in-up">
-          {currentStep === "upload" && <UploadPage onNext={handleNext} />}
->>>>>>> UIStructure
+          {currentStep === "upload" && <UploadPage onNext={handleNext} initialFile={resumeData.file} />}
           {currentStep === "extraction" && (
             <ExtractionPage resumeData={resumeData} onNext={handleNext} onPrevious={handlePrevious} />
           )}
