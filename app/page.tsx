@@ -3,7 +3,7 @@
 import type React from "react"
 
 import { useState, useEffect, useCallback } from "react"
-import { Upload, CheckCircle2, Zap, BarChart3, Briefcase, ChevronRight, Settings } from "lucide-react"
+import { Upload, CheckCircle2, Zap, BarChart3, Briefcase, ChevronRight, Settings, Moon, Sun } from "lucide-react"
 import UploadPage from "@/components/pages/upload-page"
 import ExtractionPage from "@/components/pages/extraction-page"
 import AnalysisPage from "@/components/pages/analysis-page"
@@ -35,6 +35,8 @@ interface ResumeData extends ResumeSnapshot {
   lastAnalyzed?: ResumeSnapshot
   lastAnalyzedKey?: string
 }
+
+type ThemeMode = "light" | "dark" | "system"
 
 function mergeResumeData(prev: ResumeData, data: Partial<ResumeData>): ResumeData {
   if (!data || Object.keys(data).length === 0) {
@@ -98,7 +100,7 @@ function getSnapshotSource(data: ResumeSnapshot): ResumeSnapshot {
     skills: data.skills,
     experience: data.experience,
     education: data.education,
-    summary: data.summary,
+    summary: data.sumground,
   }
 }
 
@@ -130,10 +132,39 @@ export default function Home() {
   const [furthestStepIndex, setFurthestStepIndex] = useState(0)
   const [isSettingsOpen, setIsSettingsOpen] = useState(false)
   const [mounted, setMounted] = useState(false)
+  const [theme, setTheme] = useState<ThemeMode>("light")
 
   useEffect(() => {
     setMounted(true)
+    // Load saved theme preference
+    const saved = localStorage.getItem("theme-preference") as ThemeMode | null
+    if (saved) {
+      setTheme(saved)
+      applyTheme(saved)
+    } else {
+      // Check system preference
+      const systemIsDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+      setTheme(systemIsDark ? "dark" : "light")
+      applyTheme(systemIsDark ? "dark" : "light")
+    }
   }, [])
+
+  const applyTheme = (mode: ThemeMode) => {
+    const html = document.documentElement
+    if (mode === "system") {
+      const isDark = window.matchMedia("(prefers-color-scheme: dark)").matches
+      html.classList.toggle("dark", isDark)
+    } else {
+      html.classList.toggle("dark", mode === "dark")
+    }
+  }
+
+  const toggleTheme = () => {
+    const newTheme = theme === "light" ? "dark" : "light"
+    setTheme(newTheme)
+    localStorage.setItem("theme-preference", newTheme)
+    applyTheme(newTheme)
+  }
 
   const currentStepIndex = STEPS.findIndex((s) => s.id === currentStep)
   useEffect(() => {
@@ -218,58 +249,82 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen">
-      <header className="sticky top-0 z-40 bg-background/95 dark:bg-background/95 backdrop-blur-md border-b border-border shadow-sm">
+    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-[#C3E8C9]/20 via-[#4165D5]/10 to-[#293855]/20 dark:from-[#293855] dark:via-[#4165D5]/20 dark:to-[#C3E8C9]/10 transition-colors duration-300">
+      {/* Enhanced Animated Background */}
+      <div className="absolute inset-0">
+        {/* Main Gradient */}
+        <div className="absolute inset-0 bg-gradient-to-br from-[#C3E8C9]/20 via-[#4165D5]/10 to-[#293855]/20 dark:from-[#293855] dark:via-[#4165D5]/20 dark:to-[#C3E8C9]/10 transition-colors duration-300" />
+        
+        {/* Animated Gradient Orbs */}
+        <div className="absolute w-96 h-96 -top-48 -left-48 bg-gradient-to-r from-[#4165D5]/20 to-[#293855]/20 dark:from-[#4165D5]/10 dark:to-[#293855]/10 rounded-full blur-3xl animate-pulse transition-colors duration-300" />
+        <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-gradient-to-r from-[#F1AC20]/20 to-[#C3E8C9]/20 dark:from-[#F1AC20]/10 dark:to-[#C3E8C9]/10 rounded-full blur-3xl animate-pulse delay-1000 transition-colors duration-300" />
+        
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(65,101,213,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(65,101,213,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(65,101,213,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(65,101,213,0.05)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)] transition-colors duration-300" />
+      </div>
+
+      <header className="relative bg-white/70 dark:bg-[#293855]/70 backdrop-blur-md border-b border-[#4165D5]/20 dark:border-[#4165D5]/30 sticky top-0 z-40 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between mb-4">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 bg-gradient-to-br from-primary to-primary/70 rounded-xl flex items-center justify-center shadow-lg shadow-primary/30">
-                <img src="/CVisionAI-Logo-Header.png" alt="CV Logo" className="w-8 h-8 object-contain" />
+              <div className="relative">
+                <div className="w-10 h-10 bg-gradient-to-br from-[#4165D5] to-[#293855] rounded-xl flex items-center justify-center shadow-lg shadow-[#4165D5]/20 dark:shadow-[#293855]/30">
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl" />
+                  <img src="/CVisionAI-Logo-Header.png" alt="CV Logo" className="w-8 h-8 object-contain" />
+                </div>
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#C3E8C9] rounded-full border-2 border-white dark:border-[#293855] animate-pulse" />
               </div>
               <div>
-                <h1 className="text-2xl font-bold text-foreground">CVisionAI</h1>
-                <p className="text-xs text-muted-foreground">AI-Powered Resume Analysis</p>
+                <h1 className="text-2xl font-bold text-[#293855] dark:text-white transition-colors duration-300">CVisionAI</h1>
+                <p className="text-xs text-[#4165D5] dark:text-[#C3E8C9] transition-colors duration-300">AI-Powered Resume Analysis</p>
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-sm text-muted-foreground font-medium">
+              <div className="text-sm text-[#4165D5] dark:text-[#C3E8C9] font-medium transition-colors duration-300">
                 Step {currentStepIndex + 1} of {STEPS.length}
               </div>
               <button
-                onClick={() => setIsSettingsOpen(true)}
-                className="p-2 hover:bg-muted dark:hover:bg-muted rounded-lg transition-colors duration-200"
+                onClick={toggleTheme}
+                className="p-2 rounded-lg bg-[#C3E8C9]/20 dark:bg-[#293855] border border-[#4165D5]/20 dark:border-[#4165D5]/30 hover:bg-[#C3E8C9]/30 dark:hover:bg-[#293855]/80 transition-all duration-300 group"
+                aria-label="Toggle theme"
               >
-                <Settings className="w-5 h-5 text-muted-foreground hover:text-foreground transition-colors" />
+                {theme === "dark" ? (
+                  <Sun className="w-5 h-5 text-[#F1AC20] group-hover:scale-110 transition-transform duration-300" />
+                ) : (
+                  <Moon className="w-5 h-5 text-[#4165D5] group-hover:scale-110 transition-transform duration-300" />
+                )}
               </button>
             </div>
           </div>
 
-          <div className="w-full bg-muted dark:bg-muted rounded-full h-2 overflow-hidden">
+          {/* Progress Bar */}
+          <div className="w-full bg-[#C3E8C9]/20 dark:bg-[#293855]/50 rounded-full h-2 overflow-hidden backdrop-blur-sm">
             <div
-              className="bg-gradient-to-r from-primary via-primary to-secondary h-2 rounded-full transition-all duration-700 ease-out shadow-lg shadow-primary/20"
+              className="bg-gradient-to-r from-[#4165D5] via-[#293855] to-[#F1AC20] h-2 rounded-full transition-all duration-700 ease-out shadow-lg shadow-[#4165D5]/20 dark:shadow-[#293855]/30"
               style={{ width: `${(currentStepIndex / STEPS.length) * 100}%` }}
             />
           </div>
 
+          {/* Steps Navigation */}
           <div className="flex items-center gap-0.5 sm:gap-1 mt-4 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
             {STEPS.map((step, index) => (
               <div key={step.id} className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
                 <button
                   onClick={() => handleJumpToStep(step.id)}
                   disabled={index > furthestStepIndex}
-                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 ${
+                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 backdrop-blur-sm ${
                     step.id === currentStep
-                      ? "bg-primary text-white shadow-lg shadow-primary/30 scale-100"
+                      ? "bg-gradient-to-r from-[#4165D5] to-[#293855] text-white shadow-lg shadow-[#4165D5]/30 scale-100"
                       : index <= furthestStepIndex
-                        ? "bg-accent/30 text-primary hover:bg-accent/50 cursor-pointer dark:bg-accent/20 dark:text-accent"
-                        : "bg-muted text-muted-foreground cursor-not-allowed opacity-50 dark:bg-muted"
+                        ? "bg-white/50 dark:bg-[#293855]/50 text-[#4165D5] dark:text-[#C3E8C9] hover:bg-white/70 dark:hover:bg-[#293855]/70 cursor-pointer border border-[#4165D5]/20 dark:border-[#4165D5]/30"
+                        : "bg-[#C3E8C9]/20 dark:bg-[#293855]/30 text-[#4165D5]/50 dark:text-[#C3E8C9]/50 cursor-not-allowed border border-[#4165D5]/10 dark:border-[#4165D5]/20"
                   }`}
                 >
                   {step.icon}
                   <span className="hidden sm:inline">{step.label}</span>
                 </button>
                 {index < STEPS.length - 1 && (
-                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-border hidden sm:block flex-shrink-0 dark:text-border" />
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#4165D5]/30 dark:text-[#C3E8C9]/30 hidden sm:block flex-shrink-0" />
                 )}
               </div>
             ))}
@@ -278,7 +333,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-8 bg-background dark:bg-background transition-colors duration-300">
+      <main className="relative w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
         <div className="max-w-7xl mx-auto animate-fade-in-up">
           {currentStep === "upload" && <UploadPage onNext={handleNext} initialFile={resumeData.file} />}
           {currentStep === "extraction" && (
