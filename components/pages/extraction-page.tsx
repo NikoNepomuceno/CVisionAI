@@ -1,7 +1,18 @@
 "use client"
 
 import { useState } from "react"
-import { ChevronDown, Plus, Trash2, ArrowRight, ArrowLeft, X, Sparkles, Zap, Briefcase, GraduationCap } from "lucide-react"
+import {
+  ChevronDown,
+  Plus,
+  Trash2,
+  ArrowRight,
+  ArrowLeft,
+  X,
+  Sparkles,
+  Zap,
+  Briefcase,
+  GraduationCap,
+} from "lucide-react"
 
 interface ExtractionPageProps {
   resumeData: any
@@ -26,8 +37,18 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
   const [skills, setSkills] = useState(resumeData.skills || ["React", "TypeScript", "Node.js", "SQL", "Python"])
   const [experience, setExperience] = useState<Experience[]>(
     resumeData.experience || [
-      { company: "Tech Corp", role: "Senior Developer", duration: "2 years", description: "Led frontend development and mentored junior developers" },
-      { company: "StartUp Inc", role: "Full Stack Engineer", duration: "1.5 years", description: "Built scalable web applications using modern technologies" },
+      {
+        company: "Tech Corp",
+        role: "Senior Developer",
+        duration: "2 years",
+        description: "Led frontend development and mentored junior developers",
+      },
+      {
+        company: "StartUp Inc",
+        role: "Full Stack Engineer",
+        duration: "1.5 years",
+        description: "Built scalable web applications using modern technologies",
+      },
     ],
   )
   const [education, setEducation] = useState<Education[]>(
@@ -96,13 +117,16 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
         <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 w-full space-y-4 sm:space-y-6">
           {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 mb-3 sm:mb-4">
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-              <span className="text-xs sm:text-sm font-medium text-primary">AI-Powered Extraction</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-slate-900/30 mb-3 sm:mb-4">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
+              <span className="text-xs sm:text-sm font-medium text-primary dark:text-slate-900">
+                AI-Powered Extraction
+              </span>
             </div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2">Extraction Summary</h1>
             <p className="text-sm text-muted-foreground max-w-2xl mx-auto px-2 sm:px-0">
-              Review and edit the extracted information from your resume. Add missing details or make corrections as needed.
+              Review and edit the extracted information from your resume. Add missing details or make corrections as
+              needed.
             </p>
           </div>
 
@@ -110,13 +134,13 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
           <div className="grid grid-cols-3 gap-2 sm:gap-4 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
             <div className="card-base p-2 sm:p-3 text-center border-t-3 sm:border-t-4 border-t-primary">
               <div className="flex flex-col items-center gap-1 mb-1 sm:mb-2">
-                <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
                 <h3 className="font-semibold text-foreground text-xs">Skills</h3>
               </div>
               <p className="text-lg sm:text-xl font-bold text-foreground">{skills.length}</p>
               <p className="text-xs text-muted-foreground">Extracted</p>
             </div>
-            
+
             <div className="card-base p-2 sm:p-3 text-center border-t-3 sm:border-t-4 border-t-secondary">
               <div className="flex flex-col items-center gap-1 mb-1 sm:mb-2">
                 <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 text-secondary" />
@@ -125,7 +149,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
               <p className="text-lg sm:text-xl font-bold text-foreground">{experience.length}</p>
               <p className="text-xs text-muted-foreground">Positions</p>
             </div>
-            
+
             <div className="card-base p-2 sm:p-3 text-center border-t-3 sm:border-t-4 border-t-accent">
               <div className="flex flex-col items-center gap-1 mb-1 sm:mb-2">
                 <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
@@ -138,18 +162,23 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
 
           {/* Skills Section */}
           <div className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-primary">
-            <button onClick={() => toggleSection("skills")} className="w-full flex items-center justify-between group p-3 sm:p-4">
+            <button
+              onClick={() => toggleSection("skills")}
+              className="w-full flex items-center justify-between group p-3 sm:p-4"
+            >
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
+                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
                 </div>
                 <div className="text-left">
-                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground group-hover:text-primary transition-colors">Skills</h2>
+                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground group-hover:text-primary dark:group-hover:text-slate-700 transition-colors">
+                    Skills
+                  </h2>
                   <p className="text-xs text-muted-foreground">{skills.length} skills extracted</p>
                 </div>
               </div>
               <ChevronDown
-                className={`w-4 h-4 sm:w-5 sm:h-5 text-primary transition-all duration-300 ${expandedSections.skills ? "rotate-180" : ""} group-hover:scale-110`}
+                className={`w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-slate-900 transition-all duration-300 ${expandedSections.skills ? "rotate-180" : ""} group-hover:scale-110`}
               />
             </button>
             {expandedSections.skills && (
@@ -158,12 +187,12 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                   {skills.map((skill, i) => (
                     <div
                       key={i}
-                      className="bg-primary/10 text-primary px-2 sm:px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 hover:bg-primary/20 transition-all duration-200 border border-primary/20 group relative"
+                      className="bg-primary/10 text-primary dark:text-slate-900 px-2 sm:px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 hover:bg-primary/20 transition-all duration-200 border border-primary/20 dark:border-slate-900/30 group relative"
                     >
                       <span className="max-w-[120px] sm:max-w-none truncate">{skill}</span>
-                      <button 
-                        onClick={() => removeSkill(i)} 
-                        className="opacity-0 group-hover:opacity-100 text-primary hover:text-error transition-all duration-200 flex-shrink-0"
+                      <button
+                        onClick={() => removeSkill(i)}
+                        className="opacity-0 group-hover:opacity-100 text-primary dark:text-slate-900 dark:hover:text-error transition-all duration-200 flex-shrink-0"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -179,8 +208,8 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                     placeholder="Add a new skill..."
                     className="input-base text-sm flex-1 min-w-0"
                   />
-                  <button 
-                    onClick={addSkill} 
+                  <button
+                    onClick={addSkill}
                     className="btn-primary text-sm px-3 flex items-center justify-center gap-2 hover:scale-105 transition-transform min-w-[80px]"
                     disabled={!newSkill.trim()}
                   >
@@ -194,14 +223,22 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
           </div>
 
           {/* Experience Section */}
-          <div className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-secondary" style={{ animationDelay: "100ms" }}>
-            <button onClick={() => toggleSection("experience")} className="w-full flex items-center justify-between group p-3 sm:p-4">
+          <div
+            className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-secondary"
+            style={{ animationDelay: "100ms" }}
+          >
+            <button
+              onClick={() => toggleSection("experience")}
+              className="w-full flex items-center justify-between group p-3 sm:p-4"
+            >
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-secondary/10 rounded-lg flex items-center justify-center">
                   <Briefcase className="w-3 h-3 sm:w-4 sm:h-4 text-secondary" />
                 </div>
                 <div className="text-left">
-                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground group-hover:text-secondary transition-colors">Experience</h2>
+                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground group-hover:text-secondary transition-colors">
+                    Experience
+                  </h2>
                   <p className="text-xs text-muted-foreground">{experience.length} positions extracted</p>
                 </div>
               </div>
@@ -214,7 +251,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                 {experience.map((exp, i) => (
                   <div
                     key={i}
-                    className="border border-border rounded-lg p-3 hover:border-secondary/50 hover:bg-secondary/5 transition-all duration-200 group"
+                    className="border border-border rounded-lg p-3 hover:border-secondary/50 dark:hover:border-secondary/40 hover:bg-secondary/5 dark:hover:bg-secondary/10 transition-all duration-200 group"
                   >
                     <div className="flex justify-between items-start mb-2 gap-2">
                       <div className="flex-1 min-w-0">
@@ -278,11 +315,14 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                       rows={2}
                     />
                     <div className="flex gap-2 justify-end flex-col sm:flex-row">
-                      <button onClick={() => setShowAddExperience(false)} className="btn-secondary text-sm order-2 sm:order-1">
+                      <button
+                        onClick={() => setShowAddExperience(false)}
+                        className="btn-secondary text-sm order-2 sm:order-1"
+                      >
                         Cancel
                       </button>
-                      <button 
-                        onClick={addExperience} 
+                      <button
+                        onClick={addExperience}
                         className="btn-primary text-sm flex items-center justify-center gap-2 hover:scale-105 transition-transform order-1 sm:order-2"
                         disabled={!newExperience.company.trim() || !newExperience.role.trim()}
                       >
@@ -305,14 +345,22 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
           </div>
 
           {/* Education Section */}
-          <div className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-accent" style={{ animationDelay: "200ms" }}>
-            <button onClick={() => toggleSection("education")} className="w-full flex items-center justify-between group p-3 sm:p-4">
+          <div
+            className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-accent"
+            style={{ animationDelay: "200ms" }}
+          >
+            <button
+              onClick={() => toggleSection("education")}
+              className="w-full flex items-center justify-between group p-3 sm:p-4"
+            >
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-accent/10 rounded-lg flex items-center justify-center">
                   <GraduationCap className="w-3 h-3 sm:w-4 sm:h-4 text-accent" />
                 </div>
                 <div className="text-left">
-                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground group-hover:text-accent transition-colors">Education</h2>
+                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground group-hover:text-accent transition-colors">
+                    Education
+                  </h2>
                   <p className="text-xs text-muted-foreground">{education.length} institutions extracted</p>
                 </div>
               </div>
@@ -325,7 +373,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                 {education.map((edu, i) => (
                   <div
                     key={i}
-                    className="border border-border rounded-lg p-3 hover:border-accent/50 hover:bg-accent/5 transition-all duration-200 group"
+                    className="border border-border rounded-lg p-3 hover:border-accent/50 dark:hover:border-accent/40 hover:bg-accent/5 dark:hover:bg-accent/10 transition-all duration-200 group"
                   >
                     <div className="flex justify-between items-start gap-2">
                       <div className="flex-1 min-w-0">
@@ -379,11 +427,14 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                       className="input-base text-sm w-full"
                     />
                     <div className="flex gap-2 justify-end flex-col sm:flex-row">
-                      <button onClick={() => setShowAddEducation(false)} className="btn-secondary text-sm order-2 sm:order-1">
+                      <button
+                        onClick={() => setShowAddEducation(false)}
+                        className="btn-secondary text-sm order-2 sm:order-1"
+                      >
                         Cancel
                       </button>
-                      <button 
-                        onClick={addEducation} 
+                      <button
+                        onClick={addEducation}
                         className="btn-primary text-sm flex items-center justify-center gap-2 hover:scale-105 transition-transform order-1 sm:order-2"
                         disabled={!newEducation.school.trim() || !newEducation.degree.trim()}
                       >
@@ -414,8 +465,8 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
               <ArrowLeft className="w-4 h-4" />
               Previous
             </button>
-            <button 
-              onClick={handleNext} 
+            <button
+              onClick={handleNext}
               className="btn-primary flex items-center justify-center gap-2 order-1 sm:order-2 hover:scale-105 transition-transform py-3"
             >
               Continue to Analysis

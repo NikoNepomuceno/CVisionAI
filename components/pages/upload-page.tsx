@@ -3,7 +3,21 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { Upload, CheckCircle2, Sparkles, ArrowRight, FileText, Shield, Zap, Users, Star, X, Lock, EyeOff, Server } from "lucide-react"
+import {
+  Upload,
+  CheckCircle2,
+  Sparkles,
+  ArrowRight,
+  FileText,
+  Shield,
+  Zap,
+  Users,
+  Star,
+  X,
+  Lock,
+  EyeOff,
+  Server,
+} from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 
 interface UploadPageProps {
@@ -20,7 +34,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
   useEffect(() => {
     if (isLoading) {
       const interval = setInterval(() => {
-        setUploadProgress(prev => {
+        setUploadProgress((prev) => {
           if (prev >= 95) {
             clearInterval(interval)
             return 95
@@ -91,16 +105,16 @@ export default function UploadPage({ onNext }: UploadPageProps) {
     if (!file) return
     setIsLoading(true)
     setUploadProgress(0)
-    
+
     try {
       const formData = new FormData()
       formData.append("file", file)
-      
+
       const uploadRes = await fetch("/api/upload", { method: "POST", body: formData })
       if (!uploadRes.ok) throw new Error("Upload failed")
-      
+
       setUploadProgress(100)
-      
+
       const { text } = await uploadRes.json()
       toast({
         title: "File uploaded successfully",
@@ -113,14 +127,13 @@ export default function UploadPage({ onNext }: UploadPageProps) {
         body: JSON.stringify({ text }),
       })
       if (!extractRes.ok) throw new Error("Extraction failed")
-      
+
       const { data } = await extractRes.json()
       setShowSuccess(true)
-      
+
       setTimeout(() => {
         onNext({ file, ...data })
       }, 1500)
-      
     } catch (e) {
       console.error(e)
       toast({
@@ -140,20 +153,17 @@ export default function UploadPage({ onNext }: UploadPageProps) {
           {/* Header */}
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex justify-center mb-2 sm:mb-1">
-              <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 rounded-full border border-primary/20">
-                <Sparkles className="w-3 h-3 text-primary" />
-                <span className="text-xs font-medium text-primary">AI-Powered Analysis</span>
+              <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 rounded-full border border-primary/20 dark:border-slate-900/30">
+                <Sparkles className="w-3 h-3 text-primary dark:text-slate-900" />
+                <span className="text-xs font-medium text-primary dark:text-slate-900">AI-Powered Analysis</span>
               </div>
             </div>
-            
+
             <h1 className="text-2xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-1">
-              Upload Your{" "}
-              <span className="text-primary">
-                Resume
-              </span>
+              Upload Your <span className="text-primary dark:text-slate-900">Resume</span>
             </h1>
-            
-            <p className="text-sm sm:text-xs text-muted-foreground max-w-md mx-auto px-2 sm:px-0">
+
+            <p className="text-sm sm:text-xs text-foreground dark:text-slate-200 max-w-md mx-auto px-2 sm:px-0">
               Get instant AI-powered insights to transform your resume and land your dream job.
             </p>
           </div>
@@ -169,31 +179,31 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                     <Shield className="w-4 h-4 text-success" />
                     <h3 className="font-semibold text-foreground text-xs">Secure & Private</h3>
                   </div>
-                  <p className="text-xs text-muted-foreground mb-3">
+                  <p className="text-sm text-foreground dark:text-slate-200 mb-3">
                     Your resume is processed securely and never stored on our servers.
                   </p>
-                  
+
                   {/* Additional Security Features */}
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 bg-success/10 rounded flex items-center justify-center">
                         <Lock className="w-3 h-3 text-success" />
                       </div>
-                      <span className="text-xs text-muted-foreground">End-to-end encrypted</span>
+                      <span className="text-xs text-foreground dark:text-slate-200">End-to-end encrypted</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 bg-success/10 rounded flex items-center justify-center">
                         <EyeOff className="w-3 h-3 text-success" />
                       </div>
-                      <span className="text-xs text-muted-foreground">No human review</span>
+                      <span className="text-xs text-foreground dark:text-slate-200">No human review</span>
                     </div>
-                    
+
                     <div className="flex items-center gap-2">
                       <div className="w-5 h-5 bg-success/10 rounded flex items-center justify-center">
                         <Server className="w-3 h-3 text-success" />
                       </div>
-                      <span className="text-xs text-muted-foreground">Auto-deleted after analysis</span>
+                      <span className="text-xs text-foreground dark:text-slate-200">Auto-deleted after analysis</span>
                     </div>
                   </div>
                 </div>
@@ -213,7 +223,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                         </div>
                         <div>
                           <div className="font-bold text-foreground text-xs">{stat.value}</div>
-                          <div className="text-xs text-muted-foreground">{stat.label}</div>
+                          <div className="text-xs text-foreground dark:text-slate-200">{stat.label}</div>
                         </div>
                       </div>
                     ))}
@@ -227,7 +237,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                     {["PDF", "DOC", "DOCX"].map((format) => (
                       <span
                         key={format}
-                        className="px-1.5 py-0.5 bg-muted text-muted-foreground rounded text-xs font-medium"
+                        className="px-1.5 py-0.5 bg-muted text-foreground dark:text-slate-200 rounded text-xs font-medium"
                       >
                         {format}
                       </span>
@@ -246,21 +256,21 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                       <Shield className="w-4 h-4 text-success" />
                       <h3 className="font-semibold text-foreground text-sm">Secure & Private</h3>
                     </div>
-                    <p className="text-sm text-muted-foreground mb-3">
+                    <p className="text-sm text-foreground dark:text-slate-200 mb-3">
                       Your resume is processed securely and never stored.
                     </p>
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="flex flex-col items-center">
                         <Lock className="w-4 h-4 text-success mb-1" />
-                        <span className="text-xs text-muted-foreground">Encrypted</span>
+                        <span className="text-xs text-foreground dark:text-slate-200">Encrypted</span>
                       </div>
                       <div className="flex flex-col items-center">
                         <EyeOff className="w-4 h-4 text-success mb-1" />
-                        <span className="text-xs text-muted-foreground">Private</span>
+                        <span className="text-xs text-foreground dark:text-slate-200">Private</span>
                       </div>
                       <div className="flex flex-col items-center">
                         <Server className="w-4 h-4 text-success mb-1" />
-                        <span className="text-xs text-muted-foreground">Auto-deleted</span>
+                        <span className="text-xs text-foreground dark:text-slate-200">Auto-deleted</span>
                       </div>
                     </div>
                   </div>
@@ -279,7 +289,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                           </div>
                         </div>
                         <div className="font-bold text-foreground text-xs">{stat.value}</div>
-                        <div className="text-xs text-muted-foreground">{stat.label}</div>
+                        <div className="text-xs text-foreground dark:text-slate-200">{stat.label}</div>
                       </div>
                     ))}
                   </div>
@@ -291,7 +301,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                       {["PDF", "DOC", "DOCX"].map((format) => (
                         <span
                           key={format}
-                          className="px-2 py-1 bg-muted text-muted-foreground rounded text-xs font-medium"
+                          className="px-2 py-1 bg-muted text-foreground dark:text-slate-200 rounded text-xs font-medium"
                         >
                           {format}
                         </span>
@@ -309,8 +319,8 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                     isDragging
                       ? "border-primary bg-primary/5 scale-105"
                       : file
-                      ? "border-success bg-success/5"
-                      : "border-border hover:border-primary/50 hover:bg-accent/5"
+                        ? "border-success bg-success/5"
+                        : "border-border hover:border-primary/50 hover:bg-accent/5"
                   }`}
                 >
                   <input
@@ -320,7 +330,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                     className="hidden"
                     id="file-input"
                   />
-                  
+
                   <div className="flex flex-col items-center justify-center flex-1 w-full">
                     <label htmlFor="file-input" className="cursor-pointer block w-full">
                       {file ? (
@@ -328,13 +338,11 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                           <div className="relative">
                             <CheckCircle2 className="w-12 h-12 sm:w-16 sm:h-16 text-success mx-auto" />
                           </div>
-                          
+
                           <div className="space-y-2">
-                            <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-muted-foreground mx-auto" />
-                            <h3 className="text-lg sm:text-xl font-semibold text-foreground">
-                              Ready for Analysis!
-                            </h3>
-                            <p className="text-muted-foreground break-words max-w-full mx-auto text-sm px-2 line-clamp-2">
+                            <FileText className="w-10 h-10 sm:w-12 sm:h-12 text-foreground mx-auto" />
+                            <h3 className="text-lg sm:text-xl font-semibold text-foreground">Ready for Analysis!</h3>
+                            <p className="text-foreground dark:text-slate-200 break-words max-w-full mx-auto text-sm px-2 line-clamp-2">
                               {file.name}
                             </p>
                             <button
@@ -355,15 +363,15 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                           <div className="relative">
                             <Upload className="w-12 h-12 sm:w-16 sm:h-16 text-primary mx-auto transition-transform duration-300" />
                           </div>
-                          
+
                           <div className="space-y-2">
                             <h3 className="text-lg sm:text-xl font-semibold text-foreground">
                               {isDragging ? "Drop your resume here" : "Choose your resume"}
                             </h3>
-                            <p className="text-muted-foreground text-sm">
+                            <p className="text-sm text-foreground dark:text-slate-200">
                               Drag & drop or click to browse
                             </p>
-                            <p className="text-xs text-muted-foreground">
+                            <p className="text-xs text-foreground dark:text-slate-200">
                               Supports PDF, DOC, DOCX • Max 10MB
                             </p>
                           </div>
@@ -381,11 +389,9 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                           style={{ width: `${uploadProgress}%` }}
                         />
                       </div>
-                      <p className="text-sm text-muted-foreground text-center">
+                      <p className="text-sm text-foreground dark:text-slate-200 text-center">
                         {uploadProgress < 100 ? "Analyzing your resume..." : "Almost done!"}
-                        <span className="block text-xs mt-1 font-medium">
-                          {uploadProgress}%
-                        </span>
+                        <span className="block text-xs mt-1 font-medium">{uploadProgress}%</span>
                       </p>
                     </div>
                   )}

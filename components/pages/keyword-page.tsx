@@ -1,7 +1,20 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import { Copy, Check, TrendingUp, ArrowRight, ArrowLeft, Loader2, Sparkles, AlertCircle, Target, Zap, Search, BarChart3 } from "lucide-react"
+import {
+  Copy,
+  Check,
+  TrendingUp,
+  ArrowRight,
+  ArrowLeft,
+  Loader2,
+  Sparkles,
+  AlertCircle,
+  Target,
+  Zap,
+  Search,
+  BarChart3,
+} from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import type { KeywordAnalysis } from "@/lib/deepseek"
 
@@ -64,7 +77,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
       const result = await response.json()
       const keywordAnalysis = result.data
       setAnalysis(keywordAnalysis)
-      
+
       // Persist the analysis and job description
       if (onPersist) {
         onPersist({
@@ -72,7 +85,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
           keywordJobDescription: jobDescription.trim(),
         })
       }
-      
+
       toast({
         title: "Analysis complete",
         description: "Keyword matching analysis is ready.",
@@ -125,11 +138,15 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
         <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 w-full space-y-4 sm:space-y-6">
           {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 mb-3 sm:mb-4">
-              <Target className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
-              <span className="text-xs sm:text-sm font-medium text-primary">Keyword Optimization</span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-slate-900/30 mb-3 sm:mb-4">
+              <Target className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
+              <span className="text-xs sm:text-sm font-medium text-primary dark:text-slate-900">
+                Keyword Optimization
+              </span>
             </div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-3">Keyword Match Analysis</h1>
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-3">
+              Keyword Match Analysis
+            </h1>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2 sm:px-0 leading-relaxed">
               Compare your skills with job requirements to optimize your resume for ATS systems.
             </p>
@@ -138,14 +155,14 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
           {/* Job Description Input */}
           <div className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-slate-900 flex-shrink-0" />
               <h2 className="text-lg sm:text-xl font-bold text-foreground">Paste Job Description</h2>
             </div>
             <textarea
               value={jobDescription}
               onChange={(e) => setJobDescription(e.target.value)}
               placeholder="Paste the job description here to analyze keyword matches and optimize your resume for this specific role..."
-              className="input-base min-h-32 resize-none text-sm rounded-lg border-2 focus:border-primary/50 transition-colors"
+              className="input-base min-h-32 resize-none text-sm rounded-lg border-2 focus:border-primary/50 dark:focus:border-slate-900/50 transition-colors"
               disabled={isAnalyzing}
             />
             <div className="mt-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
@@ -175,7 +192,10 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
           {/* Skills Comparison Grid */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
             {/* Your Skills */}
-            <div className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-secondary rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300" style={{ animationDelay: "100ms" }}>
+            <div
+              className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-secondary rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300"
+              style={{ animationDelay: "100ms" }}
+            >
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-secondary flex-shrink-0" />
                 <div>
@@ -191,7 +211,9 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                       className="flex items-center justify-between p-3 sm:p-4 rounded-lg hover:bg-secondary/5 transition-all duration-200 group border border-border hover:border-secondary/30"
                     >
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.foundInJob ? "bg-success" : "bg-muted-foreground/30"}`} />
+                        <div
+                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.foundInJob ? "bg-success" : "bg-muted-foreground/30"}`}
+                        />
                         <span className="text-xs sm:text-sm font-medium text-foreground truncate">{item.skill}</span>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-2">
@@ -201,11 +223,17 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                             style={{ width: `${item.match}%` }}
                           />
                         </div>
-                        <span className={`text-xs sm:text-sm font-semibold w-8 sm:w-10 text-right ${
-                          item.match >= 80 ? "text-success" :
-                          item.match >= 60 ? "text-secondary" :
-                          item.match >= 40 ? "text-primary" : "text-error"
-                        }`}>
+                        <span
+                          className={`text-xs sm:text-sm font-semibold w-8 sm:w-10 text-right ${
+                            item.match >= 80
+                              ? "text-success"
+                              : item.match >= 60
+                                ? "text-secondary"
+                                : item.match >= 40
+                                  ? "text-primary dark:text-slate-900"
+                                  : "text-error"
+                          }`}
+                        >
                           {item.match}%
                         </span>
                       </div>
@@ -221,9 +249,12 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
             </div>
 
             {/* Job Keywords */}
-            <div className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300" style={{ animationDelay: "200ms" }}>
+            <div
+              className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300"
+              style={{ animationDelay: "200ms" }}
+            >
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary flex-shrink-0" />
+                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-slate-900 flex-shrink-0" />
                 <div>
                   <h2 className="text-lg sm:text-xl font-bold text-foreground">Job Keywords</h2>
                   <p className="text-xs sm:text-sm text-muted-foreground">{jobKeywords.length} keywords extracted</p>
@@ -237,21 +268,31 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                       className={`group flex items-center justify-between p-3 sm:p-4 rounded-lg transition-all duration-200 hover:shadow-md border ${
                         item.matched
                           ? "bg-success/10 border-success/20 hover:border-success/30"
-                          : "bg-muted/50 border-transparent hover:border-primary/30"
+                          : "bg-muted/50 border-transparent hover:border-primary/30 dark:hover:border-slate-900/30"
                       }`}
                     >
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
-                        <div className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.matched ? "bg-success" : "bg-primary"}`} />
+                        <div
+                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.matched ? "bg-success" : "bg-primary"}`}
+                        />
                         <div className="flex-1 min-w-0">
-                          <span className="text-xs sm:text-sm font-medium text-foreground block truncate">{item.keyword}</span>
-                          <span className="text-xs text-muted-foreground">Mentioned {item.frequency} time{item.frequency !== 1 ? 's' : ''}</span>
+                          <span className="text-xs sm:text-sm font-medium text-foreground block truncate">
+                            {item.keyword}
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            Mentioned {item.frequency} time{item.frequency !== 1 ? "s" : ""}
+                          </span>
                         </div>
                       </div>
                       <button
                         onClick={() => handleCopy(item.keyword)}
                         className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-primary transition-all duration-200 flex-shrink-0 bg-background/80 backdrop-blur-sm rounded-lg p-1.5 sm:p-2 hover:scale-110"
                       >
-                        {copiedId === item.keyword ? <Check className="w-3 h-3 sm:w-4 sm:h-4" /> : <Copy className="w-3 h-3 sm:w-4 sm:h-4" />}
+                        {copiedId === item.keyword ? (
+                          <Check className="w-3 h-3 sm:w-4 sm:h-4" />
+                        ) : (
+                          <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
+                        )}
                       </button>
                     </div>
                   ))
@@ -270,20 +311,26 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
             <div className="space-y-4 sm:space-y-6">
               {/* Match Score */}
               <div
-                className="card-base bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/20 rounded-xl p-4 sm:p-6 animate-fade-in-up hover:shadow-md transition-all duration-300"
+                className="card-base bg-gradient-to-br from-primary/10 to-primary/5 border-2 border-primary/20 dark:border-slate-900/30 rounded-xl p-4 sm:p-6 animate-fade-in-up hover:shadow-md transition-all duration-300"
                 style={{ animationDelay: "300ms" }}
               >
                 <div className="flex flex-col items-center text-center gap-4 sm:gap-6">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-primary flex-shrink-0" />
+                    <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-primary dark:text-slate-900 flex-shrink-0" />
                     <div>
                       <h3 className="font-bold text-foreground text-lg sm:text-xl">Overall Match Score</h3>
-                      <p className="text-xs sm:text-sm text-muted-foreground">How well your resume matches this job description</p>
+                      <p className="text-xs sm:text-sm text-muted-foreground">
+                        How well your resume matches this job description
+                      </p>
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 w-full">
-                    <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-primary">{matchPercentage}%</div>
-                    <div className={`text-base sm:text-lg font-semibold ${getMatchColor(matchPercentage).replace('from-', 'text-').split(' ')[0]}`}>
+                    <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-primary dark:text-slate-900">
+                      {matchPercentage}%
+                    </div>
+                    <div
+                      className={`text-base sm:text-lg font-semibold ${getMatchColor(matchPercentage).replace("from-", "text-").split(" ")[0]}`}
+                    >
                       {getMatchLabel(matchPercentage)}
                     </div>
                   </div>
@@ -292,12 +339,17 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
 
               {/* Missing Keywords */}
               {missingKeywords.length > 0 && (
-                <div className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-error rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300" style={{ animationDelay: "400ms" }}>
+                <div
+                  className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-error rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300"
+                  style={{ animationDelay: "400ms" }}
+                >
                   <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                     <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-error flex-shrink-0" />
                     <h3 className="text-lg sm:text-xl font-bold text-foreground">Missing Keywords</h3>
                   </div>
-                  <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">These important keywords from the job description are missing from your resume:</p>
+                  <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">
+                    These important keywords from the job description are missing from your resume:
+                  </p>
                   <div className="flex flex-wrap gap-2 sm:gap-3">
                     {missingKeywords.map((keyword, i) => (
                       <span
@@ -323,7 +375,10 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                   </div>
                   <ul className="space-y-2 sm:space-y-3">
                     {suggestions.map((suggestion, i) => (
-                      <li key={i} className="flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors">
+                      <li
+                        key={i}
+                        className="flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors"
+                      >
                         <span className="text-secondary mt-1 flex-shrink-0 text-sm">•</span>
                         <span className="text-foreground leading-relaxed text-sm sm:text-base">{suggestion}</span>
                       </li>
@@ -347,8 +402,8 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
 
           {/* Enhanced Navigation */}
           <div className="flex flex-col sm:flex-row gap-3 justify-between mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-border">
-            <button 
-              onClick={onPrevious} 
+            <button
+              onClick={onPrevious}
               className="btn-secondary flex items-center justify-center gap-2 order-2 sm:order-1 hover:scale-105 transition-transform py-2.5 sm:py-3 text-sm w-full sm:w-auto"
             >
               <ArrowLeft className="w-3 h-3 sm:w-4 sm:h-4" />

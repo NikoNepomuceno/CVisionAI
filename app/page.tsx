@@ -251,16 +251,13 @@ export default function Home() {
   return (
     <div className="min-h-screen relative bg-gradient-to-br from-[#C3E8C9]/20 via-[#4165D5]/10 to-[#293855]/20 dark:from-[#293855] dark:via-[#4165D5]/20 dark:to-[#C3E8C9]/10 transition-colors duration-300">
       {/* Enhanced Animated Background */}
-      <div className="absolute inset-0">
+      <div className="absolute inset-0 overflow-hidden">
         {/* Main Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-[#C3E8C9]/20 via-[#4165D5]/10 to-[#293855]/20 dark:from-[#293855] dark:via-[#4165D5]/20 dark:to-[#C3E8C9]/10 transition-colors duration-300" />
 
         {/* Animated Gradient Orbs */}
         <div className="absolute w-96 h-96 -top-48 -left-48 bg-gradient-to-r from-[#4165D5]/20 to-[#293855]/20 dark:from-[#4165D5]/10 dark:to-[#293855]/10 rounded-full blur-3xl animate-pulse transition-colors duration-300" />
         <div className="absolute w-96 h-96 -bottom-48 -right-48 bg-gradient-to-r from-[#F1AC20]/20 to-[#C3E8C9]/20 dark:from-[#F1AC20]/10 dark:to-[#C3E8C9]/10 rounded-full blur-3xl animate-pulse delay-1000 transition-colors duration-300" />
-
-        {/* Grid Pattern */}
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(65,101,213,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(65,101,213,0.03)_1px,transparent_1px)] dark:bg-[linear-gradient(rgba(65,101,213,0.05)_1px,transparent_1px),linear-gradient(90deg,rgba(65,101,213,0.05)_1px,transparent_1px)] bg-[size:64px_64px] [mask-image:radial-gradient(ellipse_80%_50%_at_50%_50%,black,transparent)] transition-colors duration-300" />
       </div>
 
       <header className="relative bg-white/70 dark:bg-[#293855]/70 backdrop-blur-md border-b border-[#4165D5]/20 dark:border-[#4165D5]/30 sticky top-0 z-50 transition-colors duration-300">

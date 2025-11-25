@@ -164,6 +164,8 @@
   html {
     height: 100%;
     width: 100%;
+    /* prevent horizontal overflow from appearing */
+    overflow-x: hidden;
   }
 
   body {
@@ -181,6 +183,8 @@
     transition: background-color 0.3s ease, color 0.3s ease;
     /* body scrolls content, not overflow-hidden */
     overflow-y: scroll;
+    /* prevent horizontal overflow */
+    overflow-x: hidden;
   }
 
   /* Improved dark mode background with better contrast and visibility */
@@ -210,6 +214,8 @@
     pointer-events: none;
     z-index: -1; /* negative z-index so it stays behind all content */
     transition: all 0.3s ease;
+    /* prevent overflow in pseudo-element */
+    overflow: hidden;
   }
 
   /* Enhanced dark mode background overlay with better visibility */
