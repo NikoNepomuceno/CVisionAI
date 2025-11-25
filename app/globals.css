@@ -6,112 +6,99 @@
 
 /* ---------- LIGHT MODE ---------- */
 :root {
-  /* Refined brand palette with better contrast and sophistication */
-  --primary: #3b5bdb;
-  --secondary: #f1ac20;
-  --accent: #00d084;
+  /* Brand color palette */
+  --primary: 65, 101, 213; /* #4165D5 in RGB */
+  --secondary: 241, 172, 32; /* #F1AC20 in RGB */
+  --accent: 195, 232, 201; /* #C3E8C9 in RGB */
+  --dark-blue: 41, 56, 85; /* #293855 in RGB */
 
   /* Brand foregrounds (light mode) */
-  --primary-foreground: #ffffff;
-  --secondary-foreground: #1a1a1a;
-  --accent-foreground: #ffffff;
+  --primary-foreground: 255, 255, 255;
+  --secondary-foreground: 41, 56, 85;
+  --accent-foreground: 41, 56, 85;
 
   /* Feedback colors */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
+  --success: 195, 232, 201;
+  --warning: 241, 172, 32;
+  --error: 239, 68, 68;
 
-  /* Updated light mode backgrounds to softer tones instead of pure white */
-  --background: #f5f6f8;
-  --foreground: #1a1f2e;
-  --card: #f0f1f4;
-  --card-foreground: #1a1f2e;
-  --popover: #f0f1f4;
-  --popover-foreground: #1a1f2e;
-  --border: #dfe3eb;
-  --muted: #e8ebf0;
-  --muted-foreground: #6b7280;
+  /* Updated light mode backgrounds with brand gradients */
+  --background: 245, 246, 248;
+  --foreground: 41, 56, 85;
+  --card: 255, 255, 255;
+  --card-foreground: 41, 56, 85;
+  --popover: 255, 255, 255;
+  --popover-foreground: 41, 56, 85;
+  --border: 65, 101, 213;
+  --muted: 65, 101, 213;
+  --muted-foreground: 65, 101, 213;
 
   /* Sidebar */
-  --sidebar: #f5f6f8;
-  --sidebar-foreground: #1a1f2e;
-  --sidebar-primary: #3b5bdb;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #00d084;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #dfe3eb;
-  --sidebar-ring: #3b5bdb;
+  --sidebar: 245, 246, 248;
+  --sidebar-foreground: 41, 56, 85;
+  --sidebar-primary: 65, 101, 213;
+  --sidebar-primary-foreground: 255, 255, 255;
+  --sidebar-accent: 195, 232, 201;
+  --sidebar-accent-foreground: 41, 56, 85;
+  --sidebar-border: 65, 101, 213;
+  --sidebar-ring: 65, 101, 213;
 
   /* Input & radius */
-  --input: #e8ebf0;
-  --ring: #3b5bdb;
+  --input: 65, 101, 213;
+  --ring: 65, 101, 213;
   --radius: 0.625rem;
-
-  /* Surface alias used by theme mapping */
-  --surface: var(--card);
-
-  /* destructive alias (errors) */
-  --destructive: var(--error);
-  --destructive-foreground: #ffffff;
-
-  /* Chart palette */
-  --chart-1: #3b5bdb;
-  --chart-2: #f1ac20;
-  --chart-3: #10b981;
-  --chart-4: #1a1f2e;
-  --chart-5: #ef4444;
 }
 
 /* ---------- DARK MODE ---------- */
 .dark {
-  /* Updated dark mode to use softer charcoal and grays */
-  --background: #0d111a;
-  --foreground: #e3e6eb;
+  /* Dark mode with brand colors */
+  --background: 13, 17, 26;
+  --foreground: 227, 230, 235;
 
-  /* Layer hierarchy with softer grays */
-  --card: #151b27;
-  --card-foreground: #e3e6eb;
-  --popover: #1a202d;
-  --popover-foreground: #e3e6eb;
+  /* Layer hierarchy with brand colors */
+  --card: 21, 27, 39;
+  --card-foreground: 227, 230, 235;
+  --popover: 26, 32, 45;
+  --popover-foreground: 227, 230, 235;
 
-  /* Brand colors tuned for dark mode */
-  --primary: #58a6ff;
-  --primary-foreground: #ffffff;
-  --secondary: #f1ac20;
-  --secondary-foreground: #0d111a;
-  --accent: #00d084;
-  --accent-foreground: #ffffff;
+  /* Brand colors for dark mode */
+  --primary: 65, 101, 213;
+  --primary-foreground: 255, 255, 255;
+  --secondary: 241, 172, 32;
+  --secondary-foreground: 13, 17, 26;
+  --accent: 195, 232, 201;
+  --accent-foreground: 41, 56, 85;
 
   /* Status colors */
-  --success: #10b981;
-  --warning: #f59e0b;
-  --error: #ef4444;
-  --destructive: #ef4444;
-  --destructive-foreground: #ffffff;
+  --success: 195, 232, 201;
+  --warning: 241, 172, 32;
+  --error: 239, 68, 68;
+  --destructive: 239, 68, 68;
+  --destructive-foreground: 255, 255, 255;
 
-  /* Neutral tones - softer grays */
-  --muted: #262f3d;
-  --muted-foreground: #8b95a7;
-  --border: #2d3748;
-  --input: #0a0e17;
-  --ring: #58a6ff;
+  /* Neutral tones with brand influence */
+  --muted: 65, 101, 213;
+  --muted-foreground: 65, 101, 213;
+  --border: 65, 101, 213;
+  --input: 10, 14, 23;
+  --ring: 65, 101, 213;
 
   /* Data visuals */
-  --chart-1: #58a6ff;
-  --chart-2: #f1ac20;
-  --chart-3: #10b981;
-  --chart-4: #79c0ff;
-  --chart-5: #ef4444;
+  --chart-1: 65, 101, 213;
+  --chart-2: 241, 172, 32;
+  --chart-3: 195, 232, 201;
+  --chart-4: 41, 56, 85;
+  --chart-5: 239, 68, 68;
 
   /* Sidebar */
-  --sidebar: #0a0e17;
-  --sidebar-foreground: #e3e6eb;
-  --sidebar-primary: #58a6ff;
-  --sidebar-primary-foreground: #ffffff;
-  --sidebar-accent: #00d084;
-  --sidebar-accent-foreground: #ffffff;
-  --sidebar-border: #2d3748;
-  --sidebar-ring: #58a6ff;
+  --sidebar: 10, 14, 23;
+  --sidebar-foreground: 227, 230, 235;
+  --sidebar-primary: 65, 101, 213;
+  --sidebar-primary-foreground: 255, 255, 255;
+  --sidebar-accent: 195, 232, 201;
+  --sidebar-accent-foreground: 41, 56, 85;
+  --sidebar-border: 65, 101, 213;
+  --sidebar-ring: 65, 101, 213;
 }
 
 /* ---------- THEME VARIABLE MAPPING ---------- */
@@ -119,52 +106,53 @@
   --font-sans: "Geist", "Geist Fallback";
   --font-mono: "Geist Mono", "Geist Mono Fallback";
 
-  --color-primary: var(--primary);
-  --color-secondary: var(--secondary);
-  --color-accent: var(--accent);
-  --color-surface: var(--surface);
-  --color-success: var(--success);
-  --color-warning: var(--warning);
-  --color-error: var(--error);
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card);
-  --color-card-foreground: var(--card-foreground);
-  --color-border: var(--border);
-  --color-muted: var(--muted);
-  --color-muted-foreground: var(--muted-foreground);
-  --color-popover: var(--popover);
-  --color-popover-foreground: var(--popover-foreground);
-  --color-primary-foreground: var(--primary-foreground);
-  --color-secondary-foreground: var(--secondary-foreground);
-  --color-accent-foreground: var(--accent-foreground);
-  --color-destructive: var(--destructive);
-  --color-destructive-foreground: var(--destructive-foreground);
-  --color-input: var(--input);
-  --color-ring: var(--ring);
-  --color-chart-1: var(--chart-1);
-  --color-chart-2: var(--chart-2);
-  --color-chart-3: var(--chart-3);
-  --color-chart-4: var(--chart-4);
-  --color-chart-5: var(--chart-5);
+  --color-primary: rgb(var(--primary));
+  --color-secondary: rgb(var(--secondary));
+  --color-accent: rgb(var(--accent));
+  --color-surface: rgb(var(--background));
+  --color-success: rgb(var(--success));
+  --color-warning: rgb(var(--warning));
+  --color-error: rgb(var(--error));
+  --color-background: rgb(var(--background));
+  --color-foreground: rgb(var(--foreground));
+  --color-card: rgb(var(--card));
+  --color-card-foreground: rgb(var(--card-foreground));
+  --color-border: rgba(var(--border), 0.2);
+  --color-muted: rgba(var(--muted), 0.1);
+  --color-muted-foreground: rgb(var(--muted-foreground));
+  --color-popover: rgb(var(--popover));
+  --color-popover-foreground: rgb(var(--popover-foreground));
+  --color-primary-foreground: rgb(var(--primary-foreground));
+  --color-secondary-foreground: rgb(var(--secondary-foreground));
+  --color-accent-foreground: rgb(var(--accent-foreground));
+  --color-destructive: rgb(var(--error));
+  --color-destructive-foreground: rgb(var(--primary-foreground));
+  --color-input: rgba(var(--input), 0.1);
+  --color-ring: rgb(var(--ring));
+  --color-chart-1: rgb(var(--chart-1));
+  --color-chart-2: rgb(var(--chart-2));
+  --color-chart-3: rgb(var(--chart-3));
+  --color-chart-4: rgb(var(--chart-4));
+  --color-chart-5: rgb(var(--chart-5));
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-sidebar: var(--sidebar);
-  --color-sidebar-foreground: var(--sidebar-foreground);
-  --color-sidebar-primary: var(--sidebar-primary);
-  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
-  --color-sidebar-accent: var(--sidebar-accent);
-  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
-  --color-sidebar-border: var(--sidebar-border);
-  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar: rgb(var(--sidebar));
+  --color-sidebar-foreground: rgb(var(--sidebar-foreground));
+  --color-sidebar-primary: rgb(var(--sidebar-primary));
+  --color-sidebar-primary-foreground: rgb(var(--sidebar-primary-foreground));
+  --color-sidebar-accent: rgb(var(--sidebar-accent));
+  --color-sidebar-accent-foreground: rgb(var(--sidebar-accent-foreground));
+  --color-sidebar-border: rgba(var(--sidebar-border), 0.2);
+  --color-sidebar-ring: rgb(var(--sidebar-ring));
 }
 
 /* ---------- BASE LAYER ---------- */
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    border-color: var(--color-border);
+    outline-color: color-mix(in srgb, var(--color-ring) 50%, transparent);
   }
 
   /* Apply gradient to html and body to cover full viewport */
@@ -174,15 +162,53 @@
   }
 
   body {
-    /* Added subtle gradient backgrounds for both light and dark modes */
-    background: linear-gradient(135deg, #f5f6f8 0%, #e8ebf0 100%);
+    /* Brand gradient background for light mode */
+    background: linear-gradient(
+      135deg,
+      rgba(195, 232, 201, 0.2) 0%,
+      rgba(65, 101, 213, 0.1) 20%,
+      rgba(41, 56, 85, 0.2) 80%,
+      rgba(241, 172, 32, 0.1) 100%
+    );
     min-height: 100vh;
     height: 100%;
     width: 100%;
+    color: rgb(41, 56, 85);
   }
 
   .dark body {
-    background: linear-gradient(135deg, #0d111a 0%, #151b27 100%);
+    /* Brand gradient background for dark mode */
+    background: linear-gradient(
+      135deg,
+      rgb(41, 56, 85) 0%,
+      rgba(65, 101, 213, 0.2) 30%,
+      rgba(195, 232, 201, 0.1) 70%,
+      rgba(241, 172, 32, 0.05) 100%
+    );
+    color: rgb(227, 230, 235);
+  }
+
+  /* Add animated background elements like landing page */
+  body::before {
+    content: "";
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(65, 101, 213, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(195, 232, 201, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(241, 172, 32, 0.05) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  .dark body::before {
+    background: 
+      radial-gradient(circle at 20% 80%, rgba(65, 101, 213, 0.15) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(195, 232, 201, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(241, 172, 32, 0.08) 0%, transparent 50%);
   }
 }
 
@@ -190,32 +216,96 @@
 @layer components {
   /* Buttons */
   .btn-primary {
-    @apply px-4 py-2 bg-primary text-white rounded-lg font-medium transition-all duration-200
-           disabled:opacity-50 disabled:cursor-not-allowed active:scale-95
-           hover:shadow-lg hover:shadow-primary/30 hover:scale-105;
+    background: linear-gradient(to right, #4165D5, #293855);
+    color: white;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    border: none;
+    cursor: pointer;
+  }
+
+  .btn-primary:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .btn-primary:not(:disabled):hover {
+    box-shadow: 0 10px 15px -3px rgba(65, 101, 213, 0.3);
+    transform: scale(1.05);
+  }
+
+  .btn-primary:not(:disabled):active {
+    transform: scale(0.95);
   }
 
   .btn-secondary {
-    @apply px-4 py-2 border-2 border-primary text-primary rounded-lg font-medium
-           hover:bg-primary/5 transition-all duration-200 active:scale-95
-           hover:shadow-md hover:shadow-primary/20;
+    border: 2px solid #4165D5;
+    color: #4165D5;
+    padding: 0.5rem 1rem;
+    border-radius: 0.5rem;
+    font-weight: 500;
+    transition: all 0.2s;
+    background: transparent;
+    cursor: pointer;
+  }
+
+  .btn-secondary:hover {
+    background: rgba(65, 101, 213, 0.05);
+    box-shadow: 0 4px 6px -1px rgba(65, 101, 213, 0.2);
+  }
+
+  .btn-secondary:active {
+    transform: scale(0.95);
   }
 
   /* Cards */
   .card-base {
-    @apply bg-card text-card-foreground rounded-2xl border border-border p-6 shadow-sm transition-all duration-300;
+    background: rgb(var(--card));
+    color: rgb(var(--card-foreground));
+    border-radius: 1rem;
+    border: 1px solid rgba(65, 101, 213, 0.2);
+    padding: 1.5rem;
+    box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+    transition: all 0.3s;
   }
 
   .dark .card-base:hover {
-    @apply shadow-lg border-primary/30;
-    box-shadow: 0 0 16px rgba(88, 166, 255, 0.15);
+    box-shadow: 0 0 16px rgba(65, 101, 213, 0.15);
+    border-color: rgba(65, 101, 213, 0.3);
   }
 
   /* Inputs */
   .input-base {
-    @apply w-full px-4 py-2.5 border-2 border-border rounded-lg bg-background text-foreground 
-           placeholder:text-muted-foreground focus:outline-none focus:ring-2 
-           focus:ring-primary/20 focus:border-primary transition-all duration-200;
+    width: 100%;
+    padding: 0.625rem 1rem;
+    border: 2px solid rgba(65, 101, 213, 0.2);
+    border-radius: 0.5rem;
+    background: rgba(65, 101, 213, 0.1);
+    color: rgb(41, 56, 85);
+    transition: all 0.2s;
+  }
+
+  .input-base:focus {
+    outline: none;
+    ring: 2px;
+    ring-color: rgba(65, 101, 213, 0.2);
+    border-color: #4165D5;
+  }
+
+  .input-base::placeholder {
+    color: rgba(65, 101, 213, 0.6);
+  }
+
+  .dark .input-base {
+    background: rgba(10, 14, 23, 0.8);
+    color: rgb(227, 230, 235);
+    border-color: rgba(65, 101, 213, 0.3);
+  }
+
+  .dark .input-base::placeholder {
+    color: rgba(65, 101, 213, 0.5);
   }
 
   /* Animations */
@@ -255,28 +345,10 @@
   @keyframes pulse-glow {
     0%,
     100% {
-      box-shadow: 0 0 0 0 rgba(59, 91, 219, 0.7);
+      box-shadow: 0 0 0 0 rgba(65, 101, 213, 0.7);
     }
     50% {
-      box-shadow: 0 0 0 12px rgba(59, 91, 219, 0);
-    }
-  }
-
-  @keyframes shimmer {
-    0% {
-      background-position: -1000px 0;
-    }
-    100% {
-      background-position: 1000px 0;
-    }
-  }
-
-  @keyframes underline-slide {
-    from {
-      width: 0;
-    }
-    to {
-      width: 100%;
+      box-shadow: 0 0 0 12px rgba(65, 101, 213, 0);
     }
   }
 
@@ -293,33 +365,28 @@
     animation: pulse-glow 2s infinite;
   }
 
-  .animate-shimmer {
-    animation: shimmer 2s infinite;
-    background: linear-gradient(90deg, var(--muted) 25%, var(--background) 50%, var(--muted) 75%);
-    background-size: 1000px 100%;
-  }
-
   /* Link underline hover effect */
   .link-underline {
-    @apply relative inline-block;
+    position: relative;
+    display: inline-block;
   }
 
   .link-underline::after {
     content: "";
-    @apply absolute bottom-0 left-0 h-0.5 bg-secondary transition-all duration-300;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    height: 2px;
+    background: #F1AC20;
+    transition: all 0.3s;
     width: 0;
   }
 
   .link-underline:hover::after {
-    animation: underline-slide 0.3s ease-out forwards;
+    width: 100%;
   }
 
   /* Custom scrollbar */
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: rgba(59, 91, 219, 0.3) transparent;
-  }
-
   .custom-scrollbar::-webkit-scrollbar {
     width: 6px;
   }
@@ -330,24 +397,65 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(59, 91, 219, 0.3);
+    background: rgba(65, 101, 213, 0.3);
     border-radius: 10px;
     transition: background 0.2s ease;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(59, 91, 219, 0.5);
-  }
-
-  .dark .custom-scrollbar {
-    scrollbar-color: rgba(88, 166, 255, 0.4) transparent;
+    background: rgba(65, 101, 213, 0.5);
   }
 
   .dark .custom-scrollbar::-webkit-scrollbar-thumb {
-    background: rgba(88, 166, 255, 0.4);
+    background: rgba(65, 101, 213, 0.4);
   }
 
   .dark .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-    background: rgba(88, 166, 255, 0.6);
+    background: rgba(65, 101, 213, 0.6);
+  }
+
+  /* Brand-specific utility classes */
+  .bg-brand-primary {
+    background: #4165D5;
+  }
+
+  .bg-brand-secondary {
+    background: #F1AC20;
+  }
+
+  .bg-brand-accent {
+    background: #C3E8C9;
+  }
+
+  .bg-brand-dark {
+    background: #293855;
+  }
+
+  .text-brand-primary {
+    color: #4165D5;
+  }
+
+  .text-brand-secondary {
+    color: #F1AC20;
+  }
+
+  .text-brand-accent {
+    color: #C3E8C9;
+  }
+
+  .text-brand-dark {
+    color: #293855;
+  }
+
+  .border-brand-primary {
+    border-color: #4165D5;
+  }
+
+  .border-brand-secondary {
+    border-color: #F1AC20;
+  }
+
+  .border-brand-accent {
+    border-color: #C3E8C9;
   }
 }
