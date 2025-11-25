@@ -6,7 +6,6 @@ import { Zap, TrendingUp, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Load
 import type { ResumeAnalysis, AnalysisInsight } from "@/lib/deepseek"
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Cell } from "recharts"
-import jsPDF from "jspdf"
 
 interface AnalysisPageProps {
   resumeData: {
@@ -68,6 +67,115 @@ const SECTION_CONFIG: Array<{
     empty: "You're in good shape! Consider tailoring your resume to specific job descriptions for finer adjustments.",
   },
 ]
+
+// Enhanced PDF generation functions
+const createPdfBlob = (pdfLines: string[]): Blob => {
+  const pdfContent = pdfLines.join('\n')
+  return new Blob([pdfContent], { type: 'application/pdf' })
+}
+
+const escapePdfText = (text: string): string => {
+  return text
+    .replace(/\\/g, '\\\\')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)')
+    .replace(/\n/g, '\\n')
+    .replace(/\t/g, '\\t')
+}
+
+const wrapTextLines = (lines: string[]): string[] => {
+  const pdfLines: string[] = []
+  
+  // PDF Header
+  pdfLines.push('%PDF-1.4')
+  pdfLines.push('1 0 obj')
+  pdfLines.push('<< /Type /Catalog /Pages 2 0 R >>')
+  pdfLines.push('endobj')
+  
+  // Pages object
+  pdfLines.push('2 0 obj')
+  pdfLines.push('<< /Type /Pages /Kids [3 0 R] /Count 1 >>')
+  pdfLines.push('endobj')
+  
+  // Page object
+  pdfLines.push('3 0 obj')
+  pdfLines.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R >>')
+  pdfLines.push('endobj')
+  
+  // Content stream
+  let content = `
+    BT
+    /F1 12 Tf
+    50 750 Td
+    (CVisionAI - Resume Analysis Report) Tj
+    0 -20 Td
+    (Generated on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}) Tj
+    0 -40 Td
+  `
+
+  // Add all content lines
+  lines.forEach(line => {
+    if (line.trim() === '') {
+      content += '0 -15 Td\n'
+    } else if (line.startsWith('## ')) {
+      // Section header
+      content += `
+        /F1 14 Tf
+        (${escapePdfText(line.replace('## ', ''))}) Tj
+        0 -25 Td
+        /F1 12 Tf
+      `
+    } else if (line.startsWith('# ')) {
+      // Main header
+      content += `
+        /F1 16 Tf
+        (${escapePdfText(line.replace('# ', ''))}) Tj
+        0 -30 Td
+        /F1 12 Tf
+      `
+    } else if (line.startsWith('- ')) {
+      // List item
+      content += `(${escapePdfText('• ' + line.substring(2))}) Tj\n0 -18 Td\n`
+    } else if (line.startsWith('   ')) {
+      // Indented text
+      content += `     (${escapePdfText(line.trim())}) Tj\n0 -15 Td\n`
+    } else {
+      // Regular text
+      content += `(${escapePdfText(line)}) Tj\n0 -18 Td\n`
+    }
+  })
+
+  content += 'ET'
+
+  pdfLines.push('4 0 obj')
+  pdfLines.push(`<< /Length ${content.length} >>`)
+  pdfLines.push('stream')
+  pdfLines.push(content)
+  pdfLines.push('endstream')
+  pdfLines.push('endobj')
+  
+  // Font dictionary
+  pdfLines.push('5 0 obj')
+  pdfLines.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>')
+  pdfLines.push('endobj')
+  
+  // Cross-reference table and trailer
+  pdfLines.push('xref')
+  pdfLines.push('0 6')
+  pdfLines.push('0000000000 65535 f ')
+  pdfLines.push('0000000010 00000 n ')
+  pdfLines.push('0000000074 00000 n ')
+  pdfLines.push('0000000172 00000 n ')
+  pdfLines.push('0000000274 00000 n ')
+  pdfLines.push('0000001000 00000 n ')
+  pdfLines.push('trailer')
+  pdfLines.push('<< /Size 6 /Root 1 0 R >>')
+  pdfLines.push('startxref')
+  pdfLines.push('1500')
+  pdfLines.push('%%EOF')
+  
+  return pdfLines
+}
 
 export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysisPersist }: AnalysisPageProps) {
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(resumeData.analysis ?? null)
@@ -239,149 +347,109 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
   const handleDownloadSummary = () => {
     if (!analysis) return
 
-    // Create new PDF document
-    const doc = new jsPDF()
-    let yPosition = 20
-    const lineHeight = 7
-    const pageHeight = doc.internal.pageSize.height
-    const margin = 20
-    const maxWidth = 170
-
-    // Function to add text with auto page break
-    const addText = (text: string, fontSize = 12, isBold = false, isTitle = false) => {
-      const currentFontSize = doc.getFontSize()
-      doc.setFontSize(fontSize)
-      
-      if (isBold) {
-        doc.setFont(undefined, 'bold')
-      } else {
-        doc.setFont(undefined, 'normal')
-      }
-
-      // Split text into lines that fit the page width
-      const lines = doc.splitTextToSize(text, maxWidth)
-      
-      // Check if we need a new page
-      if (yPosition + (lines.length * lineHeight) > pageHeight - margin) {
-        doc.addPage()
-        yPosition = margin
-      }
-
-      // Add the text
-      if (isTitle) {
-        doc.setTextColor(0, 0, 128) // Dark blue for titles
-      } else {
-        doc.setTextColor(0, 0, 0) // Black for normal text
-      }
-
-      doc.text(lines, margin, yPosition)
-      yPosition += lines.length * lineHeight + (isTitle ? 8 : 2)
-
-      // Reset font
-      doc.setFontSize(currentFontSize)
-      doc.setTextColor(0, 0, 0)
-      doc.setFont(undefined, 'normal')
-    }
-
-    // Add header
-    addText('AI Analysis & Insights', 18, true, true)
-    addText('We analyzed your resume to surface strengths, gaps, and actionable next steps.', 11)
-    addText(`Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`, 10)
-    yPosition += 15
+    const lines: string[] = []
+    
+    // Header
+    lines.push('# AI Analysis & Insights')
+    lines.push('')
+    lines.push('We analyzed your resume to surface strengths, gaps, and actionable next steps.')
+    lines.push('')
+    lines.push(`**Generated on:** ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`)
+    lines.push('')
+    lines.push('---')
+    lines.push('')
 
     // Executive Summary
     if (analysis.summary) {
-      addText('Executive Summary', 16, true, true)
-      addText(analysis.summary, 11)
-      yPosition += 15
+      lines.push('## Executive Summary')
+      lines.push(analysis.summary)
+      lines.push('')
     }
 
     // Top Strengths
-    addText('Top Strengths', 16, true, true)
+    lines.push('## Top Strengths')
     if (analysis.strengths && analysis.strengths.length > 0) {
       analysis.strengths.forEach((insight, index) => {
-        addText(`${index + 1}. ${insight.title}`, 12, true)
-        addText(insight.description, 11)
-        
+        lines.push(`### ${insight.title}`)
+        lines.push(insight.description)
         if (insight.tags && insight.tags.length > 0) {
-          addText(`Areas: ${insight.tags.join(', ')}`, 10)
+          lines.push(`**Areas:** ${insight.tags.join(', ')}`)
         }
-        
         if (typeof insight.confidence === 'number') {
-          addText(`Confidence: ${insight.confidence}%`, 10)
+          lines.push(`**Confidence:** ${insight.confidence}%`)
         }
-        
-        yPosition += 8 // Space between insights
+        lines.push('')
       })
     } else {
-      addText('No specific strengths identified.', 11)
+      lines.push('No specific strengths identified.')
+      lines.push('')
     }
-    yPosition += 10
 
     // Potential Gaps
-    addText('Potential Gaps', 16, true, true)
+    lines.push('## Potential Gaps')
     if (analysis.weaknesses && analysis.weaknesses.length > 0) {
       analysis.weaknesses.forEach((insight, index) => {
-        addText(`${index + 1}. ${insight.title}`, 12, true)
-        addText(insight.description, 11)
-        
+        lines.push(`### ${insight.title}`)
+        lines.push(insight.description)
         if (insight.tags && insight.tags.length > 0) {
-          addText(`Areas: ${insight.tags.join(', ')}`, 10)
+          lines.push(`**Areas:** ${insight.tags.join(', ')}`)
         }
-        
         if (typeof insight.confidence === 'number') {
-          addText(`Confidence: ${insight.confidence}%`, 10)
+          lines.push(`**Confidence:** ${insight.confidence}%`)
         }
-        
-        yPosition += 8 // Space between insights
+        lines.push('')
       })
     } else {
-      addText('No significant gaps detected.', 11)
+      lines.push('No significant gaps detected.')
+      lines.push('')
     }
-    yPosition += 10
 
     // Improvement Opportunities
-    addText('Improvement Opportunities', 16, true, true)
+    lines.push('## Improvement Opportunities')
     if (analysis.improvements && analysis.improvements.length > 0) {
       analysis.improvements.forEach((insight, index) => {
-        addText(`${index + 1}. ${insight.title}`, 12, true)
-        addText(insight.description, 11)
-        
+        lines.push(`### ${insight.title}`)
+        lines.push(insight.description)
         if (insight.tags && insight.tags.length > 0) {
-          addText(`Areas: ${insight.tags.join(', ')}`, 10)
+          lines.push(`**Areas:** ${insight.tags.join(', ')}`)
         }
-        
         if (typeof insight.confidence === 'number') {
-          addText(`Confidence: ${insight.confidence}%`, 10)
+          lines.push(`**Confidence:** ${insight.confidence}%`)
         }
-        
-        yPosition += 8 // Space between insights
+        lines.push('')
       })
     } else {
-      addText('Your resume is in good shape!', 11)
+      lines.push('Your resume is in good shape!')
+      lines.push('')
     }
-    yPosition += 10
 
-    // Statistics
-    addText('Analysis Statistics', 16, true, true)
+    // Statistics Summary
+    lines.push('## Analysis Statistics')
     const totalInsights = (analysis.strengths?.length || 0) + 
-                         (analysis.weaknesses?.length || 0) + 
-                         (analysis.improvements?.length || 0)
+                        (analysis.weaknesses?.length || 0) + 
+                        (analysis.improvements?.length || 0)
     
-    addText(`Total Insights: ${totalInsights}`, 11)
-    addText(`Strengths Identified: ${analysis.strengths?.length || 0}`, 11)
-    addText(`Areas for Development: ${analysis.weaknesses?.length || 0}`, 11)
-    addText(`Improvement Opportunities: ${analysis.improvements?.length || 0}`, 11)
+    lines.push(`- **Total Insights:** ${totalInsights}`)
+    lines.push(`- **Strengths Identified:** ${analysis.strengths?.length || 0}`)
+    lines.push(`- **Areas for Development:** ${analysis.weaknesses?.length || 0}`)
+    lines.push(`- **Improvement Opportunities:** ${analysis.improvements?.length || 0}`)
+    lines.push('')
 
-    // Footer on last page
-    doc.addPage()
-    yPosition = margin
-    addText('---', 10)
-    addText('Generated by CVisionAI - AI-Powered Resume Analysis Tool', 10)
-    addText('Confidential Report - For personal use only', 10)
+    // Footer
+    lines.push('---')
+    lines.push('*Generated by CVisionAI - AI-Powered Resume Analysis Tool*')
+    lines.push('*Confidential Report - For personal use only*')
 
-    // Save the PDF
-    doc.save(`ai-analysis-report-${new Date().toISOString().split('T')[0]}.pdf`)
+    const pdfLines = wrapTextLines(lines)
+    const pdfBlob = createPdfBlob(pdfLines)
+    const url = URL.createObjectURL(pdfBlob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `ai-analysis-report-${new Date().toISOString().split('T')[0]}.pdf`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    URL.revokeObjectURL(url)
   }
 
   const renderInsights = (
