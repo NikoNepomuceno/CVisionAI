@@ -9,9 +9,7 @@
   /* Brand color palette */
   --primary: 65, 101, 213; /* #4165D5 in RGB */
   --secondary: 241, 172, 32; /* #F1AC20 in RGB */
-  --accent: 195, 232, 201; /* #C3E8C9 in RGB */
-  /* added darkened accent for light mode visibility */
-  --accent-dark: 80, 185, 142; /* #50B98E - darkened #C3E8C9 for light mode */
+  --accent: 80, 185, 142; /* #50B98E in RGB */
   --dark-blue: 41, 56, 85; /* #293855 in RGB */
 
   /* Brand foregrounds (light mode) */
@@ -20,7 +18,7 @@
   --accent-foreground: 41, 56, 85;
 
   /* Feedback colors */
-  --success: 195, 232, 201;
+  --success: 80, 185, 142;
   --warning: 241, 172, 32;
   --error: 239, 68, 68;
 
@@ -40,7 +38,7 @@
   /* Added chart colors for light mode to fix black bar issue */
   --chart-1: 65, 101, 213; /* Primary blue */
   --chart-2: 241, 172, 32; /* Secondary yellow/orange */
-  --chart-3: 195, 232, 201; /* Accent green */
+  --chart-3: 80, 185, 142; /* Accent green */
   --chart-4: 41, 56, 85; /* Dark blue */
   --chart-5: 239, 68, 68; /* Error red */
 
@@ -49,7 +47,7 @@
   --sidebar-foreground: 41, 56, 85;
   --sidebar-primary: 65, 101, 213;
   --sidebar-primary-foreground: 255, 255, 255;
-  --sidebar-accent: 195, 232, 201;
+  --sidebar-accent: 80, 185, 142;
   --sidebar-accent-foreground: 41, 56, 85;
   --sidebar-border: 226, 232, 240;
   --sidebar-ring: 65, 101, 213;
@@ -75,11 +73,11 @@
   --primary-foreground: 255, 255, 255;
   --secondary: 241, 172, 32;
   --secondary-foreground: 13, 17, 26;
-  --accent: 195, 232, 201;
+  --accent: 80, 185, 142;
   --accent-foreground: 41, 56, 85;
 
   /* Status colors */
-  --success: 195, 232, 201;
+  --success: 80, 185, 142;
   --warning: 241, 172, 32;
   --error: 239, 68, 68;
   --destructive: 239, 68, 68;
@@ -95,7 +93,7 @@
   /* Data visuals */
   --chart-1: 65, 101, 213;
   --chart-2: 241, 172, 32;
-  --chart-3: 195, 232, 201;
+  --chart-3: 80, 185, 142;
   --chart-4: 41, 56, 85;
   --chart-5: 239, 68, 68;
 
@@ -104,7 +102,7 @@
   --sidebar-foreground: 227, 230, 235;
   --sidebar-primary: 65, 101, 213;
   --sidebar-primary-foreground: 255, 255, 255;
-  --sidebar-accent: 195, 232, 201;
+  --sidebar-accent: 80, 185, 142;
   --sidebar-accent-foreground: 41, 56, 85;
   --sidebar-border: 51, 65, 85;
   --sidebar-ring: 65, 101, 213;
@@ -173,7 +171,7 @@
   body {
     background: linear-gradient(
       135deg,
-      rgba(195, 232, 201, 0.2) 0%,
+      rgba(80, 185, 142, 0.2) 0%,
       rgba(65, 101, 213, 0.1) 20%,
       rgba(41, 56, 85, 0.2) 80%,
       rgba(241, 172, 32, 0.1) 100%
@@ -195,7 +193,7 @@
       135deg,
       rgb(13, 17, 26) 0%,
       rgba(65, 101, 213, 0.15) 35%,
-      rgba(195, 232, 201, 0.08) 65%,
+      rgba(80, 185, 142, 0.08) 65%,
       rgba(241, 172, 32, 0.05) 100%
     );
     color: rgb(227, 230, 235);
@@ -211,7 +209,7 @@
     width: 100%;
     height: 100%;
     background: radial-gradient(circle at 20% 80%, rgba(65, 101, 213, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(195, 232, 201, 0.1) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(80, 185, 142, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 40% 40%, rgba(241, 172, 32, 0.05) 0%, transparent 50%);
     pointer-events: none;
     z-index: -1; /* negative z-index so it stays behind all content */
@@ -223,7 +221,7 @@
   /* Enhanced dark mode background overlay with better visibility */
   html.dark body::before {
     background: radial-gradient(circle at 20% 80%, rgba(65, 101, 213, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(195, 232, 201, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(80, 185, 142, 0.08) 0%, transparent 50%),
       radial-gradient(circle at 40% 40%, rgba(241, 172, 32, 0.06) 0%, transparent 50%);
   }
 
@@ -454,16 +452,7 @@
   }
 
   .bg-brand-accent {
-    /* use darkened accent in light mode, original in dark mode */
     background: #50b98e;
-  }
-
-  .dark .bg-brand-accent {
-    background: #c3e8c9;
-  }
-
-  .bg-brand-dark {
-    background: #293855;
   }
 
   .text-brand-primary {
@@ -475,12 +464,7 @@
   }
 
   .text-brand-accent {
-    /* use darkened accent in light mode, original in dark mode */
     color: #50b98e;
-  }
-
-  .dark .text-brand-accent {
-    color: #c3e8c9;
   }
 
   .text-brand-dark {
@@ -496,11 +480,6 @@
   }
 
   .border-brand-accent {
-    /* use darkened accent in light mode, original in dark mode */
     border-color: #50b98e;
-  }
-
-  .dark .border-brand-accent {
-    border-color: #c3e8c9;
   }
 }
