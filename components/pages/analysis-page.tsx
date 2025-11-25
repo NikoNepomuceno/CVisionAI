@@ -428,7 +428,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                 </div>
               )}
 
-              {/* Graph View - FIXED VERSION */}
+              {/* Graph View - FIXED VERSION with larger centered chart */}
               {viewMode === "graph" && chartData.length > 0 && (
                 <div className="card-base animate-fade-in-up border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center gap-3 mb-6">
@@ -436,118 +436,134 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                     <h2 className="text-xl font-bold text-foreground">Analysis Overview</h2>
                   </div>
                   
-                  <div className="h-[400px] w-full">
-                    <BarChart
-                      data={chartData}
-                      margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
-                      width={800}
-                      height={400}
-                    >
-                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
-                      <XAxis 
-                        dataKey="name"
-                        angle={-45}
-                        textAnchor="end"
-                        height={80}
-                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                      />
-                      <YAxis 
-                        yAxisId="left"
-                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                        label={{ 
-                          value: 'Insight Count', 
-                          angle: -90, 
-                          position: 'insideLeft',
-                          offset: -10,
-                          style: { fill: "hsl(var(--foreground))", fontSize: 12 }
-                        }}
-                      />
-                      <YAxis 
-                        yAxisId="right"
-                        orientation="right"
-                        domain={[0, 100]}
-                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
-                        label={{ 
-                          value: 'Avg Confidence %', 
-                          angle: -90, 
-                          position: 'insideRight',
-                          offset: -10,
-                          style: { fill: "hsl(var(--foreground))", fontSize: 12 }
-                        }}
-                      />
-                      <Tooltip 
-                        formatter={(value, name) => {
-                          if (name === "count") return [value, "Insight Count"];
-                          if (name === "avgConfidence") return [`${value}%`, "Avg Confidence"];
-                          return [value, name];
-                        }}
-                        contentStyle={{
-                          backgroundColor: "hsl(var(--card))",
-                          borderColor: "hsl(var(--border))",
-                          color: "hsl(var(--foreground))",
-                          borderRadius: "8px",
-                        }}
-                      />
-                      <Legend />
-                      
-                      {/* Insight Count Bars */}
-                      <Bar 
-                        yAxisId="left"
-                        dataKey="count" 
-                        name="Insight Count"
-                        radius={[4, 4, 0, 0]}
+                  {/* Centered Chart Container */}
+                  <div className="flex justify-center items-center w-full mb-8">
+                    <div className="h-[500px] w-full max-w-4xl">
+                      <BarChart
+                        data={chartData}
+                        margin={{ top: 30, right: 50, left: 50, bottom: 80 }}
+                        width={800}
+                        height={500}
                       >
-                        {chartData.map((entry, index) => (
-                          <Cell 
-                            key={`cell-count-${index}`} 
-                            fill={entry.color}
-                            stroke={entry.color}
-                            strokeWidth={1}
-                          />
-                        ))}
-                      </Bar>
-                      
-                      {/* Avg Confidence Bars */}
-                      <Bar 
-                        yAxisId="right"
-                        dataKey="avgConfidence" 
-                        name="Avg Confidence (%)"
-                        radius={[4, 4, 0, 0]}
-                      >
-                        {chartData.map((entry, index) => (
-                          <Cell 
-                            key={`cell-confidence-${index}`} 
-                            fill={`${entry.color}80`} // Add transparency
-                            stroke={entry.color}
-                            strokeWidth={1}
-                          />
-                        ))}
-                      </Bar>
-                    </BarChart>
+                        <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
+                        <XAxis 
+                          dataKey="name"
+                          angle={-45}
+                          textAnchor="end"
+                          height={100}
+                          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 14 }}
+                          interval={0}
+                        />
+                        <YAxis 
+                          yAxisId="left"
+                          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                          width={80}
+                          label={{ 
+                            value: 'Insight Count', 
+                            angle: -90, 
+                            position: 'insideLeft',
+                            offset: -15,
+                            style: { fill: "hsl(var(--foreground))", fontSize: 14, fontWeight: 'bold' }
+                          }}
+                        />
+                        <YAxis 
+                          yAxisId="right"
+                          orientation="right"
+                          domain={[0, 100]}
+                          tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                          width={80}
+                          label={{ 
+                            value: 'Avg Confidence %', 
+                            angle: -90, 
+                            position: 'insideRight',
+                            offset: -15,
+                            style: { fill: "hsl(var(--foreground))", fontSize: 14, fontWeight: 'bold' }
+                          }}
+                        />
+                        <Tooltip 
+                          formatter={(value, name) => {
+                            if (name === "count") return [value, "Insight Count"];
+                            if (name === "avgConfidence") return [`${value}%`, "Avg Confidence"];
+                            return [value, name];
+                          }}
+                          contentStyle={{
+                            backgroundColor: "hsl(var(--card))",
+                            borderColor: "hsl(var(--border))",
+                            color: "hsl(var(--foreground))",
+                            borderRadius: "8px",
+                            fontSize: "14px",
+                            padding: "12px",
+                          }}
+                        />
+                        <Legend 
+                          wrapperStyle={{
+                            paddingTop: "20px",
+                            fontSize: "14px",
+                          }}
+                        />
+                        
+                        {/* Insight Count Bars - Larger and more prominent */}
+                        <Bar 
+                          yAxisId="left"
+                          dataKey="count" 
+                          name="Insight Count"
+                          radius={[6, 6, 0, 0]}
+                          barSize={40}
+                        >
+                          {chartData.map((entry, index) => (
+                            <Cell 
+                              key={`cell-count-${index}`} 
+                              fill={entry.color}
+                              stroke={entry.color}
+                              strokeWidth={2}
+                            />
+                          ))}
+                        </Bar>
+                        
+                        {/* Avg Confidence Bars - Larger and more prominent */}
+                        <Bar 
+                          yAxisId="right"
+                          dataKey="avgConfidence" 
+                          name="Avg Confidence (%)"
+                          radius={[6, 6, 0, 0]}
+                          barSize={40}
+                        >
+                          {chartData.map((entry, index) => (
+                            <Cell 
+                              key={`cell-confidence-${index}`} 
+                              fill={`${entry.color}80`} // Add transparency
+                              stroke={entry.color}
+                              strokeWidth={2}
+                            />
+                          ))}
+                        </Bar>
+                      </BarChart>
+                    </div>
                   </div>
                   
-                  <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Stats Cards - Improved layout */}
+                  <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
                     {chartData.map((item, index) => (
                       <div
                         key={item.name}
-                        className="p-4 rounded-xl border border-border bg-muted/30 hover:shadow-md transition-all duration-300"
-                        style={{ borderLeft: `4px solid ${item.color}` }}
+                        className="p-6 rounded-xl border-2 border-border bg-card hover:shadow-lg transition-all duration-300 hover:scale-105"
+                        style={{ borderLeft: `6px solid ${item.color}` }}
                       >
-                        <div className="flex items-center gap-3 mb-3">
+                        <div className="flex items-center gap-4 mb-4">
                           <div
-                            className="w-4 h-4 rounded-full"
+                            className="w-6 h-6 rounded-full shadow-md"
                             style={{ backgroundColor: item.color }}
                           />
-                          <h3 className="font-semibold text-foreground">{item.name}</h3>
+                          <h3 className="font-bold text-lg text-foreground">{item.name}</h3>
                         </div>
-                        <div className="space-y-2 text-sm">
-                          <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">Insight Count:</span>
-                            <span className="font-semibold text-foreground">{item.count}</span>
+                        <div className="space-y-3 text-base">
+                          <div className="flex justify-between items-center py-2 border-b border-border">
+                            <span className="text-muted-foreground font-medium">Insight Count:</span>
+                            <span className="font-bold text-foreground text-lg">{item.count}</span>
                           </div>
-                          <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">Avg Confidence:</span>
-                            <span className="font-semibold text-foreground">{item.avgConfidence}%</span>
+                          <div className="flex justify-between items-center py-2">
+                            <span className="text-muted-foreground font-medium">Avg Confidence:</span>
+                            <span className="font-bold text-foreground text-lg">{item.avgConfidence}%</span>
                           </div>
                         </div>
                       </div>
