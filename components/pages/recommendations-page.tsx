@@ -472,12 +472,6 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                   )}
                 </div>
               </div>
-              <button
-                onClick={closeModal}
-                className="flex-shrink-0 p-2 hover:bg-muted rounded-lg transition-colors ml-4"
-              >
-                <X className="w-5 h-5" />
-              </button>
             </div>
 
             {/* Modal Content */}
