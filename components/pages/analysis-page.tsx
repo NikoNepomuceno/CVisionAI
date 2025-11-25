@@ -641,21 +641,46 @@ export default function AnalysisPage({
                     <BarChart data={chartData}>
                       <CartesianGrid
                         strokeDasharray="3 3"
-                        className="stroke-muted"
+                        stroke="hsl(var(--border))" // Changed from muted to border color
+                        strokeOpacity={0.5}
                       />
                       <XAxis
                         dataKey="name"
                         className="text-xs"
-                        tick={{ fill: "hsl(var(--muted-foreground))" }}
+                        tick={{ 
+                          fill: "hsl(var(--muted-foreground))",
+                          fontSize: 12 
+                        }}
+                        axisLine={{ 
+                          stroke: "hsl(var(--border))",
+                          strokeWidth: 1 
+                        }}
+                        tickLine={{ 
+                          stroke: "hsl(var(--border))",
+                          strokeWidth: 1 
+                        }}
                       />
                       <YAxis
                         yAxisId="left"
                         className="text-xs"
-                        tick={{ fill: "hsl(var(--muted-foreground))" }}
+                        tick={{ 
+                          fill: "hsl(var(--muted-foreground))",
+                          fontSize: 12 
+                        }}
+                        axisLine={{ 
+                          stroke: "hsl(var(--border))",
+                          strokeWidth: 1 
+                        }}
+                        tickLine={{ 
+                          stroke: "hsl(var(--border))",
+                          strokeWidth: 1 
+                        }}
                         label={{
                           value: "Insight Count",
                           angle: -90,
                           position: "insideLeft",
+                          fill: "hsl(var(--muted-foreground))",
+                          fontSize: 12,
                         }}
                       />
                       <YAxis
@@ -663,11 +688,24 @@ export default function AnalysisPage({
                         orientation="right"
                         domain={[0, 100]}
                         className="text-xs"
-                        tick={{ fill: "hsl(var(--muted-foreground))" }}
+                        tick={{ 
+                          fill: "hsl(var(--muted-foreground))",
+                          fontSize: 12 
+                        }}
+                        axisLine={{ 
+                          stroke: "hsl(var(--border))",
+                          strokeWidth: 1 
+                        }}
+                        tickLine={{ 
+                          stroke: "hsl(var(--border))",
+                          strokeWidth: 1 
+                        }}
                         label={{
                           value: "Avg Confidence %",
                           angle: -90,
                           position: "insideRight",
+                          fill: "hsl(var(--muted-foreground))",
+                          fontSize: 12,
                         }}
                       />
                       <ChartTooltip
@@ -692,7 +730,13 @@ export default function AnalysisPage({
                           />
                         }
                       />
-                      <Legend />
+                      <Legend 
+                        wrapperStyle={{
+                          color: "hsl(var(--foreground))",
+                          fontSize: "12px",
+                        }}
+                        iconSize={10}
+                      />
                       <Bar
                         yAxisId="left"
                         dataKey="count"
