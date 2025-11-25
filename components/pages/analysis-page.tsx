@@ -104,6 +104,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
     success: "#10b981",
     error: "#ef4444",
     secondary: "#f1ac20",
+    primary: "#4165D5",
   })
 
   useEffect(() => {
@@ -114,54 +115,91 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
         success: computedStyle.getPropertyValue("--success").trim() || "#10b981",
         error: computedStyle.getPropertyValue("--error").trim() || "#ef4444",
         secondary: computedStyle.getPropertyValue("--secondary").trim() || "#f1ac20",
+        primary: computedStyle.getPropertyValue("--primary").trim() || "#4165D5",
       })
     }
   }, [])
 
-  // Transform analysis data for chart visualization
+  // Transform analysis data for chart visualization - FIXED VERSION
   const chartData = useMemo(() => {
-    if (!analysis) return []
+    if (!analysis) return [];
 
     const categories = [
       { 
         key: "strengths" as const, 
         label: "Strengths", 
         color: themeColors.success, 
-        dataKey: "strengths" 
       },
       { 
         key: "weaknesses" as const, 
         label: "Weaknesses", 
         color: themeColors.error, 
-        dataKey: "weaknesses" 
       },
       { 
         key: "improvements" as const, 
         label: "Improvements", 
         color: themeColors.secondary, 
-        dataKey: "improvements" 
       },
-    ]
+    ];
 
-    return categories.map(({ key, label, color, dataKey }) => {
-      const insights = analysis[key] || []
-      const count = insights.length
+    return categories.map(({ key, label, color }) => {
+      const insights = analysis[key] || [];
+      const count = insights.length;
       const confidences = insights
         .map((insight) => insight.confidence)
-        .filter((conf): conf is number => typeof conf === "number")
+        .filter((conf): conf is number => typeof conf === "number");
       const avgConfidence = confidences.length > 0
         ? Math.round(confidences.reduce((sum, conf) => sum + conf, 0) / confidences.length)
-        : 0
+        : 0;
 
       return {
-        category: label,
+        name: label,
         count,
         avgConfidence,
         color,
-        dataKey,
-      }
-    })
-  }, [analysis, themeColors])
+        // For the ChartContainer config
+        [`${key}Count`]: count,
+        [`${key}Confidence`]: avgConfidence,
+      };
+    });
+  }, [analysis, themeColors]);
+
+  // Chart config - FIXED VERSION
+  const chartConfig = useMemo(() => ({
+    count: {
+      label: "Insight Count",
+      color: themeColors.primary || "#4165D5",
+    },
+    avgConfidence: {
+      label: "Avg Confidence (%)",
+      color: themeColors.secondary || "#F1AC20",
+    },
+    // Individual category configs for tooltips
+    strengthsCount: {
+      label: "Strengths Count",
+      color: themeColors.success,
+    },
+    weaknessesCount: {
+      label: "Weaknesses Count", 
+      color: themeColors.error,
+    },
+    improvementsCount: {
+      label: "Improvements Count",
+      color: themeColors.secondary,
+    },
+    strengthsConfidence: {
+      label: "Strengths Confidence",
+      color: themeColors.success,
+    },
+    weaknessesConfidence: {
+      label: "Weaknesses Confidence",
+      color: themeColors.error,
+    },
+    improvementsConfidence: {
+      label: "Improvements Confidence",
+      color: themeColors.secondary,
+    },
+  }), [themeColors]);
 
   useEffect(() => {
     if (resumeData.analysis) {
@@ -441,38 +479,13 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                   </div>
                   
                   <ChartContainer
-                    config={{
-                      strengthsCount: {
-                        label: "Strengths - Count",
-                        color: "hsl(var(--success))",
-                      },
-                      strengthsConfidence: {
-                        label: "Strengths - Confidence",
-                        color: "hsl(var(--success))",
-                      },
-                      weaknessesCount: {
-                        label: "Weaknesses - Count",
-                        color: "hsl(var(--error))",
-                      },
-                      weaknessesConfidence: {
-                        label: "Weaknesses - Confidence",
-                        color: "hsl(var(--error))",
-                      },
-                      improvementsCount: {
-                        label: "Improvements - Count",
-                        color: "hsl(var(--secondary))",
-                      },
-                      improvementsConfidence: {
-                        label: "Improvements - Confidence",
-                        color: "hsl(var(--secondary))",
-                      },
-                    }}
+                    config={chartConfig}
                     className="h-[300px] sm:h-[400px] w-full"
                   >
                     <BarChart data={chartData}>
                       <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
                       <XAxis
-                        dataKey="category"
+                        dataKey="name"
                         className="text-xs"
                         tick={{ fill: "hsl(var(--muted-foreground))" }}
                       />
@@ -480,6 +493,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                         yAxisId="left"
                         className="text-xs"
                         tick={{ fill: "hsl(var(--muted-foreground))" }}
+                        label={{ value: 'Insight Count', angle: -90, position: 'insideLeft' }}
                       />
                       <YAxis
                         yAxisId="right"
@@ -487,6 +501,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                         domain={[0, 100]}
                         className="text-xs"
                         tick={{ fill: "hsl(var(--muted-foreground))" }}
+                        label={{ value: 'Avg Confidence %', angle: -90, position: 'insideRight' }}
                       />
                       <ChartTooltip 
                         content={<ChartTooltipContent 
@@ -496,7 +511,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                               return [`${value}`, "Insight Count"]
                             }
                             if (nameStr.includes("Confidence") || nameStr === "avgConfidence") {
-                              return [`${value}%`, "Avg Confidence (%)"]
+                              return [`${value}%`, "Avg Confidence"]
                             }
                             return [value, name]
                           }}
@@ -529,7 +544,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                   <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
                     {chartData.map((item) => (
                       <div
-                        key={item.category}
+                        key={item.name}
                         className="p-4 rounded-xl border border-border bg-muted/30 hover:shadow-md transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 mb-3">
@@ -537,7 +552,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                             className="w-4 h-4 rounded-full"
                             style={{ backgroundColor: item.color }}
                           />
-                          <h3 className="font-semibold text-foreground">{item.category}</h3>
+                          <h3 className="font-semibold text-foreground">{item.name}</h3>
                         </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between items-center">
