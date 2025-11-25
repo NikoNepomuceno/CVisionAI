@@ -345,167 +345,107 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
   }
 
   const handleDownloadSummary = () => {
+    if (!analysis) return
+
     const lines: string[] = []
     
     // Header
-    lines.push('# CVisionAI - Comprehensive Resume Analysis Report')
+    lines.push('# AI Analysis & Insights')
     lines.push('')
-    lines.push(`Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`)
+    lines.push('We analyzed your resume to surface strengths, gaps, and actionable next steps.')
+    lines.push('')
+    lines.push(`**Generated on:** ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`)
+    lines.push('')
+    lines.push('---')
     lines.push('')
 
-    // Resume Data Section
-    lines.push('## Resume Overview')
-    lines.push('')
-
-    // Skills
-    lines.push('### Skills & Competencies')
-    if (resumeData.skills.length > 0) {
-      resumeData.skills.forEach(skill => {
-        lines.push(`- ${skill}`)
-      })
-    } else {
-      lines.push('- No skills listed')
+    // Executive Summary
+    if (analysis.summary) {
+      lines.push('## Executive Summary')
+      lines.push(analysis.summary)
+      lines.push('')
     }
-    lines.push('')
 
-    // Experience
-    lines.push('### Professional Experience')
-    if (resumeData.experience.length > 0) {
-      resumeData.experience.forEach((exp, index) => {
-        lines.push(`**${exp.role}** at ${exp.company}`)
-        if (exp.duration) {
-          lines.push(`  Duration: ${exp.duration}`)
+    // Top Strengths
+    lines.push('## Top Strengths')
+    if (analysis.strengths && analysis.strengths.length > 0) {
+      analysis.strengths.forEach((insight, index) => {
+        lines.push(`### ${insight.title}`)
+        lines.push(insight.description)
+        if (insight.tags && insight.tags.length > 0) {
+          lines.push(`**Areas:** ${insight.tags.join(', ')}`)
         }
-        if (exp.description) {
-          lines.push(`  Description: ${exp.description}`)
+        if (typeof insight.confidence === 'number') {
+          lines.push(`**Confidence:** ${insight.confidence}%`)
         }
-        if (index < resumeData.experience.length - 1) {
-          lines.push('')
+        lines.push('')
+      })
+    } else {
+      lines.push('No specific strengths identified.')
+      lines.push('')
+    }
+
+    // Potential Gaps
+    lines.push('## Potential Gaps')
+    if (analysis.weaknesses && analysis.weaknesses.length > 0) {
+      analysis.weaknesses.forEach((insight, index) => {
+        lines.push(`### ${insight.title}`)
+        lines.push(insight.description)
+        if (insight.tags && insight.tags.length > 0) {
+          lines.push(`**Areas:** ${insight.tags.join(', ')}`)
         }
+        if (typeof insight.confidence === 'number') {
+          lines.push(`**Confidence:** ${insight.confidence}%`)
+        }
+        lines.push('')
       })
     } else {
-      lines.push('- No experience listed')
+      lines.push('No significant gaps detected.')
+      lines.push('')
     }
+
+    // Improvement Opportunities
+    lines.push('## Improvement Opportunities')
+    if (analysis.improvements && analysis.improvements.length > 0) {
+      analysis.improvements.forEach((insight, index) => {
+        lines.push(`### ${insight.title}`)
+        lines.push(insight.description)
+        if (insight.tags && insight.tags.length > 0) {
+          lines.push(`**Areas:** ${insight.tags.join(', ')}`)
+        }
+        if (typeof insight.confidence === 'number') {
+          lines.push(`**Confidence:** ${insight.confidence}%`)
+        }
+        lines.push('')
+      })
+    } else {
+      lines.push('Your resume is in good shape!')
+      lines.push('')
+    }
+
+    // Statistics Summary
+    lines.push('## Analysis Statistics')
+    const totalInsights = (analysis.strengths?.length || 0) + 
+                        (analysis.weaknesses?.length || 0) + 
+                        (analysis.improvements?.length || 0)
+    
+    lines.push(`- **Total Insights:** ${totalInsights}`)
+    lines.push(`- **Strengths Identified:** ${analysis.strengths?.length || 0}`)
+    lines.push(`- **Areas for Development:** ${analysis.weaknesses?.length || 0}`)
+    lines.push(`- **Improvement Opportunities:** ${analysis.improvements?.length || 0}`)
     lines.push('')
-
-    // Education
-    lines.push('### Education')
-    if (resumeData.education.length > 0) {
-      resumeData.education.forEach(edu => {
-        lines.push(`- ${edu.degree} from ${edu.school}${edu.year ? ` (${edu.year})` : ''}`)
-      })
-    } else {
-      lines.push('- No education listed')
-    }
-    lines.push('')
-
-    // Summary
-    if (resumeData.summary) {
-      lines.push('### Professional Summary')
-      lines.push(resumeData.summary)
-      lines.push('')
-    }
-
-    // AI Analysis Section
-    if (analysis) {
-      lines.push('## AI-Powered Analysis & Insights')
-      lines.push('')
-
-      // Overall Summary
-      if (analysis.summary) {
-        lines.push('### Executive Summary')
-        lines.push(analysis.summary)
-        lines.push('')
-      }
-
-      // Strengths
-      lines.push('### Top Strengths')
-      if (analysis.strengths && analysis.strengths.length > 0) {
-        analysis.strengths.forEach((insight, index) => {
-          lines.push(`**${index + 1}. ${insight.title}**`)
-          lines.push(`   ${insight.description}`)
-          if (insight.tags && insight.tags.length > 0) {
-            lines.push(`   Related Areas: ${insight.tags.join(', ')}`)
-          }
-          if (typeof insight.confidence === 'number') {
-            lines.push(`   Confidence Level: ${insight.confidence}%`)
-          }
-          lines.push('')
-        })
-      } else {
-        lines.push('No specific strengths identified. Consider highlighting your key achievements and core competencies.')
-        lines.push('')
-      }
-
-      // Weaknesses
-      lines.push('### Potential Gaps & Areas for Development')
-      if (analysis.weaknesses && analysis.weaknesses.length > 0) {
-        analysis.weaknesses.forEach((insight, index) => {
-          lines.push(`**${index + 1}. ${insight.title}**`)
-          lines.push(`   ${insight.description}`)
-          if (insight.tags && insight.tags.length > 0) {
-            lines.push(`   Related Areas: ${insight.tags.join(', ')}`)
-          }
-          if (typeof insight.confidence === 'number') {
-            lines.push(`   Confidence Level: ${insight.confidence}%`)
-          }
-          lines.push('')
-        })
-      } else {
-        lines.push('No significant gaps detected. Your resume appears well-rounded for most positions.')
-        lines.push('')
-      }
-
-      // Improvements
-      lines.push('### Improvement Opportunities')
-      if (analysis.improvements && analysis.improvements.length > 0) {
-        analysis.improvements.forEach((insight, index) => {
-          lines.push(`**${index + 1}. ${insight.title}**`)
-          lines.push(`   ${insight.description}`)
-          if (insight.tags && insight.tags.length > 0) {
-            lines.push(`   Related Areas: ${insight.tags.join(', ')}`)
-          }
-          if (typeof insight.confidence === 'number') {
-            lines.push(`   Confidence Level: ${insight.confidence}%`)
-          }
-          lines.push('')
-        })
-      } else {
-        lines.push('Your resume is in good shape! Consider tailoring it for specific job applications.')
-        lines.push('')
-      }
-
-      // Statistics
-      lines.push('### Analysis Statistics')
-      const stats = {
-        'Total Insights': (analysis.strengths?.length || 0) + (analysis.weaknesses?.length || 0) + (analysis.improvements?.length || 0),
-        'Strengths Identified': analysis.strengths?.length || 0,
-        'Areas for Improvement': analysis.weaknesses?.length || 0,
-        'Optimization Opportunities': analysis.improvements?.length || 0,
-      }
-      
-      Object.entries(stats).forEach(([key, value]) => {
-        lines.push(`- ${key}: ${value}`)
-      })
-      lines.push('')
-
-    } else {
-      lines.push('## AI Analysis')
-      lines.push('No AI analysis available. Please run the analysis to get insights.')
-      lines.push('')
-    }
 
     // Footer
     lines.push('---')
-    lines.push('Generated by CVisionAI - AI-Powered Resume Analysis Tool')
-    lines.push('Confidential Report - For personal use only')
+    lines.push('*Generated by CVisionAI - AI-Powered Resume Analysis Tool*')
+    lines.push('*Confidential Report - For personal use only*')
 
     const pdfLines = wrapTextLines(lines)
     const pdfBlob = createPdfBlob(pdfLines)
     const url = URL.createObjectURL(pdfBlob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `cv-analysis-report-${new Date().toISOString().split('T')[0]}.pdf`
+    link.download = `ai-analysis-report-${new Date().toISOString().split('T')[0]}.pdf`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
