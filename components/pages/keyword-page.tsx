@@ -1,6 +1,6 @@
-"use client"
+"use client";
 
-import { useEffect, useState } from "react"
+import { useEffect, useState } from "react";
 import {
   Copy,
   Check,
@@ -14,51 +14,69 @@ import {
   Zap,
   Search,
   BarChart3,
-} from "lucide-react"
-import { toast } from "@/hooks/use-toast"
-import type { KeywordAnalysis } from "@/lib/deepseek"
+} from "lucide-react";
+import { toast } from "@/hooks/use-toast";
+import type { KeywordAnalysis } from "@/lib/deepseek";
 
 interface KeywordPageProps {
   resumeData: {
-    skills: string[]
-    experience: Array<{ company: string; role: string; duration?: string; description?: string }>
-    education: Array<{ school: string; degree: string; year?: string }>
-    summary?: string
-    keywordAnalysis?: KeywordAnalysis | null
-    keywordJobDescription?: string
-  }
-  onNext: (data: any) => void
-  onPrevious: () => void
-  onPersist?: (data: { keywordAnalysis?: KeywordAnalysis | null; keywordJobDescription?: string }) => void
+    skills: string[];
+    experience: Array<{
+      company: string;
+      role: string;
+      duration?: string;
+      description?: string;
+    }>;
+    education: Array<{ school: string; degree: string; year?: string }>;
+    summary?: string;
+    keywordAnalysis?: KeywordAnalysis | null;
+    keywordJobDescription?: string;
+  };
+  onNext: (data: any) => void;
+  onPrevious: () => void;
+  onPersist?: (data: {
+    keywordAnalysis?: KeywordAnalysis | null;
+    keywordJobDescription?: string;
+  }) => void;
 }
 
-export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist }: KeywordPageProps) {
-  const [jobDescription, setJobDescription] = useState(resumeData.keywordJobDescription ?? "")
-  const [copiedId, setCopiedId] = useState<string | null>(null)
-  const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysis, setAnalysis] = useState<KeywordAnalysis | null>(resumeData.keywordAnalysis ?? null)
+export default function KeywordPage({
+  resumeData,
+  onNext,
+  onPrevious,
+  onPersist,
+}: KeywordPageProps) {
+  const [jobDescription, setJobDescription] = useState(
+    resumeData.keywordJobDescription ?? ""
+  );
+  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [analysis, setAnalysis] = useState<KeywordAnalysis | null>(
+    resumeData.keywordAnalysis ?? null
+  );
 
   // Keep local state in sync if resume data updates (e.g., navigating back)
   useEffect(() => {
     if (resumeData.keywordAnalysis) {
-      setAnalysis(resumeData.keywordAnalysis)
+      setAnalysis(resumeData.keywordAnalysis);
     }
     if (typeof resumeData.keywordJobDescription === "string") {
-      setJobDescription(resumeData.keywordJobDescription)
+      setJobDescription(resumeData.keywordJobDescription);
     }
-  }, [resumeData.keywordAnalysis, resumeData.keywordJobDescription])
+  }, [resumeData.keywordAnalysis, resumeData.keywordJobDescription]);
 
   const handleAnalyze = async () => {
     if (!jobDescription.trim() || jobDescription.trim().length < 10) {
       toast({
         variant: "destructive",
         title: "Invalid job description",
-        description: "Please paste a job description with at least 10 characters.",
-      })
-      return
+        description:
+          "Please paste a job description with at least 10 characters.",
+      });
+      return;
     }
 
-    setIsAnalyzing(true)
+    setIsAnalyzing(true);
     try {
       const response = await fetch("/api/keywords", {
         method: "POST",
@@ -67,70 +85,73 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
           resume: resumeData,
           jobDescription: jobDescription.trim(),
         }),
-      })
+      });
 
       if (!response.ok) {
-        const error = await response.json()
-        throw new Error(error.error || "Analysis failed")
+        const error = await response.json();
+        throw new Error(error.error || "Analysis failed");
       }
 
-      const result = await response.json()
-      const keywordAnalysis = result.data
-      setAnalysis(keywordAnalysis)
+      const result = await response.json();
+      const keywordAnalysis = result.data;
+      setAnalysis(keywordAnalysis);
 
       // Persist the analysis and job description
       if (onPersist) {
         onPersist({
           keywordAnalysis,
           keywordJobDescription: jobDescription.trim(),
-        })
+        });
       }
 
       toast({
         title: "Analysis complete",
         description: "Keyword matching analysis is ready.",
-      })
+      });
     } catch (error: any) {
       toast({
         variant: "destructive",
         title: "Analysis failed",
-        description: error.message || "Failed to analyze keywords. Please try again.",
-      })
+        description:
+          error.message || "Failed to analyze keywords. Please try again.",
+      });
     } finally {
-      setIsAnalyzing(false)
+      setIsAnalyzing(false);
     }
-  }
+  };
 
   const handleCopy = (text: string) => {
-    navigator.clipboard.writeText(text)
-    setCopiedId(text)
-    setTimeout(() => setCopiedId(null), 2000)
+    navigator.clipboard.writeText(text);
+    setCopiedId(text);
+    setTimeout(() => setCopiedId(null), 2000);
     toast({
       title: "Copied!",
       description: "Keyword copied to clipboard.",
-    })
-  }
+    });
+  };
 
   // Use real data if analysis exists, otherwise show placeholder with actual resume skills
-  const yourSkills = analysis?.yourSkills || resumeData.skills.map((skill) => ({ skill, match: 0, foundInJob: false }))
-  const jobKeywords = analysis?.jobKeywords || []
-  const matchPercentage = analysis?.matchPercentage || 0
-  const missingKeywords = analysis?.missingKeywords || []
-  const suggestions = analysis?.suggestions || []
+  const yourSkills =
+    analysis?.yourSkills ||
+    resumeData.skills.map((skill) => ({ skill, match: 0, foundInJob: false }));
+  const jobKeywords = analysis?.jobKeywords || [];
+  const matchPercentage = analysis?.matchPercentage || 0;
+  const missingKeywords = analysis?.missingKeywords || [];
+  const suggestions = analysis?.suggestions || [];
 
   const getMatchColor = (percentage: number) => {
-    if (percentage >= 80) return "from-success to-success/70"
-    if (percentage >= 60) return "from-secondary to-secondary/70"
-    if (percentage >= 40) return "from-primary to-primary/70"
-    return "from-error to-error/70"
-  }
+    if (percentage >= 80) return "from-success to-success/70";
+    if (percentage >= 60) return "from-secondary to-secondary/70";
+    if (percentage >= 40) return "from-primary to-primary/70";
+    return "from-error to-error/70";
+  };
 
   const getMatchLabel = (percentage: number) => {
-    if (percentage >= 80) return "Excellent Match"
-    if (percentage >= 60) return "Good Match"
-    if (percentage >= 40) return "Fair Match"
-    return "Needs Improvement"
-  }
+    if (percentage >= 80) return "Excellent Match";
+    if (percentage >= 60) return "Good Match";
+    if (percentage >= 40) return "Fair Match";
+    return "Needs Improvement";
+  };
 
   return (
     <div className="min-h-screen flex flex-col">
@@ -148,7 +169,8 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
               Keyword Match Analysis
             </h1>
             <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2 sm:px-0 leading-relaxed">
-              Compare your skills with job requirements to optimize your resume for ATS systems.
+              Compare your skills with job requirements to optimize your resume
+              for ATS systems.
             </p>
           </div>
 
@@ -156,7 +178,9 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
           <div className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
               <Search className="w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-slate-900 flex-shrink-0" />
-              <h2 className="text-lg sm:text-xl font-bold text-foreground">Paste Job Description</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-foreground">
+                Paste Job Description
+              </h2>
             </div>
             <textarea
               value={jobDescription}
@@ -167,11 +191,17 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
             />
             <div className="mt-4 flex flex-col sm:flex-row justify-between items-stretch sm:items-center gap-3">
               <span className="text-xs text-muted-foreground text-center sm:text-left">
-                {jobDescription.length > 0 ? `${jobDescription.length} characters` : "Paste job description to begin"}
+                {jobDescription.length > 0
+                  ? `${jobDescription.length} characters`
+                  : "Paste job description to begin"}
               </span>
               <button
                 onClick={handleAnalyze}
-                disabled={isAnalyzing || !jobDescription.trim() || jobDescription.trim().length < 10}
+                disabled={
+                  isAnalyzing ||
+                  !jobDescription.trim() ||
+                  jobDescription.trim().length < 10
+                }
                 className="btn-primary flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 py-2.5 sm:py-3 disabled:opacity-50 disabled:cursor-not-allowed hover:scale-105 transition-transform text-sm w-full sm:w-auto"
               >
                 {isAnalyzing ? (
@@ -199,8 +229,12 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <Zap className="w-4 h-4 sm:w-5 sm:h-5 text-secondary flex-shrink-0" />
                 <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-foreground">Your Skills</h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{yourSkills.length} skills detected</p>
+                  <h2 className="text-lg sm:text-xl font-bold text-foreground">
+                    Your Skills
+                  </h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {yourSkills.length} skills detected
+                  </p>
                 </div>
               </div>
               <div className="space-y-3 sm:space-y-4">
@@ -212,14 +246,22 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                     >
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                         <div
-                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.foundInJob ? "bg-success dark:bg-success" : "bg-muted-foreground/30"}`}
+                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${
+                            item.foundInJob
+                              ? "bg-success dark:bg-success"
+                              : "bg-muted-foreground/30"
+                          }`}
                         />
-                        <span className="text-xs sm:text-sm font-medium text-foreground truncate">{item.skill}</span>
+                        <span className="text-xs sm:text-sm font-medium text-foreground truncate">
+                          {item.skill}
+                        </span>
                       </div>
                       <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0 ml-2">
                         <div className="w-16 sm:w-20 h-1.5 sm:h-2 bg-muted rounded-full overflow-hidden">
                           <div
-                            className={`h-full bg-gradient-to-r transition-all duration-500 ${getMatchColor(item.match)}`}
+                            className={`h-full bg-gradient-to-r transition-all duration-500 ${getMatchColor(
+                              item.match
+                            )}`}
                             style={{ width: `${item.match}%` }}
                           />
                         </div>
@@ -228,10 +270,10 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                             item.match >= 80
                               ? "text-success dark:text-success"
                               : item.match >= 60
-                                ? "text-secondary dark:text-secondary"
-                                : item.match >= 40
-                                  ? "text-primary dark:text-slate-900"
-                                  : "text-error dark:text-error"
+                              ? "text-secondary dark:text-secondary"
+                              : item.match >= 40
+                              ? "text-primary dark:text-slate-900"
+                              : "text-error dark:text-error"
                           }`}
                         >
                           {item.match}%
@@ -242,7 +284,9 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                 ) : (
                   <div className="text-center py-6 sm:py-8 text-muted-foreground">
                     <Zap className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 opacity-50" />
-                    <p className="text-xs sm:text-sm">No skills found in your resume.</p>
+                    <p className="text-xs sm:text-sm">
+                      No skills found in your resume.
+                    </p>
                   </div>
                 )}
               </div>
@@ -256,8 +300,12 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                 <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-slate-900 flex-shrink-0" />
                 <div>
-                  <h2 className="text-lg sm:text-xl font-bold text-foreground">Job Keywords</h2>
-                  <p className="text-xs sm:text-sm text-muted-foreground">{jobKeywords.length} keywords extracted</p>
+                  <h2 className="text-lg sm:text-xl font-bold text-foreground">
+                    Job Keywords
+                  </h2>
+                  <p className="text-xs sm:text-sm text-muted-foreground">
+                    {jobKeywords.length} keywords extracted
+                  </p>
                 </div>
               </div>
               <div className="space-y-2 sm:space-y-3">
@@ -273,14 +321,19 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                     >
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                         <div
-                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.matched ? "bg-success dark:bg-success" : "bg-primary dark:bg-primary"}`}
+                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${
+                            item.matched
+                              ? "bg-success dark:bg-success"
+                              : "bg-primary dark:bg-primary"
+                          }`}
                         />
                         <div className="flex-1 min-w-0">
                           <span className="text-xs sm:text-sm font-medium text-foreground block truncate">
                             {item.keyword}
                           </span>
                           <span className="text-xs text-muted-foreground">
-                            Mentioned {item.frequency} time{item.frequency !== 1 ? "s" : ""}
+                            Mentioned {item.frequency} time
+                            {item.frequency !== 1 ? "s" : ""}
                           </span>
                         </div>
                       </div>
@@ -299,7 +352,10 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                 ) : (
                   <div className="text-center py-6 sm:py-8 text-muted-foreground">
                     <Target className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 opacity-50" />
-                    <p className="text-xs sm:text-sm">No keywords extracted yet. Analyze a job description first.</p>
+                    <p className="text-xs sm:text-sm">
+                      No keywords extracted yet. Analyze a job description
+                      first.
+                    </p>
                   </div>
                 )}
               </div>
@@ -318,18 +374,26 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                   <div className="flex items-center gap-2 sm:gap-3">
                     <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-primary dark:text-slate-900 flex-shrink-0" />
                     <div>
-                      <h3 className="font-bold text-foreground text-lg sm:text-xl">Overall Match Score</h3>
+                      <h3 className="font-bold text-foreground text-lg sm:text-xl">
+                        Overall Match Score
+                      </h3>
                       <p className="text-xs sm:text-sm text-muted-foreground">
                         How well your resume matches this job description
                       </p>
                     </div>
                   </div>
-                  <div className="flex flex-col sm:flex-row items-center gap-3 sm:gap-6 w-full">
-                    <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-primary dark:text-slate-900">
+
+                  {/* Centered Number and Percentage */}
+                  <div className="flex flex-col items-center justify-center gap-2 w-full">
+                    <div className="text-5xl sm:text-6xl lg:text-7xl font-bold text-primary dark:text-slate-900 text-center">
                       {matchPercentage}%
                     </div>
                     <div
-                      className={`text-base sm:text-lg font-semibold ${getMatchColor(matchPercentage).replace("from-", "text-").split(" ")[0]}`}
+                      className={`text-base sm:text-lg font-semibold text-center ${
+                        getMatchColor(matchPercentage)
+                          .replace("from-", "text-")
+                          .split(" ")[0]
+                      }`}
                     >
                       {getMatchLabel(matchPercentage)}
                     </div>
@@ -345,10 +409,13 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                 >
                   <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                     <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5 text-error flex-shrink-0" />
-                    <h3 className="text-lg sm:text-xl font-bold text-foreground">Missing Keywords</h3>
+                    <h3 className="text-lg sm:text-xl font-bold text-foreground">
+                      Missing Keywords
+                    </h3>
                   </div>
                   <p className="text-muted-foreground mb-3 sm:mb-4 text-sm sm:text-base">
-                    These important keywords from the job description are missing from your resume:
+                    These important keywords from the job description are
+                    missing from your resume:
                   </p>
                   <div className="flex flex-wrap gap-2 sm:gap-3">
                     {missingKeywords.map((keyword, i) => (
@@ -371,7 +438,9 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                 >
                   <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
                     <TrendingUp className="w-4 h-4 sm:w-5 sm:h-5 text-secondary flex-shrink-0" />
-                    <h3 className="text-lg sm:text-xl font-bold text-foreground">Optimization Suggestions</h3>
+                    <h3 className="text-lg sm:text-xl font-bold text-foreground">
+                      Optimization Suggestions
+                    </h3>
                   </div>
                   <ul className="space-y-2 sm:space-y-3">
                     {suggestions.map((suggestion, i) => (
@@ -379,8 +448,12 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                         key={i}
                         className="flex items-start gap-2 sm:gap-3 p-2.5 sm:p-3 rounded-lg bg-secondary/5 hover:bg-secondary/10 transition-colors"
                       >
-                        <span className="text-secondary mt-1 flex-shrink-0 text-sm">•</span>
-                        <span className="text-foreground leading-relaxed text-sm sm:text-base">{suggestion}</span>
+                        <span className="text-secondary mt-1 flex-shrink-0 text-sm">
+                          •
+                        </span>
+                        <span className="text-foreground leading-relaxed text-sm sm:text-base">
+                          {suggestion}
+                        </span>
                       </li>
                     ))}
                   </ul>
@@ -393,9 +466,12 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
           {!analysis && !isAnalyzing && (
             <div className="card-base text-center py-8 sm:py-12 text-muted-foreground animate-fade-in-up rounded-xl border-2 border-dashed border-muted-foreground/30">
               <Target className="w-12 h-12 sm:w-14 sm:h-14 mx-auto mb-3 sm:mb-4 opacity-50" />
-              <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">Ready for Analysis</h3>
+              <h3 className="font-semibold text-base sm:text-lg mb-1 sm:mb-2">
+                Ready for Analysis
+              </h3>
               <p className="text-xs sm:text-sm max-w-md mx-auto px-2">
-                Paste a job description above and click "Analyze Keywords" to see how well your resume matches the role.
+                Paste a job description above and click "Analyze Keywords" to
+                see how well your resume matches the role.
               </p>
             </div>
           )}
@@ -426,5 +502,5 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
         </div>
       </div>
     </div>
-  )
+  );
 }
