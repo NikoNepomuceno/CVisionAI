@@ -35,6 +35,13 @@
   --input: 241, 245, 249;
   --ring: 65, 101, 213;
 
+  /* Added chart colors for light mode to fix black bar issue */
+  --chart-1: 65, 101, 213; /* Primary blue */
+  --chart-2: 241, 172, 32; /* Secondary yellow/orange */
+  --chart-3: 195, 232, 201; /* Accent green */
+  --chart-4: 41, 56, 85; /* Dark blue */
+  --chart-5: 239, 68, 68; /* Error red */
+
   /* Sidebar */
   --sidebar: 245, 246, 248;
   --sidebar-foreground: 41, 56, 85;
