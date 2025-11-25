@@ -472,6 +472,12 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                   )}
                 </div>
               </div>
+              <button
+                onClick={closeModal}
+                className="flex-shrink-0 p-2 hover:bg-muted rounded-lg transition-colors ml-4"
+              >
+                <X className="w-5 h-5" />
+              </button>
             </div>
 
             {/* Modal Content */}
@@ -576,16 +582,6 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                   </div>
                 )}
               </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="flex gap-3 p-6 border-t border-border bg-muted/30">
-              <button
-                onClick={closeModal}
-                className="flex-1 btn-secondary py-3"
-              >
-                Close
-              </button>
             </div>
           </div>
         </div>
