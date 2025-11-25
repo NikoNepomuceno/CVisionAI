@@ -174,10 +174,11 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  .dark body {
+  /* FIXED: Ensure dark mode background is properly applied */
+  html.dark body {
     background: linear-gradient(
       135deg,
-      rgb(41, 56, 85) 0%,
+      rgb(13, 17, 26) 0%,
       rgba(65, 101, 213, 0.2) 30%,
       rgba(195, 232, 201, 0.1) 70%,
       rgba(241, 172, 32, 0.05) 100%
@@ -202,7 +203,8 @@
     transition: all 0.3s ease;
   }
 
-  .dark body::before {
+  /* FIXED: Ensure dark mode background overlay is properly applied */
+  html.dark body::before {
     background: 
       radial-gradient(circle at 20% 80%, rgba(65, 101, 213, 0.15) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(195, 232, 201, 0.1) 0%, transparent 50%),
