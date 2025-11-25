@@ -209,23 +209,26 @@ export default function AnalysisPage({
         key: "strengths" as const,
         label: "Strengths",
         color: themeColors.chart3, // Using --color-chart-3 (success/green)
+        confidenceColor: `${themeColors.chart3}80`, // Same color with opacity for confidence
         icon: <CheckCircle2 className="w-4 h-4" />,
       },
       {
         key: "weaknesses" as const,
         label: "Weaknesses",
         color: themeColors.error, // Using --color-error (red)
+        confidenceColor: `${themeColors.error}80`, // Same color with opacity for confidence
         icon: <AlertCircle className="w-4 h-4" />,
       },
       {
         key: "improvements" as const,
         label: "Improvements",
         color: themeColors.chart2, // Using --color-chart-2 (secondary/yellow)
+        confidenceColor: `${themeColors.chart2}80`, // Same color with opacity for confidence
         icon: <TrendingUp className="w-4 h-4" />,
       },
     ];
 
-    return categories.map(({ key, label, color, icon }) => {
+    return categories.map(({ key, label, color, confidenceColor, icon }) => {
       const insights = analysis[key] || [];
       const count = insights.length;
       const confidences = insights
@@ -244,6 +247,7 @@ export default function AnalysisPage({
         count,
         avgConfidence,
         color,
+        confidenceColor, // Add this for the confidence bars
         icon,
       };
     });
@@ -647,33 +651,33 @@ export default function AnalysisPage({
                       <XAxis
                         dataKey="name"
                         className="text-xs"
-                        tick={{ 
+                        tick={{
                           fill: "hsl(var(--muted-foreground))",
-                          fontSize: 12 
+                          fontSize: 12,
                         }}
-                        axisLine={{ 
+                        axisLine={{
                           stroke: "hsl(var(--border))",
-                          strokeWidth: 1 
+                          strokeWidth: 1,
                         }}
-                        tickLine={{ 
+                        tickLine={{
                           stroke: "hsl(var(--border))",
-                          strokeWidth: 1 
+                          strokeWidth: 1,
                         }}
                       />
                       <YAxis
                         yAxisId="left"
                         className="text-xs"
-                        tick={{ 
+                        tick={{
                           fill: "hsl(var(--muted-foreground))",
-                          fontSize: 12 
+                          fontSize: 12,
                         }}
-                        axisLine={{ 
+                        axisLine={{
                           stroke: "hsl(var(--border))",
-                          strokeWidth: 1 
+                          strokeWidth: 1,
                         }}
-                        tickLine={{ 
+                        tickLine={{
                           stroke: "hsl(var(--border))",
-                          strokeWidth: 1 
+                          strokeWidth: 1,
                         }}
                         label={{
                           value: "Insight Count",
@@ -688,17 +692,17 @@ export default function AnalysisPage({
                         orientation="right"
                         domain={[0, 100]}
                         className="text-xs"
-                        tick={{ 
+                        tick={{
                           fill: "hsl(var(--muted-foreground))",
-                          fontSize: 12 
+                          fontSize: 12,
                         }}
-                        axisLine={{ 
+                        axisLine={{
                           stroke: "hsl(var(--border))",
-                          strokeWidth: 1 
+                          strokeWidth: 1,
                         }}
-                        tickLine={{ 
+                        tickLine={{
                           stroke: "hsl(var(--border))",
-                          strokeWidth: 1 
+                          strokeWidth: 1,
                         }}
                         label={{
                           value: "Avg Confidence %",
@@ -730,7 +734,7 @@ export default function AnalysisPage({
                           />
                         }
                       />
-                      <Legend 
+                      <Legend
                         wrapperStyle={{
                           color: "hsl(var(--foreground))",
                           fontSize: "12px",
@@ -759,7 +763,7 @@ export default function AnalysisPage({
                         {chartData.map((entry, index) => (
                           <Cell
                             key={`cell-confidence-${index}`}
-                            fill={`${entry.color}80`}
+                            fill={entry.confidenceColor} // Use the confidenceColor instead of opacity
                           />
                         ))}
                       </Bar>
