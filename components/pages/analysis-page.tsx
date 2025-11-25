@@ -68,7 +68,114 @@ const SECTION_CONFIG: Array<{
   },
 ]
 
-// ... (keep all your existing PDF functions: createPdfBlob, escapePdfText, wrapTextLines)
+// Enhanced PDF generation functions
+const createPdfBlob = (pdfLines: string[]): Blob => {
+  const pdfContent = pdfLines.join('\n')
+  return new Blob([pdfContent], { type: 'application/pdf' })
+}
+
+const escapePdfText = (text: string): string => {
+  return text
+    .replace(/\\/g, '\\\\')
+    .replace(/\(/g, '\\(')
+    .replace(/\)/g, '\\)')
+    .replace(/\n/g, '\\n')
+    .replace(/\t/g, '\\t')
+}
+
+const wrapTextLines = (lines: string[]): string[] => {
+  const pdfLines: string[] = []
+  
+  // PDF Header
+  pdfLines.push('%PDF-1.4')
+  pdfLines.push('1 0 obj')
+  pdfLines.push('<< /Type /Catalog /Pages 2 0 R >>')
+  pdfLines.push('endobj')
+  
+  // Pages object
+  pdfLines.push('2 0 obj')
+  pdfLines.push('<< /Type /Pages /Kids [3 0 R] /Count 1 >>')
+  pdfLines.push('endobj')
+  
+  // Page object
+  pdfLines.push('3 0 obj')
+  pdfLines.push('<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Contents 4 0 R >>')
+  pdfLines.push('endobj')
+  
+  // Content stream
+  let content = `
+    BT
+    /F1 12 Tf
+    50 750 Td
+    (CVisionAI - Resume Analysis Report) Tj
+    0 -20 Td
+    (Generated on: ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString()}) Tj
+    0 -40 Td
+  `
+
+  // Add all content lines
+  lines.forEach(line => {
+    if (line.trim() === '') {
+      content += '0 -15 Td\n'
+    } else if (line.startsWith('## ')) {
+      // Section header
+      content += `
+        /F1 14 Tf
+        (${escapePdfText(line.replace('## ', ''))}) Tj
+        0 -25 Td
+        /F1 12 Tf
+      `
+    } else if (line.startsWith('# ')) {
+      // Main header
+      content += `
+        /F1 16 Tf
+        (${escapePdfText(line.replace('# ', ''))}) Tj
+        0 -30 Td
+        /F1 12 Tf
+      `
+    } else if (line.startsWith('- ')) {
+      // List item
+      content += `(${escapePdfText('• ' + line.substring(2))}) Tj\n0 -18 Td\n`
+    } else if (line.startsWith('   ')) {
+      // Indented text
+      content += `     (${escapePdfText(line.trim())}) Tj\n0 -15 Td\n`
+    } else {
+      // Regular text
+      content += `(${escapePdfText(line)}) Tj\n0 -18 Td\n`
+    }
+  })
+
+  content += 'ET'
+
+  pdfLines.push('4 0 obj')
+  pdfLines.push(`<< /Length ${content.length} >>`)
+  pdfLines.push('stream')
+  pdfLines.push(content)
+  pdfLines.push('endstream')
+  pdfLines.push('endobj')
+  
+  // Font dictionary
+  pdfLines.push('5 0 obj')
+  pdfLines.push('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>')
+  pdfLines.push('endobj')
+  
+  // Cross-reference table and trailer
+  pdfLines.push('xref')
+  pdfLines.push('0 6')
+  pdfLines.push('0000000000 65535 f ')
+  pdfLines.push('0000000010 00000 n ')
+  pdfLines.push('0000000074 00000 n ')
+  pdfLines.push('0000000172 00000 n ')
+  pdfLines.push('0000000274 00000 n ')
+  pdfLines.push('0000001000 00000 n ')
+  pdfLines.push('trailer')
+  pdfLines.push('<< /Size 6 /Root 1 0 R >>')
+  pdfLines.push('startxref')
+  pdfLines.push('1500')
+  pdfLines.push('%%EOF')
+  
+  return pdfLines
+}
 
 export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysisPersist }: AnalysisPageProps) {
   const [analysis, setAnalysis] = useState<ResumeAnalysis | null>(resumeData.analysis ?? null)
@@ -238,46 +345,167 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
   }
 
   const handleDownloadSummary = () => {
-    if (!analysis) return
-
     const lines: string[] = []
-    const addSection = (title: string, insights: AnalysisInsight[]) => {
-      lines.push(`\n${title}`)
-      if (insights.length === 0) {
-        lines.push("- None")
-        return
-      }
-      insights.forEach((insight, index) => {
-        lines.push(`${index + 1}. ${insight.title}`)
-        lines.push(`   ${insight.description}`)
-        if (insight.tags && insight.tags.length > 0) {
-          lines.push(`   Tags: ${insight.tags.join(", ")}`)
+    
+    // Header
+    lines.push('# CVisionAI - Comprehensive Resume Analysis Report')
+    lines.push('')
+    lines.push(`Generated on: ${new Date().toLocaleDateString()} at ${new Date().toLocaleTimeString()}`)
+    lines.push('')
+
+    // Resume Data Section
+    lines.push('## Resume Overview')
+    lines.push('')
+
+    // Skills
+    lines.push('### Skills & Competencies')
+    if (resumeData.skills.length > 0) {
+      resumeData.skills.forEach(skill => {
+        lines.push(`- ${skill}`)
+      })
+    } else {
+      lines.push('- No skills listed')
+    }
+    lines.push('')
+
+    // Experience
+    lines.push('### Professional Experience')
+    if (resumeData.experience.length > 0) {
+      resumeData.experience.forEach((exp, index) => {
+        lines.push(`**${exp.role}** at ${exp.company}`)
+        if (exp.duration) {
+          lines.push(`  Duration: ${exp.duration}`)
         }
-        if (typeof insight.confidence === "number") {
-          lines.push(`   Confidence: ${insight.confidence}%`)
+        if (exp.description) {
+          lines.push(`  Description: ${exp.description}`)
+        }
+        if (index < resumeData.experience.length - 1) {
+          lines.push('')
         }
       })
+    } else {
+      lines.push('- No experience listed')
+    }
+    lines.push('')
+
+    // Education
+    lines.push('### Education')
+    if (resumeData.education.length > 0) {
+      resumeData.education.forEach(edu => {
+        lines.push(`- ${edu.degree} from ${edu.school}${edu.year ? ` (${edu.year})` : ''}`)
+      })
+    } else {
+      lines.push('- No education listed')
+    }
+    lines.push('')
+
+    // Summary
+    if (resumeData.summary) {
+      lines.push('### Professional Summary')
+      lines.push(resumeData.summary)
+      lines.push('')
     }
 
-    lines.push("CVisionAI Analysis Summary")
-    lines.push(`Generated: ${new Date().toLocaleString()}`)
-    if (analysis.summary) {
-      lines.push("\nOverall Summary")
-      lines.push(analysis.summary)
+    // AI Analysis Section
+    if (analysis) {
+      lines.push('## AI-Powered Analysis & Insights')
+      lines.push('')
+
+      // Overall Summary
+      if (analysis.summary) {
+        lines.push('### Executive Summary')
+        lines.push(analysis.summary)
+        lines.push('')
+      }
+
+      // Strengths
+      lines.push('### Top Strengths')
+      if (analysis.strengths && analysis.strengths.length > 0) {
+        analysis.strengths.forEach((insight, index) => {
+          lines.push(`**${index + 1}. ${insight.title}**`)
+          lines.push(`   ${insight.description}`)
+          if (insight.tags && insight.tags.length > 0) {
+            lines.push(`   Related Areas: ${insight.tags.join(', ')}`)
+          }
+          if (typeof insight.confidence === 'number') {
+            lines.push(`   Confidence Level: ${insight.confidence}%`)
+          }
+          lines.push('')
+        })
+      } else {
+        lines.push('No specific strengths identified. Consider highlighting your key achievements and core competencies.')
+        lines.push('')
+      }
+
+      // Weaknesses
+      lines.push('### Potential Gaps & Areas for Development')
+      if (analysis.weaknesses && analysis.weaknesses.length > 0) {
+        analysis.weaknesses.forEach((insight, index) => {
+          lines.push(`**${index + 1}. ${insight.title}**`)
+          lines.push(`   ${insight.description}`)
+          if (insight.tags && insight.tags.length > 0) {
+            lines.push(`   Related Areas: ${insight.tags.join(', ')}`)
+          }
+          if (typeof insight.confidence === 'number') {
+            lines.push(`   Confidence Level: ${insight.confidence}%`)
+          }
+          lines.push('')
+        })
+      } else {
+        lines.push('No significant gaps detected. Your resume appears well-rounded for most positions.')
+        lines.push('')
+      }
+
+      // Improvements
+      lines.push('### Improvement Opportunities')
+      if (analysis.improvements && analysis.improvements.length > 0) {
+        analysis.improvements.forEach((insight, index) => {
+          lines.push(`**${index + 1}. ${insight.title}**`)
+          lines.push(`   ${insight.description}`)
+          if (insight.tags && insight.tags.length > 0) {
+            lines.push(`   Related Areas: ${insight.tags.join(', ')}`)
+          }
+          if (typeof insight.confidence === 'number') {
+            lines.push(`   Confidence Level: ${insight.confidence}%`)
+          }
+          lines.push('')
+        })
+      } else {
+        lines.push('Your resume is in good shape! Consider tailoring it for specific job applications.')
+        lines.push('')
+      }
+
+      // Statistics
+      lines.push('### Analysis Statistics')
+      const stats = {
+        'Total Insights': (analysis.strengths?.length || 0) + (analysis.weaknesses?.length || 0) + (analysis.improvements?.length || 0),
+        'Strengths Identified': analysis.strengths?.length || 0,
+        'Areas for Improvement': analysis.weaknesses?.length || 0,
+        'Optimization Opportunities': analysis.improvements?.length || 0,
+      }
+      
+      Object.entries(stats).forEach(([key, value]) => {
+        lines.push(`- ${key}: ${value}`)
+      })
+      lines.push('')
+
+    } else {
+      lines.push('## AI Analysis')
+      lines.push('No AI analysis available. Please run the analysis to get insights.')
+      lines.push('')
     }
 
-    addSection("Strengths", analysis.strengths || [])
-    lines.push("")
-    addSection("Weaknesses", analysis.weaknesses || [])
-    lines.push("")
-    addSection("Improvement Opportunities", analysis.improvements || [])
+    // Footer
+    lines.push('---')
+    lines.push('Generated by CVisionAI - AI-Powered Resume Analysis Tool')
+    lines.push('Confidential Report - For personal use only')
 
     const pdfLines = wrapTextLines(lines)
     const pdfBlob = createPdfBlob(pdfLines)
     const url = URL.createObjectURL(pdfBlob)
     const link = document.createElement("a")
     link.href = url
-    link.download = `cv-analysis-${new Date().toISOString().split("T")[0]}.pdf`
+    link.download = `cv-analysis-report-${new Date().toISOString().split('T')[0]}.pdf`
     document.body.appendChild(link)
     link.click()
     document.body.removeChild(link)
@@ -378,7 +606,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
               className="btn-secondary flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed hover:scale-105 transition-transform text-sm py-3 w-full sm:w-auto sm:mt-0 mt-2"
             >
               <Download className="w-4 h-4" />
-              <span>Download Summary</span>
+              <span>Download Full Report</span>
             </button>
           </div>
 
