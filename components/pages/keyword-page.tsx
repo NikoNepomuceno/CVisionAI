@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Copy, Check, TrendingUp, ArrowRight, ArrowLeft, Loader2, Sparkles, AlertCircle, Target, Zap, Search, BarChart3 } from "lucide-react"
 import { toast } from "@/hooks/use-toast"
 import type { KeywordAnalysis } from "@/lib/deepseek"
@@ -11,16 +11,29 @@ interface KeywordPageProps {
     experience: Array<{ company: string; role: string; duration?: string; description?: string }>
     education: Array<{ school: string; degree: string; year?: string }>
     summary?: string
+    keywordAnalysis?: KeywordAnalysis | null
+    keywordJobDescription?: string
   }
   onNext: (data: any) => void
   onPrevious: () => void
+  onPersist?: (data: { keywordAnalysis?: KeywordAnalysis | null; keywordJobDescription?: string }) => void
 }
 
-export default function KeywordPage({ resumeData, onNext, onPrevious }: KeywordPageProps) {
-  const [jobDescription, setJobDescription] = useState("")
+export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist }: KeywordPageProps) {
+  const [jobDescription, setJobDescription] = useState(resumeData.keywordJobDescription ?? "")
   const [copiedId, setCopiedId] = useState<string | null>(null)
   const [isAnalyzing, setIsAnalyzing] = useState(false)
-  const [analysis, setAnalysis] = useState<KeywordAnalysis | null>(null)
+  const [analysis, setAnalysis] = useState<KeywordAnalysis | null>(resumeData.keywordAnalysis ?? null)
+
+  // Keep local state in sync if resume data updates (e.g., navigating back)
+  useEffect(() => {
+    if (resumeData.keywordAnalysis) {
+      setAnalysis(resumeData.keywordAnalysis)
+    }
+    if (typeof resumeData.keywordJobDescription === "string") {
+      setJobDescription(resumeData.keywordJobDescription)
+    }
+  }, [resumeData.keywordAnalysis, resumeData.keywordJobDescription])
 
   const handleAnalyze = async () => {
     if (!jobDescription.trim() || jobDescription.trim().length < 10) {
@@ -49,7 +62,17 @@ export default function KeywordPage({ resumeData, onNext, onPrevious }: KeywordP
       }
 
       const result = await response.json()
-      setAnalysis(result.data)
+      const keywordAnalysis = result.data
+      setAnalysis(keywordAnalysis)
+      
+      // Persist the analysis and job description
+      if (onPersist) {
+        onPersist({
+          keywordAnalysis,
+          keywordJobDescription: jobDescription.trim(),
+        })
+      }
+      
       toast({
         title: "Analysis complete",
         description: "Keyword matching analysis is ready.",
@@ -332,7 +355,12 @@ export default function KeywordPage({ resumeData, onNext, onPrevious }: KeywordP
               Back to Feedback
             </button>
             <button
-              onClick={() => onNext({ keywordAnalysis: analysis })}
+              onClick={() =>
+                onNext({
+                  keywordAnalysis: analysis,
+                  keywordJobDescription: jobDescription.trim(),
+                })
+              }
               disabled={!analysis}
               className="btn-primary flex items-center justify-center gap-2 order-1 sm:order-2 hover:scale-105 transition-transform disabled:opacity-50 disabled:cursor-not-allowed py-2.5 sm:py-3 text-sm w-full sm:w-auto"
             >

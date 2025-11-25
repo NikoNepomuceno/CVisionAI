@@ -4,6 +4,7 @@ import { useMemo } from "react"
 import { CheckCircle2, TrendingUp, Download, Share2, Sparkles, ArrowLeft, Target, Zap, BarChart3, Rocket, Award, Star } from "lucide-react"
 import type { KeywordAnalysis, ResumeAnalysis } from "@/lib/deepseek"
 import { toast } from "@/hooks/use-toast"
+import { createPdfBlob, downloadPdf, type PDFSection } from "@/lib/pdf-utils"
 
 interface ResultsPageProps {
   resumeData: {
@@ -18,37 +19,7 @@ interface ResultsPageProps {
   onPrevious: () => void
 }
 
-const createPdfBlob = (lines: string[]): Blob => {
-  // Simple PDF creation implementation
-  const pdfContent = lines.join('\n')
-  return new Blob([pdfContent], { type: 'application/pdf' })
-}
-
-const escapePdfText = (text: string): string => {
-  return text.replace(/[\(\)\\]/g, '\\$&')
-}
-
-const wrapTextLines = (lines: string[]): string[] => {
-  return lines.map(line => {
-    if (line.length <= 80) return line
-    // Simple wrapping logic
-    const words = line.split(' ')
-    const wrapped: string[] = []
-    let currentLine = ''
-    
-    words.forEach(word => {
-      if ((currentLine + word).length <= 80) {
-        currentLine += (currentLine ? ' ' : '') + word
-      } else {
-        if (currentLine) wrapped.push(currentLine)
-        currentLine = word
-      }
-    })
-    
-    if (currentLine) wrapped.push(currentLine)
-    return wrapped
-  }).flat()
-}
+// PDF generation now handled by shared utility in lib/pdf-utils.ts
 
 export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsPageProps) {
   const keywordAnalysis = resumeData.keywordAnalysis
@@ -122,77 +93,80 @@ export default function ResultsPage({ resumeData, onNext, onPrevious }: ResultsP
   }
 
   const handleDownloadPDF = () => {
-    const lines: string[] = []
-    lines.push("CVisionAI Resume Analysis Results")
-    lines.push(`Generated: ${new Date().toLocaleString()}`)
-    lines.push("")
+    const sections: PDFSection[] = []
 
     // Overall Match Score
     if (keywordAnalysis) {
-      lines.push("Overall Match Score")
-      lines.push("=".repeat(20))
-      lines.push(`${matchPercentage}%`)
-      lines.push("")
+      sections.push({
+        title: 'Overall Match Score',
+        type: 'section',
+        content: [
+          `**${matchPercentage}%** - ${getMatchLabel(matchPercentage)}`,
+          keywordAnalysis.matchPercentage > 0 
+            ? `Your resume matches ${matchPercentage}% of the job requirements.`
+            : 'Complete keyword analysis to see your match score.',
+        ],
+      })
     }
 
     // Top Strengths
     if (topStrengths.length > 0) {
-      lines.push("Top Strengths")
-      lines.push("=".repeat(12))
-      topStrengths.forEach((strength, i) => {
-        lines.push(`${i + 1}. ${strength}`)
+      sections.push({
+        title: 'Top Strengths',
+        type: 'section',
+        content: topStrengths.map((strength, i) => `${i + 1}. ${strength}`),
       })
-      lines.push("")
     }
 
     // Skills Breakdown
     if (skillsBreakdown.length > 0) {
-      lines.push("Skills Breakdown")
-      lines.push("=".repeat(16))
-      skillsBreakdown.forEach((item) => {
-        lines.push(`${item.label}: ${item.value}%`)
+      const breakdownContent = skillsBreakdown.map((item) => 
+        `- ${item.label}: ${item.value}%`
+      )
+      sections.push({
+        title: 'Skills Breakdown',
+        type: 'section',
+        content: breakdownContent,
       })
-      lines.push("")
     }
 
     // Next Steps
     if (nextSteps.length > 0) {
-      lines.push("Next Steps")
-      lines.push("=".repeat(10))
-      nextSteps.forEach((step) => {
-        lines.push(step.replace("✓ ", ""))
+      sections.push({
+        title: 'Next Steps',
+        type: 'section',
+        content: nextSteps.map((step) => step.replace("✓ ", "")),
       })
-      lines.push("")
     }
 
     // Missing Keywords
     if (keywordAnalysis?.missingKeywords && keywordAnalysis.missingKeywords.length > 0) {
-      lines.push("Missing Keywords")
-      lines.push("=".repeat(16))
-      keywordAnalysis.missingKeywords.forEach((keyword) => {
-        lines.push(`- ${keyword}`)
+      sections.push({
+        title: 'Missing Keywords',
+        type: 'section',
+        content: keywordAnalysis.missingKeywords.map((keyword) => `- ${keyword}`),
       })
-      lines.push("")
     }
 
     // Analysis Summary
     if (analysis?.summary) {
-      lines.push("Analysis Summary")
-      lines.push("=".repeat(16))
-      lines.push(analysis.summary)
-      lines.push("")
+      sections.push({
+        title: 'Analysis Summary',
+        type: 'section',
+        content: [analysis.summary],
+      })
     }
 
-    const pdfLines = wrapTextLines(lines)
-    const pdfBlob = createPdfBlob(pdfLines)
-    const url = URL.createObjectURL(pdfBlob)
-    const link = document.createElement("a")
-    link.href = url
-    link.download = `cv-results-${new Date().toISOString().split("T")[0]}.pdf`
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    URL.revokeObjectURL(url)
+    const metadata = {
+      title: 'CVisionAI Resume Analysis Results',
+      subtitle: 'Comprehensive Resume Analysis & Match Score',
+      generatedAt: new Date(),
+      footer: 'Generated by CVisionAI - AI-Powered Resume Analysis Tool | Confidential Report - For personal use only',
+    }
+
+    const pdfBlob = createPdfBlob(sections, metadata)
+    const filename = `cv-results-${new Date().toISOString().split("T")[0]}.pdf`
+    downloadPdf(pdfBlob, filename)
 
     toast({
       title: "PDF Downloaded",

@@ -496,4 +496,78 @@ Return ONLY valid JSON array.`
   return recommendations.sort((a, b) => b.match - a.match)
 }
 
+export type JobDetails = {
+  description: string
+  requirements: string[]
+  benefits: string[]
+  applicationProcess: string
+  companyInfo: string
+}
+
+export async function generateJobDetails(
+  jobTitle: string,
+  company: string,
+  skills: string[],
+  location: string,
+  type?: string
+): Promise<JobDetails> {
+  if (!jobTitle || !company) {
+    throw new Error("Missing job title or company")
+  }
+
+  const system =
+    "You are an expert job description writer. Generate detailed, realistic job information based on the provided job details. Return structured JSON with comprehensive job information."
+
+  const userPrompt = `Generate detailed job information for the following position:
+
+JOB TITLE: ${jobTitle}
+COMPANY: ${company}
+LOCATION: ${location}
+TYPE: ${type || "full-time"}
+RELEVANT SKILLS: ${skills.join(", ") || "Not specified"}
+
+Return a JSON object with this structure:
+{
+  "description": "Detailed job description (2-3 paragraphs explaining the role, responsibilities, and what the company is looking for)",
+  "requirements": ["Requirement 1", "Requirement 2", "Requirement 3", ...] (5-8 specific requirements),
+  "benefits": ["Benefit 1", "Benefit 2", "Benefit 3", ...] (4-6 realistic benefits),
+  "applicationProcess": "Brief description of how to apply (1-2 sentences)",
+  "companyInfo": "Brief information about the company (1-2 sentences)"
+}
+
+Guidelines:
+- Make the description realistic and detailed
+- Requirements should be specific and relevant to the job title
+- Benefits should be realistic (health insurance, 401k, remote work, etc.)
+- Application process should be brief but informative
+- Company info should be generic but professional
+- All content should be professional and appropriate
+
+Return ONLY valid JSON.`
+
+  const content = await deepseekChat(userPrompt, { system, temperature: 0.3 })
+
+  const jsonStart = content.indexOf("{")
+  const jsonEnd = content.lastIndexOf("}")
+  if (jsonStart === -1 || jsonEnd === -1) {
+    throw new Error("Failed to parse JSON job details from DeepSeek output")
+  }
+
+  const jsonText = content.slice(jsonStart, jsonEnd + 1)
+  const parsed = JSON.parse(jsonText)
+
+  // Normalize and validate
+  return {
+    description: typeof parsed.description === "string" ? parsed.description : "Job description not available.",
+    requirements: Array.isArray(parsed.requirements)
+      ? parsed.requirements.filter((r: any) => typeof r === "string" && r.length > 0)
+      : [],
+    benefits: Array.isArray(parsed.benefits)
+      ? parsed.benefits.filter((b: any) => typeof b === "string" && b.length > 0)
+      : [],
+    applicationProcess: typeof parsed.applicationProcess === "string" ? parsed.applicationProcess : "Apply through company website or job portal.",
+    companyInfo: typeof parsed.companyInfo === "string" ? parsed.companyInfo : `${company} is a professional organization.`,
+  }
+}
+
 
