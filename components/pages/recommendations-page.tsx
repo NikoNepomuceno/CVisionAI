@@ -1,7 +1,7 @@
 "use client"
 
 import { useState, useEffect, useMemo } from "react"
-import { ExternalLink, Share2, MapPin, DollarSign, Sparkles, ArrowLeft, Loader2, AlertCircle, Star, TrendingUp, Zap, X, Calendar, Users, Building } from "lucide-react"
+import { ExternalLink, Share2, MapPin, DollarSign, Sparkles, ArrowLeft, Loader2, AlertCircle, Star, TrendingUp, Zap, X, Calendar, Users, Building, Copy } from "lucide-react"
 import type { JobRecommendation } from "@/lib/deepseek"
 import { toast } from "@/hooks/use-toast"
 
@@ -397,9 +397,9 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                               })
                             }}
                             className="btn-secondary p-2 sm:p-3 hover:shadow-lg transform hover:scale-105 transition-all duration-200"
-                            title="Share job details"
+                            title="Copy job details"
                           >
-                            <Share2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <Copy className="w-3 h-3 sm:w-4 sm:h-4" />
                           </button>
                         </div>
                       </div>
@@ -591,19 +591,6 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                 className="flex-1 btn-secondary py-3"
               >
                 Close
-              </button>
-              <button
-                onClick={() => {
-                  // This would open the actual job application page
-                  toast({
-                    title: "External job link",
-                    description: "This would redirect to the actual job application page.",
-                  })
-                }}
-                className="flex-1 btn-primary py-3 flex items-center justify-center gap-2"
-              >
-                <ExternalLink className="w-4 h-4" />
-                Apply Now
               </button>
             </div>
           </div>
