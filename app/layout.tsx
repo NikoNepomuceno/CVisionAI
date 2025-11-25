@@ -1,10 +1,8 @@
 import type React from "react"
 import type { Metadata } from "next"
 import { Geist, Geist_Mono } from "next/font/google"
-import { Analytics } from "@vercel/analytics/next"
 import { Toaster } from "@/components/ui/toaster"
 import { QueryProvider } from "@/components/providers/query-provider"
-import { cookies } from "next/headers"
 import "./globals.css"
 
 const geist = Geist({ subsets: ["latin"] })
@@ -26,7 +24,7 @@ export const metadata: Metadata = {
 
 function getInitialTheme() {
   // This runs only on the server
-  return 'light' // Default theme, you can make this dynamic
+  return "light" // Default theme, you can make this dynamic
 }
 
 export default function RootLayout({
@@ -35,15 +33,10 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   const initialTheme = getInitialTheme()
-  const isDark = initialTheme === 'dark'
+  const isDark = initialTheme === "dark"
 
   return (
-    <html 
-      lang="en" 
-      className={isDark ? 'dark' : ''}
-      data-theme={initialTheme}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={isDark ? "dark" : ""} data-theme={initialTheme} suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -73,7 +66,6 @@ export default function RootLayout({
         <QueryProvider>
           {children}
           <Toaster />
-          <Analytics />
         </QueryProvider>
       </body>
     </html>

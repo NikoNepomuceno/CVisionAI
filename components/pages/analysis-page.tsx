@@ -473,7 +473,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
             <div className="space-y-6">
               {/* Summary Section */}
               {analysis.summary && (
-                <div className="card-base animate-fade-in-up border-t-4 border-t-primary bg-primary/5 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300">
+                <div className="card-base animate-fade-in-up border-t-4 border-t-primary bg-white dark:bg-slate-800 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center gap-3 mb-4">
                     <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary" />
                     <h2 className="text-xl font-bold text-foreground">Executive Summary</h2>
@@ -491,7 +491,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                       return (
                         <div
                           key={key}
-                          className={`card-base animate-fade-in-up border-t-4 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 ${topBorderClass}`}
+                          className={`card-base animate-fade-in-up border-t-4 rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-800 ${topBorderClass}`}
                           style={{ animationDelay: "150ms" }}
                         >
                           <div className="flex flex-col sm:flex-row sm:items-center justify-between mb-4 sm:mb-6 gap-3 sm:gap-0">
@@ -532,7 +532,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
 
               {/* Graph View */}
               {viewMode === "graph" && chartData.length > 0 && (
-                <div className="card-base animate-fade-in-up border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300">
+                <div className="card-base animate-fade-in-up border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 bg-white dark:bg-slate-800">
                   <div className="flex items-center gap-3 mb-6">
                     <BarChart3 className="w-6 h-6 text-primary" />
                     <h2 className="text-xl font-bold text-foreground">Analysis Overview</h2>
@@ -540,11 +540,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
 
                   <ChartContainer config={chartConfig} className="h-[300px] sm:h-[400px] w-full">
                     <BarChart data={chartData}>
-                      <CartesianGrid
-                        strokeDasharray="3 3"
-                        stroke="hsl(var(--border))" // Changed from muted to border color
-                        strokeOpacity={0.5}
-                      />
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--border))" strokeOpacity={0.5} />
                       <XAxis
                         dataKey="name"
                         className="text-xs"
@@ -639,10 +635,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                       </Bar>
                       <Bar yAxisId="right" dataKey="avgConfidence" name="Avg Confidence (%)" radius={[4, 4, 0, 0]}>
                         {chartData.map((entry, index) => (
-                          <Cell
-                            key={`cell-confidence-${index}`}
-                            fill={entry.confidenceColor} // Use the confidenceColor instead of opacity
-                          />
+                          <Cell key={`cell-confidence-${index}`} fill={entry.confidenceColor} />
                         ))}
                       </Bar>
                     </BarChart>
@@ -652,7 +645,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                     {chartData.map((item) => (
                       <div
                         key={item.name}
-                        className="p-4 rounded-xl border border-border bg-muted/30 hover:shadow-md transition-all duration-300"
+                        className="p-4 rounded-xl border border-border bg-slate-50 dark:bg-slate-700 hover:shadow-md transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }} />
@@ -675,7 +668,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
               )}
 
               {viewMode === "graph" && chartData.length === 0 && (
-                <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground rounded-xl p-8 text-center">
+                <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-slate-50 dark:bg-slate-800 text-muted-foreground rounded-xl p-8 text-center">
                   <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p className="font-medium text-lg mb-2">No data available for graph view</p>
                   <p className="text-sm">Switch to cards view to see detailed insights and recommendations.</p>
@@ -686,7 +679,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
 
           {/* No Analysis State */}
           {!isLoading && !error && !analysis && (
-            <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-muted/30 text-muted-foreground rounded-xl p-6 sm:p-8 text-center">
+            <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 bg-slate-50 dark:bg-slate-800 text-muted-foreground rounded-xl p-6 sm:p-8 text-center">
               <Lightbulb className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium text-base sm:text-lg mb-2">No insights available yet</p>
               <p className="text-sm">
