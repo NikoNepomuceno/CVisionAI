@@ -4,8 +4,7 @@ import { useEffect, useMemo, useState } from "react"
 import type { JSX } from "react"
 import { Zap, TrendingUp, AlertCircle, CheckCircle2, ArrowRight, ArrowLeft, Loader2, Download, LayoutGrid, BarChart3, Sparkles, Target, AlertTriangle, Lightbulb } from "lucide-react"
 import type { ResumeAnalysis, AnalysisInsight } from "@/lib/deepseek"
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from "@/components/ui/chart"
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Cell } from "recharts"
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend, Cell, Tooltip } from "recharts"
 import { createPdfBlob, downloadPdf, createAnalysisSections } from "@/lib/pdf-utils"
 
 interface AnalysisPageProps {
@@ -99,23 +98,22 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
     [resumeData.lastAnalyzed],
   )
 
-  // Get theme colors for chart
+  // Get theme colors for chart - FIXED with actual brand colors
   const [themeColors, setThemeColors] = useState({
-    success: "#10b981",
-    error: "#ef4444",
-    secondary: "#f1ac20",
-    primary: "#4165D5",
+    success: "#C3E8C9", // Your brand success color
+    error: "#ef4444", 
+    secondary: "#F1AC20", // Your brand secondary color
+    primary: "#4165D5", // Your brand primary color
   })
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const root = document.documentElement
-      const computedStyle = getComputedStyle(root)
+      // Use your actual brand colors directly
       setThemeColors({
-        success: computedStyle.getPropertyValue("--success").trim() || "#10b981",
-        error: computedStyle.getPropertyValue("--error").trim() || "#ef4444",
-        secondary: computedStyle.getPropertyValue("--secondary").trim() || "#f1ac20",
-        primary: computedStyle.getPropertyValue("--primary").trim() || "#4165D5",
+        success: "#C3E8C9", // Light green from your brand
+        error: "#ef4444",   // Red for errors
+        secondary: "#F1AC20", // Yellow/orange from your brand
+        primary: "#4165D5", // Blue from your brand
       })
     }
   }, [])
@@ -157,49 +155,9 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
         count,
         avgConfidence,
         color,
-        // For the ChartContainer config
-        [`${key}Count`]: count,
-        [`${key}Confidence`]: avgConfidence,
       };
     });
   }, [analysis, themeColors]);
-
-  // Chart config - FIXED VERSION
-  const chartConfig = useMemo(() => ({
-    count: {
-      label: "Insight Count",
-      color: themeColors.primary || "#4165D5",
-    },
-    avgConfidence: {
-      label: "Avg Confidence (%)",
-      color: themeColors.secondary || "#F1AC20",
-    },
-    // Individual category configs for tooltips
-    strengthsCount: {
-      label: "Strengths Count",
-      color: themeColors.success,
-    },
-    weaknessesCount: {
-      label: "Weaknesses Count", 
-      color: themeColors.error,
-    },
-    improvementsCount: {
-      label: "Improvements Count",
-      color: themeColors.secondary,
-    },
-    strengthsConfidence: {
-      label: "Strengths Confidence",
-      color: themeColors.success,
-    },
-    weaknessesConfidence: {
-      label: "Weaknesses Confidence",
-      color: themeColors.error,
-    },
-    improvementsConfidence: {
-      label: "Improvements Confidence",
-      color: themeColors.secondary,
-    },
-  }), [themeColors]);
 
   useEffect(() => {
     if (resumeData.analysis) {
@@ -470,7 +428,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                 </div>
               )}
 
-              {/* Graph View */}
+              {/* Graph View - FIXED VERSION */}
               {viewMode === "graph" && chartData.length > 0 && (
                 <div className="card-base animate-fade-in-up border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center gap-3 mb-6">
@@ -478,74 +436,102 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                     <h2 className="text-xl font-bold text-foreground">Analysis Overview</h2>
                   </div>
                   
-                  <ChartContainer
-                    config={chartConfig}
-                    className="h-[300px] sm:h-[400px] w-full"
-                  >
-                    <BarChart data={chartData}>
-                      <CartesianGrid strokeDasharray="3 3" className="stroke-muted" />
-                      <XAxis
+                  <div className="h-[400px] w-full">
+                    <BarChart
+                      data={chartData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 60 }}
+                      width={800}
+                      height={400}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="hsl(var(--muted))" />
+                      <XAxis 
                         dataKey="name"
-                        className="text-xs"
-                        tick={{ fill: "hsl(var(--muted-foreground))" }}
+                        angle={-45}
+                        textAnchor="end"
+                        height={80}
+                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
                       />
-                      <YAxis
+                      <YAxis 
                         yAxisId="left"
-                        className="text-xs"
-                        tick={{ fill: "hsl(var(--muted-foreground))" }}
-                        label={{ value: 'Insight Count', angle: -90, position: 'insideLeft' }}
+                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                        label={{ 
+                          value: 'Insight Count', 
+                          angle: -90, 
+                          position: 'insideLeft',
+                          offset: -10,
+                          style: { fill: "hsl(var(--foreground))", fontSize: 12 }
+                        }}
                       />
-                      <YAxis
+                      <YAxis 
                         yAxisId="right"
                         orientation="right"
                         domain={[0, 100]}
-                        className="text-xs"
-                        tick={{ fill: "hsl(var(--muted-foreground))" }}
-                        label={{ value: 'Avg Confidence %', angle: -90, position: 'insideRight' }}
+                        tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 12 }}
+                        label={{ 
+                          value: 'Avg Confidence %', 
+                          angle: -90, 
+                          position: 'insideRight',
+                          offset: -10,
+                          style: { fill: "hsl(var(--foreground))", fontSize: 12 }
+                        }}
                       />
-                      <ChartTooltip 
-                        content={<ChartTooltipContent 
-                          formatter={(value, name) => {
-                            const nameStr = String(name || "")
-                            if (nameStr.includes("Count") || nameStr === "count") {
-                              return [`${value}`, "Insight Count"]
-                            }
-                            if (nameStr.includes("Confidence") || nameStr === "avgConfidence") {
-                              return [`${value}%`, "Avg Confidence"]
-                            }
-                            return [value, name]
-                          }}
-                        />} 
+                      <Tooltip 
+                        formatter={(value, name) => {
+                          if (name === "count") return [value, "Insight Count"];
+                          if (name === "avgConfidence") return [`${value}%`, "Avg Confidence"];
+                          return [value, name];
+                        }}
+                        contentStyle={{
+                          backgroundColor: "hsl(var(--card))",
+                          borderColor: "hsl(var(--border))",
+                          color: "hsl(var(--foreground))",
+                          borderRadius: "8px",
+                        }}
                       />
                       <Legend />
-                      <Bar
+                      
+                      {/* Insight Count Bars */}
+                      <Bar 
                         yAxisId="left"
-                        dataKey="count"
+                        dataKey="count" 
                         name="Insight Count"
                         radius={[4, 4, 0, 0]}
                       >
                         {chartData.map((entry, index) => (
-                          <Cell key={`cell-count-${index}`} fill={entry.color} />
+                          <Cell 
+                            key={`cell-count-${index}`} 
+                            fill={entry.color}
+                            stroke={entry.color}
+                            strokeWidth={1}
+                          />
                         ))}
                       </Bar>
-                      <Bar
+                      
+                      {/* Avg Confidence Bars */}
+                      <Bar 
                         yAxisId="right"
-                        dataKey="avgConfidence"
+                        dataKey="avgConfidence" 
                         name="Avg Confidence (%)"
                         radius={[4, 4, 0, 0]}
                       >
                         {chartData.map((entry, index) => (
-                          <Cell key={`cell-confidence-${index}`} fill={entry.color} />
+                          <Cell 
+                            key={`cell-confidence-${index}`} 
+                            fill={`${entry.color}80`} // Add transparency
+                            stroke={entry.color}
+                            strokeWidth={1}
+                          />
                         ))}
                       </Bar>
                     </BarChart>
-                  </ChartContainer>
+                  </div>
                   
-                  <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-4">
-                    {chartData.map((item) => (
+                  <div className="mt-8 grid grid-cols-1 md:grid-cols-3 gap-4">
+                    {chartData.map((item, index) => (
                       <div
                         key={item.name}
                         className="p-4 rounded-xl border border-border bg-muted/30 hover:shadow-md transition-all duration-300"
+                        style={{ borderLeft: `4px solid ${item.color}` }}
                       >
                         <div className="flex items-center gap-3 mb-3">
                           <div
