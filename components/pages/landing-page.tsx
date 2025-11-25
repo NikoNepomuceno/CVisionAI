@@ -48,8 +48,8 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
       icon: BarChart3,
       title: "ATS Compatibility",
       description: "Ensure your resume passes through applicant tracking systems successfully",
-      color: "from-[#C3E8C9] to-[#a8d8b1]",
-      bgColor: "bg-[#C3E8C9]/10",
+      color: "from-[#50B98E] dark:from-[#C3E8C9] to-[#a8d8b1]",
+      bgColor: "bg-[#50B98E]/10 dark:bg-[#C3E8C9]/10",
     },
     {
       icon: Target,
@@ -131,7 +131,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl" />
                   <img src="/CVisionAI-Logo-Header.png" alt="CV Logo" className="w-8 h-8 object-contain" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#C3E8C9] rounded-full border-2 border-white dark:border-[#293855] animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#50B98E] dark:bg-[#C3E8C9] rounded-full border-2 border-white dark:border-[#293855] animate-pulse" />
               </div>
               <div>
                 <h1 className="text-xl font-bold text-[#293855] dark:text-white transition-colors duration-300">
@@ -161,7 +161,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
               {/* Trust Indicators */}
               <div className="hidden lg:flex items-center gap-6">
                 <div className="flex items-center gap-2 text-[#293855] dark:text-foreground transition-colors duration-300">
-                  <Shield className="w-4 h-4 text-[#C3E8C9]" />
+                  <Shield className="w-4 h-4 text-[#50B98E] dark:text-[#C3E8C9]" />
                   <span className="text-sm font-medium">Secure & Private</span>
                 </div>
                 <div className="flex items-center gap-2 text-[#293855] dark:text-foreground transition-colors duration-300">
@@ -184,13 +184,16 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
               <div className="inline-flex items-center gap-3 px-4 py-2 rounded-2xl bg-[#4165D5]/10 dark:bg-[#4165D5]/20 border border-[#4165D5]/20 dark:border-[#4165D5]/30 backdrop-blur-sm transition-colors duration-300">
                 <div className="flex items-center gap-1">
                   {[1, 2, 3, 4, 5].map((star) => (
-                    <Star key={star} className="w-3 h-3 fill-[#C3E8C9] text-[#C3E8C9]" />
+                    <Star
+                      key={star}
+                      className="w-3 h-3 fill-[#50B98E] dark:fill-[#C3E8C9] text-[#50B98E] dark:text-[#C3E8C9]"
+                    />
                   ))}
                 </div>
                 <span className="text-sm font-semibold text-[#293855] dark:text-white transition-colors duration-300">
                   Rated 4.9/5 by Career Experts
                 </span>
-                <Sparkles className="w-3 h-3 text-[#C3E8C9]" />
+                <Sparkles className="w-3 h-3 text-[#50B98E] dark:text-[#C3E8C9]" />
               </div>
 
               {/* Main Heading */}
@@ -211,7 +214,7 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
               {/* Macridging Tickets Section - Fixed Layout */}
               <div className="space-y-4">
                 <div className="flex items-center gap-3 p-4 rounded-xl bg-white/50 dark:bg-[#4165D5]/20 border border-[#4165D5]/20 dark:border-[#4165D5]/30 backdrop-blur-sm transition-colors duration-300">
-                  <div className="w-10 h-10 bg-[#C3E8C9] dark:bg-[#C3E8C9]/20 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-300">
+                  <div className="w-10 h-10 bg-[#50B98E] dark:bg-[#C3E8C9]/20 rounded-lg flex items-center justify-center flex-shrink-0 transition-colors duration-300">
                     <FileText className="w-5 h-5 text-[#293855] dark:text-white transition-colors duration-300" />
                   </div>
                   <div className="min-w-0 flex-1">

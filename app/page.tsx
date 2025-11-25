@@ -269,7 +269,7 @@ export default function Home() {
                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl" />
                   <img src="/CVisionAI-Logo-Header.png" alt="CV Logo" className="w-8 h-8 object-contain" />
                 </div>
-                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#C3E8C9] rounded-full border-2 border-white dark:border-[#293855] animate-pulse" />
+                <div className="absolute -top-1 -right-1 w-3 h-3 bg-[#50B98E] dark:bg-[#C3E8C9] rounded-full border-2 border-white dark:border-[#293855] animate-pulse" />
               </div>
               <div>
                 <h1 className="text-2xl font-bold text-[#293855] dark:text-white transition-colors duration-300">
@@ -281,7 +281,7 @@ export default function Home() {
               </div>
             </div>
             <div className="flex items-center gap-4">
-              <div className="text-sm text-[#4165D5] dark:text-[#C3E8C9] font-medium transition-colors duration-300">
+              <div className="text-sm text-[#50B98E] dark:text-[#C3E8C9] font-medium transition-colors duration-300">
                 Step {currentStepIndex + 1} of {STEPS.length}
               </div>
               <button
@@ -325,7 +325,7 @@ export default function Home() {
                   <span className="hidden sm:inline">{step.label}</span>
                 </button>
                 {index < STEPS.length - 1 && (
-                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#4165D5]/30 dark:text-[#C3E8C9]/30 hidden sm:block flex-shrink-0" />
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#50B98E]/30 dark:text-[#C3E8C9]/30 hidden sm:block flex-shrink-0" />
                 )}
               </div>
             ))}

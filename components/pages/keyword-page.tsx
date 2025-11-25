@@ -212,7 +212,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                     >
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                         <div
-                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.foundInJob ? "bg-success" : "bg-muted-foreground/30"}`}
+                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.foundInJob ? "bg-success dark:bg-success" : "bg-muted-foreground/30"}`}
                         />
                         <span className="text-xs sm:text-sm font-medium text-foreground truncate">{item.skill}</span>
                       </div>
@@ -226,12 +226,12 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                         <span
                           className={`text-xs sm:text-sm font-semibold w-8 sm:w-10 text-right ${
                             item.match >= 80
-                              ? "text-success"
+                              ? "text-success dark:text-success"
                               : item.match >= 60
-                                ? "text-secondary"
+                                ? "text-secondary dark:text-secondary"
                                 : item.match >= 40
                                   ? "text-primary dark:text-slate-900"
-                                  : "text-error"
+                                  : "text-error dark:text-error"
                           }`}
                         >
                           {item.match}%
@@ -267,13 +267,13 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                       key={i}
                       className={`group flex items-center justify-between p-3 sm:p-4 rounded-lg transition-all duration-200 hover:shadow-md border ${
                         item.matched
-                          ? "bg-success/10 border-success/20 hover:border-success/30"
+                          ? "bg-success/10 dark:bg-success/10 border-success/20 dark:border-success/20 hover:border-success/30 dark:hover:border-success/30"
                           : "bg-muted/50 border-transparent hover:border-primary/30 dark:hover:border-slate-900/30"
                       }`}
                     >
                       <div className="flex items-center gap-2 sm:gap-3 flex-1 min-w-0">
                         <div
-                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.matched ? "bg-success" : "bg-primary"}`}
+                          className={`w-2 h-2 sm:w-3 sm:h-3 rounded-full flex-shrink-0 ${item.matched ? "bg-success dark:bg-success" : "bg-primary dark:bg-primary"}`}
                         />
                         <div className="flex-1 min-w-0">
                           <span className="text-xs sm:text-sm font-medium text-foreground block truncate">

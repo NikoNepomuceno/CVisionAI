@@ -10,6 +10,8 @@
   --primary: 65, 101, 213; /* #4165D5 in RGB */
   --secondary: 241, 172, 32; /* #F1AC20 in RGB */
   --accent: 195, 232, 201; /* #C3E8C9 in RGB */
+  /* added darkened accent for light mode visibility */
+  --accent-dark: 80, 185, 142; /* #50B98E - darkened #C3E8C9 for light mode */
   --dark-blue: 41, 56, 85; /* #293855 in RGB */
 
   /* Brand foregrounds (light mode) */
@@ -452,6 +454,11 @@
   }
 
   .bg-brand-accent {
+    /* use darkened accent in light mode, original in dark mode */
+    background: #50b98e;
+  }
+
+  .dark .bg-brand-accent {
     background: #c3e8c9;
   }
 
@@ -468,6 +475,11 @@
   }
 
   .text-brand-accent {
+    /* use darkened accent in light mode, original in dark mode */
+    color: #50b98e;
+  }
+
+  .dark .text-brand-accent {
     color: #c3e8c9;
   }
 
@@ -484,6 +496,11 @@
   }
 
   .border-brand-accent {
+    /* use darkened accent in light mode, original in dark mode */
+    border-color: #50b98e;
+  }
+
+  .dark .border-brand-accent {
     border-color: #c3e8c9;
   }
 }

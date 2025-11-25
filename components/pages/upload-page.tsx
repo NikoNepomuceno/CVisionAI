@@ -174,9 +174,9 @@ export default function UploadPage({ onNext }: UploadPageProps) {
               {/* Left Column - Features & Stats - Hidden on mobile, visible on lg+ */}
               <div className="lg:col-span-1 space-y-3 sm:space-y-4 hidden lg:block">
                 {/* Enhanced Security Badge */}
-                <div className="card-base p-3 border-l-3 border-l-success">
+                <div className="card-base p-3 border-l-3 border-l-[#50B98E] dark:border-l-[#C3E8C9]">
                   <div className="flex items-center gap-1 mb-2">
-                    <Shield className="w-4 h-4 text-success" />
+                    <Shield className="w-4 h-4 text-[#50B98E] dark:text-[#C3E8C9]" />
                     <h3 className="font-semibold text-foreground text-xs">Secure & Private</h3>
                   </div>
                   <p className="text-sm text-foreground dark:text-slate-200 mb-3">
@@ -186,22 +186,22 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                   {/* Additional Security Features */}
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 bg-success/10 rounded flex items-center justify-center">
-                        <Lock className="w-3 h-3 text-success" />
+                      <div className="w-5 h-5 bg-[#50B98E]/10 dark:bg-[#C3E8C9]/10 rounded flex items-center justify-center">
+                        <Lock className="w-3 h-3 text-[#50B98E] dark:text-[#C3E8C9]" />
                       </div>
                       <span className="text-xs text-foreground dark:text-slate-200">End-to-end encrypted</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 bg-success/10 rounded flex items-center justify-center">
-                        <EyeOff className="w-3 h-3 text-success" />
+                      <div className="w-5 h-5 bg-[#50B98E]/10 dark:bg-[#C3E8C9]/10 rounded flex items-center justify-center">
+                        <EyeOff className="w-3 h-3 text-[#50B98E] dark:text-[#C3E8C9]" />
                       </div>
                       <span className="text-xs text-foreground dark:text-slate-200">No human review</span>
                     </div>
 
                     <div className="flex items-center gap-2">
-                      <div className="w-5 h-5 bg-success/10 rounded flex items-center justify-center">
-                        <Server className="w-3 h-3 text-success" />
+                      <div className="w-5 h-5 bg-[#50B98E]/10 dark:bg-[#C3E8C9]/10 rounded flex items-center justify-center">
+                        <Server className="w-3 h-3 text-[#50B98E] dark:text-[#C3E8C9]" />
                       </div>
                       <span className="text-xs text-foreground dark:text-slate-200">Auto-deleted after analysis</span>
                     </div>
@@ -251,9 +251,9 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                 {/* Mobile-Only Security & Stats Summary */}
                 <div className="lg:hidden space-y-3">
                   {/* Security Summary */}
-                  <div className="card-base p-3 border-l-3 border-l-success">
+                  <div className="card-base p-3 border-l-3 border-l-[#50B98E] dark:border-l-[#C3E8C9]">
                     <div className="flex items-center gap-2 mb-2">
-                      <Shield className="w-4 h-4 text-success" />
+                      <Shield className="w-4 h-4 text-[#50B98E] dark:text-[#C3E8C9]" />
                       <h3 className="font-semibold text-foreground text-sm">Secure & Private</h3>
                     </div>
                     <p className="text-sm text-foreground dark:text-slate-200 mb-3">
@@ -261,15 +261,15 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                     </p>
                     <div className="grid grid-cols-3 gap-2 text-center">
                       <div className="flex flex-col items-center">
-                        <Lock className="w-4 h-4 text-success mb-1" />
+                        <Lock className="w-4 h-4 text-[#50B98E] dark:text-[#C3E8C9] mb-1" />
                         <span className="text-xs text-foreground dark:text-slate-200">Encrypted</span>
                       </div>
                       <div className="flex flex-col items-center">
-                        <EyeOff className="w-4 h-4 text-success mb-1" />
+                        <EyeOff className="w-4 h-4 text-[#50B98E] dark:text-[#C3E8C9] mb-1" />
                         <span className="text-xs text-foreground dark:text-slate-200">Private</span>
                       </div>
                       <div className="flex flex-col items-center">
-                        <Server className="w-4 h-4 text-success mb-1" />
+                        <Server className="w-4 h-4 text-[#50B98E] dark:text-[#C3E8C9] mb-1" />
                         <span className="text-xs text-foreground dark:text-slate-200">Auto-deleted</span>
                       </div>
                     </div>
@@ -319,7 +319,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                     isDragging
                       ? "border-primary bg-primary/5 scale-105"
                       : file
-                        ? "border-success bg-success/5"
+                        ? "border-[#50B98E] dark:border-[#C3E8C9] bg-[#50B98E]/5 dark:bg-[#C3E8C9]/5"
                         : "border-border hover:border-primary/50 hover:bg-accent/5"
                   }`}
                 >
@@ -336,7 +336,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                       {file ? (
                         <div className="space-y-3 sm:space-y-4">
                           <div className="relative">
-                            <CheckCircle2 className="w-12 h-12 sm:w-16 sm:h-16 text-success mx-auto" />
+                            <CheckCircle2 className="w-12 h-12 sm:w-16 sm:h-16 text-[#50B98E] dark:text-[#C3E8C9] mx-auto" />
                           </div>
 
                           <div className="space-y-2">
@@ -399,7 +399,7 @@ export default function UploadPage({ onNext }: UploadPageProps) {
                   {/* Success Animation */}
                   {showSuccess && (
                     <div className="w-full mt-4 sm:mt-6 animate-fade-in">
-                      <div className="flex items-center justify-center gap-2 text-success text-sm">
+                      <div className="flex items-center justify-center gap-2 text-[#50B98E] dark:text-[#C3E8C9] text-sm">
                         <Sparkles className="w-4 h-4" />
                         <span className="font-semibold">Analysis Complete!</span>
                       </div>
