@@ -43,8 +43,7 @@ function mergeResumeData(prev: ResumeData, data: Partial<ResumeData>): ResumeDat
 
   const next: ResumeData = { ...prev, ...data }
 
-  const resumeFieldsChanged =
-    "skills" in data || "experience" in data || "education" in data || "summary" in data
+  const resumeFieldsChanged = "skills" in data || "experience" in data || "education" in data || "summary" in data
   const fileChanged = "file" in data
 
   if ("analysis" in data) {
@@ -184,14 +183,17 @@ export default function Home() {
     })
   }
 
-  const handleAnalysisPersist = useCallback((analysis?: ResumeAnalysis) => {
-    if (!analysis) {
-      applyResumeUpdate({ analysis: undefined })
-      return
-    }
+  const handleAnalysisPersist = useCallback(
+    (analysis?: ResumeAnalysis) => {
+      if (!analysis) {
+        applyResumeUpdate({ analysis: undefined })
+        return
+      }
 
-    applyResumeUpdate({ analysis })
-  }, [applyResumeUpdate])
+      applyResumeUpdate({ analysis })
+    },
+    [applyResumeUpdate],
+  )
 
   const handleKeywordPersist = useCallback(
     (data: { keywordAnalysis?: KeywordAnalysis | null; keywordJobDescription?: string }) => {
@@ -276,7 +278,7 @@ export default function Home() {
       </header>
 
       {/* Main Content */}
-      <main className="w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-8">
+      <main className="w-full px-3 sm:px-6 lg:px-8 py-6 sm:py-8 bg-background dark:bg-background transition-colors duration-300">
         <div className="max-w-7xl mx-auto animate-fade-in-up">
           {currentStep === "upload" && <UploadPage onNext={handleNext} initialFile={resumeData.file} />}
           {currentStep === "extraction" && (

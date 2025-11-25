@@ -174,13 +174,13 @@
     transition: background-color 0.3s ease, color 0.3s ease;
   }
 
-  /* FIXED: Ensure dark mode background is properly applied */
+  /* Improved dark mode background with better contrast and visibility */
   html.dark body {
     background: linear-gradient(
       135deg,
       rgb(13, 17, 26) 0%,
-      rgba(65, 101, 213, 0.2) 30%,
-      rgba(195, 232, 201, 0.1) 70%,
+      rgba(65, 101, 213, 0.15) 35%,
+      rgba(195, 232, 201, 0.08) 65%,
       rgba(241, 172, 32, 0.05) 100%
     );
     color: rgb(227, 230, 235);
@@ -194,8 +194,7 @@
     left: 0;
     width: 100%;
     height: 100%;
-    background: 
-      radial-gradient(circle at 20% 80%, rgba(65, 101, 213, 0.1) 0%, transparent 50%),
+    background: radial-gradient(circle at 20% 80%, rgba(65, 101, 213, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 80% 20%, rgba(195, 232, 201, 0.1) 0%, transparent 50%),
       radial-gradient(circle at 40% 40%, rgba(241, 172, 32, 0.05) 0%, transparent 50%);
     pointer-events: none;
@@ -203,12 +202,11 @@
     transition: all 0.3s ease;
   }
 
-  /* FIXED: Ensure dark mode background overlay is properly applied */
+  /* Enhanced dark mode background overlay with better visibility */
   html.dark body::before {
-    background: 
-      radial-gradient(circle at 20% 80%, rgba(65, 101, 213, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 20%, rgba(195, 232, 201, 0.1) 0%, transparent 50%),
-      radial-gradient(circle at 40% 40%, rgba(241, 172, 32, 0.08) 0%, transparent 50%);
+    background: radial-gradient(circle at 20% 80%, rgba(65, 101, 213, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 80% 20%, rgba(195, 232, 201, 0.08) 0%, transparent 50%),
+      radial-gradient(circle at 40% 40%, rgba(241, 172, 32, 0.06) 0%, transparent 50%);
   }
 }
 
@@ -216,7 +214,7 @@
 @layer components {
   /* Buttons */
   .btn-primary {
-    background: linear-gradient(to right, #4165D5, #293855);
+    background: linear-gradient(to right, #4165d5, #293855);
     color: white;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
@@ -241,8 +239,8 @@
   }
 
   .btn-secondary {
-    border: 2px solid #4165D5;
-    color: #4165D5;
+    border: 2px solid #4165d5;
+    color: #4165d5;
     padding: 0.5rem 1rem;
     border-radius: 0.5rem;
     font-weight: 500;
@@ -252,8 +250,8 @@
   }
 
   .dark .btn-secondary {
-    border-color: #4165D5;
-    color: #4165D5;
+    border-color: #4165d5;
+    color: #4165d5;
   }
 
   .btn-secondary:hover {
@@ -386,7 +384,7 @@
     bottom: 0;
     left: 0;
     height: 2px;
-    background: #F1AC20;
+    background: #f1ac20;
     transition: all 0.3s;
     width: 0;
   }
@@ -425,15 +423,15 @@
 
   /* Brand-specific utility classes */
   .bg-brand-primary {
-    background: #4165D5;
+    background: #4165d5;
   }
 
   .bg-brand-secondary {
-    background: #F1AC20;
+    background: #f1ac20;
   }
 
   .bg-brand-accent {
-    background: #C3E8C9;
+    background: #c3e8c9;
   }
 
   .bg-brand-dark {
@@ -441,15 +439,15 @@
   }
 
   .text-brand-primary {
-    color: #4165D5;
+    color: #4165d5;
   }
 
   .text-brand-secondary {
-    color: #F1AC20;
+    color: #f1ac20;
   }
 
   .text-brand-accent {
-    color: #C3E8C9;
+    color: #c3e8c9;
   }
 
   .text-brand-dark {
@@ -457,14 +455,14 @@
   }
 
   .border-brand-primary {
-    border-color: #4165D5;
+    border-color: #4165d5;
   }
 
   .border-brand-secondary {
-    border-color: #F1AC20;
+    border-color: #f1ac20;
   }
 
   .border-brand-accent {
-    border-color: #C3E8C9;
+    border-color: #c3e8c9;
   }
 }
