@@ -153,10 +153,13 @@ export default function Home() {
   useEffect(() => {
     const scrollToTop = () => {
       requestAnimationFrame(() => {
+        // Scroll both window and document element to ensure it works
         window.scrollTo({
           top: 0,
           behavior: "smooth",
         })
+        document.documentElement.scrollTop = 0
+        document.body.scrollTop = 0
       })
     }
 
