@@ -171,10 +171,10 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                   <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
                 </div>
                 <div className="text-left">
-                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground group-hover:text-primary dark:group-hover:text-slate-700 transition-colors">
+                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground dark:text-white group-hover:text-primary dark:group-hover:text-slate-100 transition-colors">
                     Skills
                   </h2>
-                  <p className="text-xs text-muted-foreground">{skills.length} skills extracted</p>
+                  <p className="text-xs text-muted-foreground dark:text-slate-300">{skills.length} skills extracted</p>
                 </div>
               </div>
               <ChevronDown
@@ -187,7 +187,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                   {skills.map((skill, i) => (
                     <div
                       key={i}
-                      className="bg-primary/10 text-primary dark:text-slate-900 px-2 sm:px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 hover:bg-primary/20 transition-all duration-200 border border-primary/20 dark:border-slate-900/30 group relative"
+                      className="bg-primary/10 text-primary dark:text-white px-2 sm:px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 hover:bg-primary/20 transition-all duration-200 border border-primary/20 dark:border-slate-900/30 group relative"
                     >
                       <span className="max-w-[120px] sm:max-w-none truncate">{skill}</span>
                       <button
