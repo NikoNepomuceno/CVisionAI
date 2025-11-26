@@ -74,7 +74,7 @@ function createPageHeader(metadata: PDFMetadata, pageNumber: number): string {
   header += `BT\n`
   header += `/F2 14 Tf\n`
   header += `${rgbToPdfColor(COLORS.background)} rg\n`
-  header += `50 ${yPosition - 8} Td\n`
+  header += `1 0 0 1 50 ${yPosition - 8} Tm\n`
   header += `(${escapePdfText(metadata.title)}) Tj\n`
   header += `ET\n`
 
@@ -82,7 +82,7 @@ function createPageHeader(metadata: PDFMetadata, pageNumber: number): string {
   header += `BT\n`
   header += `/F1 10 Tf\n`
   header += `${rgbToPdfColor(COLORS.background)} rg\n`
-  header += `500 ${yPosition - 8} Td\n`
+  header += `1 0 0 1 500 ${yPosition - 8} Tm\n`
   header += `(${escapePdfText(`Page ${pageNumber}`)}) Tj\n`
   header += `ET\n`
 
@@ -108,7 +108,7 @@ function createPageFooter(metadata: PDFMetadata): string {
     footer += `BT\n`
     footer += `/F1 8 Tf\n`
     footer += `${rgbToPdfColor(COLORS.darkBlue)} rg\n`
-    footer += `50 ${yPosition - 15} Td\n`
+    footer += `1 0 0 1 50 ${yPosition - 15} Tm\n`
     footer += `(${escapePdfText(metadata.footer)}) Tj\n`
     footer += `ET\n`
   }
@@ -139,11 +139,7 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
     currentPageContent = ""
     yPosition = 750
 
-    // Add page header (except for first page which has full header)
-    if (pageNumber > 2) {
-      currentPageContent += createPageHeader(metadata, pageNumber - 1)
-      yPosition -= 40
-    }
+    // No header for subsequent pages - removed per user request
   }
 
   // First page header - Blue background with white text
@@ -159,7 +155,7 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
   currentPageContent += `BT\n`
   currentPageContent += `/F2 24 Tf\n`
   currentPageContent += `${rgbToPdfColor(COLORS.background)} rg\n`
-  currentPageContent += `50 ${yPosition} Td\n`
+  currentPageContent += `1 0 0 1 50 ${yPosition} Tm\n`
   currentPageContent += `(${escapePdfText(metadata.title)}) Tj\n`
   currentPageContent += `ET\n`
 
@@ -170,18 +166,18 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
     currentPageContent += `BT\n`
     currentPageContent += `/F1 12 Tf\n`
     currentPageContent += `${rgbToPdfColor(COLORS.foreground)} rg\n`
-    currentPageContent += `50 ${yPosition} Td\n`
+    currentPageContent += `1 0 0 1 50 ${yPosition} Tm\n`
     currentPageContent += `(${escapePdfText(metadata.subtitle)}) Tj\n`
     currentPageContent += `ET\n`
     yPosition -= 18
   }
 
   // Generated date with lighter text
+  const dateStr = `Generated: ${metadata.generatedAt.toLocaleDateString()} at ${metadata.generatedAt.toLocaleTimeString()}`
   currentPageContent += `BT\n`
   currentPageContent += `/F1 9 Tf\n`
   currentPageContent += `${rgbToPdfColor([100, 116, 139])} rg\n`
-  currentPageContent += `50 ${yPosition} Td\n`
-  const dateStr = `Generated: ${metadata.generatedAt.toLocaleDateString()} at ${metadata.generatedAt.toLocaleTimeString()}`
+  currentPageContent += `1 0 0 1 50 ${yPosition} Tm\n`
   currentPageContent += `(${escapePdfText(dateStr)}) Tj\n`
   currentPageContent += `ET\n`
 
@@ -194,7 +190,7 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
   currentPageContent += `f\n`
   currentPageContent += `Q\n`
 
-  yPosition -= 20
+  yPosition -= 25
 
   // Process sections
   for (const section of sections) {
@@ -221,7 +217,7 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
       currentPageContent += `BT\n`
       currentPageContent += `/F2 18 Tf\n`
       currentPageContent += `${rgbToPdfColor(COLORS.background)} rg\n`
-      currentPageContent += `55 ${yPosition} Td\n`
+      currentPageContent += `1 0 0 1 55 ${yPosition} Tm\n`
       currentPageContent += `(${escapePdfText(section.title)}) Tj\n`
       currentPageContent += `ET\n`
       yPosition -= 40
@@ -230,7 +226,7 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
       currentPageContent += `BT\n`
       currentPageContent += `/F2 15 Tf\n`
       currentPageContent += `${rgbToPdfColor(COLORS.primary)} rg\n`
-      currentPageContent += `50 ${yPosition} Td\n`
+      currentPageContent += `1 0 0 1 50 ${yPosition} Tm\n`
       currentPageContent += `(${escapePdfText(section.title)}) Tj\n`
       currentPageContent += `ET\n`
       yPosition -= 22
@@ -277,7 +273,7 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
       currentPageContent += `BT\n`
       currentPageContent += `/F2 12 Tf\n`
       currentPageContent += `${rgbToPdfColor(COLORS.darkBlue)} rg\n`
-      currentPageContent += `58 ${yPosition} Td\n`
+      currentPageContent += `1 0 0 1 58 ${yPosition} Tm\n`
       currentPageContent += `(${escapePdfText(section.title)}) Tj\n`
       currentPageContent += `ET\n`
 
@@ -302,7 +298,7 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
         currentPageContent += `BT\n`
         currentPageContent += `/F1 7 Tf\n`
         currentPageContent += `${rgbToPdfColor(COLORS.background)} rg\n`
-        currentPageContent += `${badgeX + 3} ${yPosition + 5} Td\n`
+        currentPageContent += `1 0 0 1 ${badgeX + 3} ${yPosition + 5} Tm\n`
         currentPageContent += `(${escapePdfText(priorityText)}) Tj\n`
         currentPageContent += `ET\n`
       }
@@ -312,7 +308,7 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
         currentPageContent += `BT\n`
         currentPageContent += `/F1 9 Tf\n`
         currentPageContent += `${rgbToPdfColor(COLORS.primary)} rg\n`
-        currentPageContent += `58 ${yPosition - 12} Td\n`
+        currentPageContent += `1 0 0 1 58 ${yPosition - 12} Tm\n`
         currentPageContent += `(${escapePdfText(section.category)}) Tj\n`
         currentPageContent += `ET\n`
       }
@@ -322,14 +318,15 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
 
     // Content lines
     for (const line of section.content) {
-      // Check if we need a new page
-      if (yPosition < BOTTOM_MARGIN) {
+      // Check if we need a new page (account for line height)
+      const lineHeight = 14
+      if (yPosition - lineHeight < BOTTOM_MARGIN) {
         currentPageContent += createPageFooter(metadata)
         startNewPage()
       }
 
       if (line.trim() === "") {
-        yPosition -= 8
+        yPosition -= 10
         continue
       }
 
@@ -338,33 +335,35 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
       // Check if it's a list item
       if (line.trim().startsWith("- ") || line.trim().startsWith("• ")) {
         const listContent = line.trim().substring(2)
+        // Use simple dash for bullet point (more PDF-compatible)
         currentPageContent += `BT\n`
         currentPageContent += `/F2 10 Tf\n`
         currentPageContent += `${rgbToPdfColor(COLORS.primary)} rg\n`
-        currentPageContent += `${indentX + 5} ${yPosition} Td\n`
-        currentPageContent += `(${escapePdfText("•")}) Tj\n`
+        currentPageContent += `1 0 0 1 ${indentX + 5} ${yPosition} Tm\n`
+        currentPageContent += `(${escapePdfText("-")}) Tj\n`
         currentPageContent += `ET\n`
 
         currentPageContent += `BT\n`
         currentPageContent += `/F1 10 Tf\n`
         currentPageContent += `${rgbToPdfColor(COLORS.foreground)} rg\n`
-        currentPageContent += `${indentX + 15} ${yPosition} Td\n`
+        currentPageContent += `1 0 0 1 ${indentX + 15} ${yPosition} Tm\n`
         currentPageContent += `(${escapePdfText(listContent)}) Tj\n`
         currentPageContent += `ET\n`
-        yPosition -= 14
+        yPosition -= 16
       } else if (line.trim().startsWith("**") && line.trim().endsWith("**")) {
         // Bold text
         const boldText = line.trim().replace(/\*\*/g, "")
         currentPageContent += `BT\n`
         currentPageContent += `/F2 11 Tf\n`
         currentPageContent += `${rgbToPdfColor(COLORS.darkBlue)} rg\n`
-        currentPageContent += `${indentX} ${yPosition} Td\n`
+        currentPageContent += `1 0 0 1 ${indentX} ${yPosition} Tm\n`
         currentPageContent += `(${escapePdfText(boldText)}) Tj\n`
         currentPageContent += `ET\n`
-        yPosition -= 16
+        yPosition -= 18
       } else {
         // Regular paragraph text with word wrapping
         const fontSize = section.type === "subsection" && section.priority ? 9.5 : 10
+        const lineHeight = 14
         const words = line.split(" ")
         let currentLine = ""
         const maxChars = 78
@@ -376,7 +375,7 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
           } else {
             if (currentLine) {
               // Check if we need new page before adding line
-              if (yPosition < BOTTOM_MARGIN) {
+              if (yPosition - lineHeight < BOTTOM_MARGIN) {
                 currentPageContent += createPageFooter(metadata)
                 startNewPage()
               }
@@ -384,17 +383,17 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
               currentPageContent += `BT\n`
               currentPageContent += `/F1 ${fontSize} Tf\n`
               currentPageContent += `${rgbToPdfColor(COLORS.foreground)} rg\n`
-              currentPageContent += `${indentX} ${yPosition} Td\n`
+              currentPageContent += `1 0 0 1 ${indentX} ${yPosition} Tm\n`
               currentPageContent += `(${escapePdfText(currentLine)}) Tj\n`
               currentPageContent += `ET\n`
-              yPosition -= 13
+              yPosition -= lineHeight
             }
             currentLine = word
           }
         }
 
         if (currentLine) {
-          if (yPosition < BOTTOM_MARGIN) {
+          if (yPosition - lineHeight < BOTTOM_MARGIN) {
             currentPageContent += createPageFooter(metadata)
             startNewPage()
           }
@@ -402,15 +401,16 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
           currentPageContent += `BT\n`
           currentPageContent += `/F1 ${fontSize} Tf\n`
           currentPageContent += `${rgbToPdfColor(COLORS.foreground)} rg\n`
-          currentPageContent += `${indentX} ${yPosition} Td\n`
+          currentPageContent += `1 0 0 1 ${indentX} ${yPosition} Tm\n`
           currentPageContent += `(${escapePdfText(currentLine)}) Tj\n`
           currentPageContent += `ET\n`
-          yPosition -= 13
+          yPosition -= lineHeight
         }
       }
     }
 
-    yPosition -= section.type === "subsection" && section.priority ? 12 : 8
+    // Add spacing after section
+    yPosition -= section.type === "subsection" && section.priority ? 15 : 10
   }
 
   // Add footer to last page
@@ -464,10 +464,11 @@ export function createPdfBlob(sections: PDFSection[], metadata: PDFMetadata): Bl
     )
     pdfLines.push("endobj")
 
-    // Content stream
+    // Content stream - use byte length instead of character length
+    const contentBytes = new TextEncoder().encode(pages[i].content)
     objectOffsets.push(pdfLines.join("\n").length)
     pdfLines.push(`${contentStreamNums[i]} 0 obj`)
-    pdfLines.push(`<< /Length ${pages[i].content.length} >>`)
+    pdfLines.push(`<< /Length ${contentBytes.length} >>`)
     pdfLines.push("stream")
     pdfLines.push(pages[i].content)
     pdfLines.push("endstream")

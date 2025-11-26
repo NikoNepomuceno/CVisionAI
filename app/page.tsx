@@ -298,22 +298,24 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Progress Bar */}
-          <div className="w-full bg-[#C3E8C9]/20 dark:bg-[#293855]/50 rounded-full h-2 overflow-hidden backdrop-blur-sm">
-            <div
-              className="bg-gradient-to-r from-[#4165D5] via-[#293855] to-[#F1AC20] h-2 rounded-full transition-all duration-700 ease-out shadow-lg shadow-[#4165D5]/20 dark:shadow-[#293855]/30"
-              style={{ width: `${(currentStepIndex / STEPS.length) * 100}%` }}
-            />
-          </div>
+          {/* Progress Bar and Steps Navigation Container */}
+          <div className="-mx-4 px-4 sm:mx-0 sm:px-0">
+            {/* Progress Bar */}
+            <div className="w-full bg-[#C3E8C9]/20 dark:bg-[#293855]/50 rounded-full h-2 overflow-hidden backdrop-blur-sm">
+              <div
+                className="bg-gradient-to-r from-[#4165D5] via-[#293855] to-[#F1AC20] h-2 rounded-full transition-all duration-700 ease-out shadow-lg shadow-[#4165D5]/20 dark:shadow-[#293855]/30"
+                style={{ width: `${((currentStepIndex + 0.5) / STEPS.length) * 100}%` }}
+              />
+            </div>
 
-          {/* Steps Navigation */}
-          <div className="flex items-center gap-0.5 sm:gap-1 mt-4 overflow-x-auto pb-2 scrollbar-hide -mx-4 px-4 sm:mx-0 sm:px-0">
+            {/* Steps Navigation */}
+            <div className="flex items-center justify-between mt-4 overflow-x-auto pb-2 scrollbar-hide w-full">
             {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center gap-0.5 sm:gap-1 flex-shrink-0">
+              <div key={step.id} className="flex items-center gap-0.5 sm:gap-1 flex-1 min-w-0">
                 <button
                   onClick={() => handleJumpToStep(step.id)}
                   disabled={index > furthestStepIndex}
-                  className={`flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 backdrop-blur-sm ${
+                  className={`flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 backdrop-blur-sm w-full min-w-fit ${
                     step.id === currentStep
                       ? "bg-gradient-to-r from-[#4165D5] to-[#293855] text-white shadow-lg shadow-[#4165D5]/30 scale-100"
                       : index <= furthestStepIndex
@@ -325,10 +327,11 @@ export default function Home() {
                   <span className="hidden sm:inline">{step.label}</span>
                 </button>
                 {index < STEPS.length - 1 && (
-                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#50B98E]/30 dark:text-[#C3E8C9]/30 hidden sm:block flex-shrink-0" />
+                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#50B98E]/30 dark:text-[#C3E8C9]/30 hidden sm:block flex-shrink-0 mx-1" />
                 )}
               </div>
             ))}
+          </div>
           </div>
         </div>
       </header>

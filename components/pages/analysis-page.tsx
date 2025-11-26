@@ -133,23 +133,58 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
     chart1: "rgb(65, 101, 213)", // --color-chart-1
     chart2: "rgb(241, 172, 32)", // --color-chart-2
     chart3: "rgb(195, 232, 201)", // --color-chart-3
+    foreground: "hsl(222.2, 84%, 4.9%)", // Default light mode foreground
   })
 
   useEffect(() => {
     if (typeof window !== "undefined") {
       const root = document.documentElement
-      const computedStyle = getComputedStyle(root)
+      
+      const updateColors = () => {
+        const computedStyle = getComputedStyle(root)
 
-      // Get colors directly from CSS custom properties
-      setThemeColors({
-        success: computedStyle.getPropertyValue("--color-success").trim() || "rgb(195, 232, 201)",
-        error: computedStyle.getPropertyValue("--color-error").trim() || "rgb(239, 68, 68)",
-        secondary: computedStyle.getPropertyValue("--color-secondary").trim() || "rgb(241, 172, 32)",
-        primary: computedStyle.getPropertyValue("--color-primary").trim() || "rgb(65, 101, 213)",
-        chart1: computedStyle.getPropertyValue("--color-chart-1").trim() || "rgb(65, 101, 213)",
-        chart2: computedStyle.getPropertyValue("--color-chart-2").trim() || "rgb(241, 172, 32)",
-        chart3: computedStyle.getPropertyValue("--color-chart-3").trim() || "rgb(195, 232, 201)",
+        // Get colors directly from CSS custom properties
+        // For foreground, get the computed color value since Recharts doesn't support CSS variables
+        // Use a brighter white in dark mode for better visibility
+        const isDarkMode = root.classList.contains("dark")
+        const foregroundColor = isDarkMode 
+          ? "rgb(255, 255, 255)" // Pure white for dark mode
+          : (computedStyle.color || "hsl(222.2, 84%, 4.9%)") // Use computed color for light mode
+
+        setThemeColors({
+          success: computedStyle.getPropertyValue("--color-success").trim() || "rgb(195, 232, 201)",
+          error: computedStyle.getPropertyValue("--color-error").trim() || "rgb(239, 68, 68)",
+          secondary: computedStyle.getPropertyValue("--color-secondary").trim() || "rgb(241, 172, 32)",
+          primary: computedStyle.getPropertyValue("--color-primary").trim() || "rgb(65, 101, 213)",
+          chart1: computedStyle.getPropertyValue("--color-chart-1").trim() || "rgb(65, 101, 213)",
+          chart2: computedStyle.getPropertyValue("--color-chart-2").trim() || "rgb(241, 172, 32)",
+          chart3: computedStyle.getPropertyValue("--color-chart-3").trim() || "rgb(195, 232, 201)",
+          foreground: foregroundColor,
+        })
+      }
+
+      // Initial update
+      updateColors()
+
+      // Watch for theme changes by observing class changes on the root element
+      const observer = new MutationObserver(() => {
+        updateColors()
       })
+
+      observer.observe(root, {
+        attributes: true,
+        attributeFilter: ["class", "data-theme"],
+      })
+
+      // Also listen for system theme changes
+      const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
+      const handleSystemThemeChange = () => updateColors()
+      mediaQuery.addEventListener("change", handleSystemThemeChange)
+
+      return () => {
+        observer.disconnect()
+        mediaQuery.removeEventListener("change", handleSystemThemeChange)
+      }
     }
   }, [])
 
@@ -477,7 +512,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
               {analysis.summary && (
                 <div className="card-base animate-fade-in-up border-t-4 border-t-primary bg-card dark:bg-card rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center gap-3 mb-4">
-                    <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary dark:text-slate-900" />
+                    <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary dark:text-white" />
                     <h2 className="text-xl font-bold text-foreground">Executive Summary</h2>
                   </div>
                   <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">{analysis.summary}</p>
@@ -536,7 +571,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
               {viewMode === "graph" && chartData.length > 0 && (
                 <div className="card-base animate-fade-in-up border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 bg-card dark:bg-card">
                   <div className="flex items-center gap-3 mb-6">
-                    <BarChart3 className="w-6 h-6 text-primary dark:text-slate-900" />
+                    <BarChart3 className="w-6 h-6 text-primary dark:text-white" />
                     <h2 className="text-xl font-bold text-foreground">Analysis Overview</h2>
                   </div>
 
@@ -563,7 +598,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                         yAxisId="left"
                         className="text-xs"
                         tick={{
-                          fill: "hsl(var(--foreground))",
+                          fill: themeColors.foreground,
                           fontSize: 12,
                         }}
                         axisLine={{
@@ -578,7 +613,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                           value: "Insight Count",
                           angle: -90,
                           position: "insideLeft",
-                          fill: "hsl(var(--foreground))",
+                          fill: themeColors.foreground,
                           fontSize: 12,
                         }}
                       />
@@ -588,7 +623,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                         domain={[0, 100]}
                         className="text-xs"
                         tick={{
-                          fill: "hsl(var(--foreground))",
+                          fill: themeColors.foreground,
                           fontSize: 12,
                         }}
                         axisLine={{
@@ -603,7 +638,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                           value: "Avg Confidence %",
                           angle: -90,
                           position: "insideRight",
-                          fill: "hsl(var(--foreground))",
+                          fill: themeColors.foreground,
                           fontSize: 12,
                         }}
                       />
