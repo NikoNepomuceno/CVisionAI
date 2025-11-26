@@ -563,7 +563,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                         yAxisId="left"
                         className="text-xs"
                         tick={{
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "hsl(var(--foreground))",
                           fontSize: 12,
                         }}
                         axisLine={{
@@ -578,7 +578,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                           value: "Insight Count",
                           angle: -90,
                           position: "insideLeft",
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "hsl(var(--foreground))",
                           fontSize: 12,
                         }}
                       />
@@ -588,7 +588,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                         domain={[0, 100]}
                         className="text-xs"
                         tick={{
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "hsl(var(--foreground))",
                           fontSize: 12,
                         }}
                         axisLine={{
@@ -603,7 +603,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                           value: "Avg Confidence %",
                           angle: -90,
                           position: "insideRight",
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "hsl(var(--foreground))",
                           fontSize: 12,
                         }}
                       />

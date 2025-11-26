@@ -154,7 +154,7 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
       case "medium":
         return "bg-secondary/10 dark:bg-secondary/20 text-secondary dark:text-white border-secondary/20 dark:border-secondary/30"
       case "low":
-        return "bg-primary/10 dark:bg-primary/20 text-primary dark:text-white border-primary/20 dark:border-slate-900/30"
+        return "bg-primary/10 dark:bg-primary/20 text-primary dark:text-white border-primary/20 dark:border-primary/30"
       default:
         return "bg-muted dark:bg-muted text-muted-foreground dark:text-muted-foreground border-border dark:border-border"
     }

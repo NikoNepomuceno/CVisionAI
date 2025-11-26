@@ -343,7 +343,9 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                         {/* Match Score */}
                         <div className="mb-4 sm:mb-6 p-3 sm:p-4 bg-gradient-to-r from-primary/10 to-primary/5 rounded-lg sm:rounded-xl border border-primary/10 dark:border-slate-900/20 group-hover:border-primary/20 dark:group-hover:border-slate-900/30 transition-colors">
                           <div className="flex items-center justify-between">
-                            <span className="text-xs sm:text-sm font-semibold text-foreground">Your Match</span>
+                            <span className="text-xs sm:text-sm font-semibold text-foreground dark:text-white">
+                              Your Match
+                            </span>
                             <div className="flex items-center gap-2">
                               <div className="w-12 sm:w-16 bg-muted/30 rounded-full h-1.5 sm:h-2 overflow-hidden">
                                 <div
