@@ -547,7 +547,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                         dataKey="name"
                         className="text-xs"
                         tick={{
-                          fill: "hsl(var(--muted-foreground))",
+                          fill: "hsl(var(--foreground))",
                           fontSize: 12,
                         }}
                         axisLine={{
