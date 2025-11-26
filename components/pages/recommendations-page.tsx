@@ -138,7 +138,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
   const getMatchColor = (match: number) => {
     if (match >= 90) return "text-success"
     if (match >= 80) return "text-secondary"
-    if (match >= 60) return "text-primary dark:text-slate-900"
+    if (match >= 60) return "text-primary dark:text-primary"
     return "text-muted-foreground"
   }
 
@@ -297,7 +297,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                         {filter.count > 0 && (
                           <span
                             className={`px-1.5 py-0.5 sm:px-2 sm:py-1 rounded-full text-xs ${
-                              isActive ? "bg-white/20 text-white" : "bg-primary/10 text-primary dark:text-slate-900"
+                              isActive ? "bg-white/20 text-white" : "bg-primary/10 text-primary dark:text-primary"
                             }`}
                           >
                             {filter.count}
@@ -327,17 +327,17 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                         {/* Header */}
                         <div className="mb-4 sm:mb-6">
                           <div className="flex justify-between items-start mb-2 gap-2">
-                            <h3 className="text-base sm:text-lg md:text-xl font-bold text-foreground group-hover:text-primary dark:group-hover:text-slate-700 transition-colors line-clamp-2 flex-1 min-w-0">
+                            <h3 className="text-base sm:text-lg md:text-xl font-bold text-foreground dark:text-white group-hover:text-primary dark:group-hover:text-primary transition-colors line-clamp-2 flex-1 min-w-0">
                               {job.title}
                             </h3>
                             {job.match >= 85 && (
-                              <div className="flex-shrink-0 bg-primary/10 text-primary dark:text-slate-900 px-2 py-1 rounded-full flex items-center gap-1">
+                              <div className="flex-shrink-0 bg-primary/10 text-primary dark:text-secondary px-2 py-1 rounded-full flex items-center gap-1">
                                 <Star className="w-2.5 h-2.5 sm:w-3 sm:h-3 fill-current" />
-                                <span className="text-xs font-semibold">Top</span>
+                                <span className="text-xs font-semibold dark:text-white">Top</span>
                               </div>
                             )}
                           </div>
-                          <p className="text-sm text-muted-foreground font-medium">{job.company}</p>
+                          <p className="text-sm text-muted-foreground dark:text-slate-400 font-medium">{job.company}</p>
                         </div>
 
                         {/* Match Score */}
@@ -370,7 +370,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
 
                         {/* Skills */}
                         <div className="mb-4 sm:mb-6">
-                          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-2 sm:mb-3">
+                          <p className="text-xs font-semibold text-muted-foreground dark:text-slate-400 uppercase tracking-wide mb-2 sm:mb-3">
                             Matched Skills
                           </p>
                           {job.skills.length > 0 ? (
@@ -378,7 +378,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                               {job.skills.slice(0, 4).map((skill, i) => (
                                 <span
                                   key={i}
-                                  className="text-xs bg-primary/10 text-primary dark:text-slate-900 px-2 py-1 sm:px-3 sm:py-1.5 rounded-md sm:rounded-lg hover:bg-primary/20 transition-all duration-200 border border-primary/20 dark:border-slate-900/30 hover:border-primary/30 dark:hover:border-slate-900/40 hover:transform hover:scale-105 font-medium"
+                                  className="text-xs bg-primary/10 text-primary dark:text-primary px-2 py-1 sm:px-3 sm:py-1.5 rounded-md sm:rounded-lg hover:bg-primary/20 transition-all duration-200 border border-primary/20 dark:border-slate-900/30 hover:border-primary/30 dark:hover:border-slate-900/40 hover:transform hover:scale-105 font-medium"
                                 >
                                   {skill}
                                 </span>
@@ -396,19 +396,19 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
 
                         {/* Job Details */}
                         <div className="space-y-2 sm:space-y-3 mb-4 sm:mb-6 pb-3 sm:pb-4 border-b border-border/50">
-                          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
-                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-primary dark:text-slate-900" />
+                          <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground dark:text-slate-400">
+                            <MapPin className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-primary dark:text-primary" />
                             <span className="truncate">{job.location}</span>
                           </div>
                           {job.salary && (
-                            <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground">
-                              <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-primary dark:text-slate-900" />
+                            <div className="flex items-center gap-2 sm:gap-3 text-xs sm:text-sm text-muted-foreground dark:text-slate-400">
+                              <DollarSign className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0 text-primary dark:text-primary" />
                               <span className="truncate font-medium">{job.salary}</span>
                             </div>
                           )}
                           {job.type && (
                             <div className="flex items-center gap-2">
-                              <span className="text-xs bg-secondary/10 text-secondary px-2 py-1 sm:px-3 sm:py-1.5 rounded-md sm:rounded-lg border border-secondary/20 dark:border-slate-900/30 hover:bg-secondary/20 dark:hover:bg-slate-900/20 transition-all duration-200 font-semibold">
+                              <span className="text-xs bg-secondary/10 text-secondary dark:text-primary px-2 py-1 sm:px-3 sm:py-1.5 rounded-md sm:rounded-lg border border-secondary/20 dark:border-primary hover:bg-secondary/20 dark:hover:bg-primary transition-all duration-200 font-semibold">
                                 {job.type}
                               </span>
                             </div>
@@ -492,18 +492,20 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
             {/* Modal Header */}
             <div className="flex items-center justify-between p-6 border-b border-border bg-gradient-to-r from-primary/5 to-primary/10">
               <div className="flex-1 min-w-0">
-                <h2 className="text-xl sm:text-2xl font-bold text-foreground mb-2">{selectedJob.title}</h2>
+                <h2 className="text-xl sm:text-2xl font-bold text-foreground dark:text-white mb-2">
+                  {selectedJob.title}
+                </h2>
                 <div className="flex items-center gap-4 flex-wrap">
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-slate-400">
                     <Building className="w-4 h-4" />
                     <span className="font-medium">{selectedJob.company}</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-slate-400">
                     <MapPin className="w-4 h-4" />
                     <span>{selectedJob.location}</span>
                   </div>
                   {selectedJob.type && (
-                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground dark:text-slate-400">
                       <Users className="w-4 h-4" />
                       <span>{selectedJob.type}</span>
                     </div>
@@ -524,8 +526,8 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                 {/* Match Score */}
                 <div className="flex items-center justify-between p-4 bg-muted/30 rounded-xl">
                   <div className="flex items-center gap-3">
-                    <Star className="w-5 h-5 text-primary dark:text-slate-900" />
-                    <span className="font-semibold text-foreground">Your Match Score</span>
+                    <Star className="w-5 h-5 text-primary dark:text-primary" />
+                    <span className="font-semibold text-foreground dark:text-white">Your Match Score</span>
                   </div>
                   <div className="flex items-center gap-3">
                     <div className="w-24 bg-muted rounded-full h-2 overflow-hidden">
@@ -551,8 +553,8 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                 {/* Loading State for Details */}
                 {isDetailsLoading && (
                   <div className="flex items-center justify-center py-8">
-                    <Loader2 className="w-8 h-8 animate-spin text-primary dark:text-slate-900 mr-3" />
-                    <span className="text-muted-foreground">Loading job details...</span>
+                    <Loader2 className="w-8 h-8 animate-spin text-primary dark:text-primary mr-3" />
+                    <span className="text-muted-foreground dark:text-slate-400">Loading job details...</span>
                   </div>
                 )}
 
@@ -561,20 +563,25 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                   <div className="space-y-6">
                     {/* Job Description */}
                     <div>
-                      <h3 className="text-lg font-semibold text-foreground mb-3 flex items-center gap-2">
-                        <Calendar className="w-5 h-5 text-primary dark:text-slate-900" />
+                      <h3 className="text-lg font-semibold text-foreground dark:text-white mb-3 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-primary dark:text-primary" />
                         Job Description
                       </h3>
-                      <p className="text-muted-foreground leading-relaxed">{jobDetails.description}</p>
+                      <p className="text-muted-foreground dark:text-slate-400 leading-relaxed">
+                        {jobDetails.description}
+                      </p>
                     </div>
 
                     {/* Requirements */}
                     {jobDetails.requirements && jobDetails.requirements.length > 0 && (
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground mb-3">Requirements</h3>
+                        <h3 className="text-lg font-semibold text-foreground dark:text-white mb-3">Requirements</h3>
                         <ul className="space-y-2">
                           {jobDetails.requirements.map((requirement, index) => (
-                            <li key={index} className="flex items-start gap-3 text-muted-foreground">
+                            <li
+                              key={index}
+                              className="flex items-start gap-3 text-muted-foreground dark:text-slate-400"
+                            >
                               <div className="w-1.5 h-1.5 bg-primary rounded-full mt-2 flex-shrink-0" />
                               <span>{requirement}</span>
                             </li>
@@ -586,12 +593,12 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                     {/* Benefits */}
                     {jobDetails.benefits && jobDetails.benefits.length > 0 && (
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground mb-3">Benefits</h3>
+                        <h3 className="text-lg font-semibold text-foreground dark:text-white mb-3">Benefits</h3>
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
                           {jobDetails.benefits.map((benefit, index) => (
                             <div key={index} className="flex items-center gap-2 p-2 bg-success/10 rounded-lg">
                               <div className="w-2 h-2 bg-success rounded-full flex-shrink-0" />
-                              <span className="text-sm text-success-foreground">{benefit}</span>
+                              <span className="text-sm text-success-foreground dark:text-primary">{benefit}</span>
                             </div>
                           ))}
                         </div>
@@ -601,16 +608,24 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
                     {/* Application Process */}
                     {jobDetails.applicationProcess && (
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground mb-3">Application Process</h3>
-                        <p className="text-muted-foreground leading-relaxed">{jobDetails.applicationProcess}</p>
+                        <h3 className="text-lg font-semibold text-foreground dark:text-white mb-3">
+                          Application Process
+                        </h3>
+                        <p className="text-muted-foreground dark:text-slate-400 leading-relaxed">
+                          {jobDetails.applicationProcess}
+                        </p>
                       </div>
                     )}
 
                     {/* Company Info */}
                     {jobDetails.companyInfo && (
                       <div>
-                        <h3 className="text-lg font-semibold text-foreground mb-3">About {selectedJob.company}</h3>
-                        <p className="text-muted-foreground leading-relaxed">{jobDetails.companyInfo}</p>
+                        <h3 className="text-lg font-semibold text-foreground dark:text-white mb-3">
+                          About {selectedJob.company}
+                        </h3>
+                        <p className="text-muted-foreground dark:text-slate-400 leading-relaxed">
+                          {jobDetails.companyInfo}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -618,7 +633,7 @@ export default function RecommendationsPage({ resumeData, onPrevious, onReset }:
 
                 {/* Error State for Details */}
                 {!jobDetails && !isDetailsLoading && (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-8 text-muted-foreground dark:text-slate-400">
                     <AlertCircle className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>Unable to load job details. Please try again.</p>
                   </div>

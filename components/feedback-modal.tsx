@@ -1,6 +1,6 @@
 "use client"
 
-import { Download, X } from "lucide-react"
+import { Download } from "lucide-react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import type { FeedbackItem } from "@/lib/deepseek"
 
@@ -17,11 +17,10 @@ export default function FeedbackModal({ isOpen, onClose, feedbackItems, onDownlo
       <DialogContent className="max-w-6xl w-[90vw] max-h-[90vh] overflow-hidden flex flex-col">
         <DialogHeader>
           <div className="flex items-center justify-between">
-            <DialogTitle className="text-2xl font-bold text-foreground">Feedback & Suggestions</DialogTitle>
-            <button
-              onClick={onDownload}
-              className="btn-secondary flex items-center gap-2 text-sm"
-            >
+            <DialogTitle className="text-2xl font-bold text-foreground dark:text-white">
+              Feedback & Suggestions
+            </DialogTitle>
+            <button onClick={onDownload} className="btn-secondary flex items-center gap-2 text-sm">
               <Download className="w-4 h-4" />
               Download
             </button>
@@ -30,7 +29,7 @@ export default function FeedbackModal({ isOpen, onClose, feedbackItems, onDownlo
 
         <div className="flex-1 overflow-y-auto pr-2 space-y-3 mt-4 custom-scrollbar">
           {feedbackItems.length === 0 ? (
-            <div className="card-base text-center py-8 text-muted-foreground">
+            <div className="card-base text-center py-8 text-muted-foreground dark:text-slate-400">
               <p>No feedback available.</p>
             </div>
           ) : (
@@ -45,18 +44,20 @@ export default function FeedbackModal({ isOpen, onClose, feedbackItems, onDownlo
                 <div className="flex-1">
                   <div className="flex items-start justify-between mb-1">
                     <div>
-                      <h3 className="font-semibold text-foreground">{item.title}</h3>
-                      <p className="text-xs text-muted-foreground mt-1">{item.category}</p>
+                      <h3 className="font-semibold text-foreground dark:text-white">{item.title}</h3>
+                      <p className="text-xs text-muted-foreground dark:text-slate-400 mt-1">{item.category}</p>
                     </div>
                     <span
                       className={`text-xs font-medium px-2 py-1 rounded ${
-                        item.priority === "high" ? "bg-error/10 text-error" : "bg-secondary/10 text-secondary"
+                        item.priority === "high"
+                          ? "bg-error/10 text-error dark:text-white"
+                          : "bg-secondary/10 text-secondary dark:text-white"
                       }`}
                     >
                       {item.priority}
                     </span>
                   </div>
-                  <p className="text-sm text-muted-foreground mt-2">{item.description}</p>
+                  <p className="text-sm text-muted-foreground dark:text-slate-300 mt-2">{item.description}</p>
                 </div>
               </div>
             ))
@@ -66,4 +67,3 @@ export default function FeedbackModal({ isOpen, onClose, feedbackItems, onDownlo
     </Dialog>
   )
 }
-

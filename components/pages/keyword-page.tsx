@@ -338,7 +338,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
               >
                 <div className="flex flex-col items-center text-center gap-4 sm:gap-6">
                   <div className="flex items-center gap-2 sm:gap-3">
-                    <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-primary dark:text-slate-900 flex-shrink-0" />
+                    <BarChart3 className="w-6 h-6 sm:w-7 sm:h-7 text-primary dark:text-primary flex-shrink-0" />
                     <div>
                       <h3 className="font-bold text-foreground text-lg sm:text-xl">Overall Match Score</h3>
                       <p className="text-xs sm:text-sm text-muted-foreground">

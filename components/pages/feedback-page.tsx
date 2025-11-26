@@ -306,7 +306,7 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
                           {item.title}
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          <span className="text-xs font-medium text-primary dark:text-slate-900 bg-primary/10 dark:bg-primary/20 px-2 py-1 sm:px-3 sm:py-1 rounded-full border border-primary/20 dark:border-slate-900/30">
+                          <span className="text-xs font-medium text-primary dark:text-white bg-primary/10 dark:bg-primary/20 px-2 py-1 sm:px-3 sm:py-1 rounded-full border border-primary/20 dark:border-slate-900/30">
                             {item.category}
                           </span>
                           <span
