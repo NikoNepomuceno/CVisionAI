@@ -149,6 +149,10 @@ export default function Home() {
     }
   }, [])
 
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "smooth" })
+  }, [currentStep])
+
   const applyTheme = (mode: ThemeMode) => {
     const html = document.documentElement
     if (mode === "system") {
@@ -214,6 +218,25 @@ export default function Home() {
     })
   }
 
+  const handleLogoClick = () => {
+    setShowLanding(true)
+    window.scrollTo({ top: 0, behavior: "smooth" })
+    setCurrentStep("upload")
+    setFurthestStepIndex(0)
+    setResumeData({
+      skills: [],
+      experience: [],
+      education: [],
+      summary: "",
+      file: undefined,
+      analysis: undefined,
+      keywordAnalysis: undefined,
+      keywordJobDescription: "",
+      lastAnalyzed: undefined,
+      lastAnalyzedKey: undefined,
+    })
+  }
+
   const handleAnalysisPersist = useCallback(
     (analysis?: ResumeAnalysis) => {
       if (!analysis) {
@@ -263,7 +286,11 @@ export default function Home() {
       <header className="relative bg-white/70 dark:bg-[#293855]/70 backdrop-blur-md border-b border-[#4165D5]/20 dark:border-[#4165D5]/30 sticky top-0 z-50 transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between mb-4">
-            <div className="flex items-center gap-3">
+            <button
+              onClick={handleLogoClick}
+              className="flex items-center gap-3 hover:opacity-80 transition-opacity duration-300 cursor-pointer"
+              aria-label="Return to landing page"
+            >
               <div className="relative">
                 <div className="w-10 h-10 bg-gradient-to-br from-[#4165D5] to-[#293855] rounded-xl flex items-center justify-center shadow-lg shadow-[#4165D5]/20 dark:shadow-[#293855]/30">
                   <div className="absolute inset-0 bg-gradient-to-br from-white/20 to-transparent rounded-xl" />
@@ -279,7 +306,7 @@ export default function Home() {
                   AI-Powered Resume Analysis
                 </p>
               </div>
-            </div>
+            </button>
             <div className="flex items-center gap-4">
               <div className="text-sm text-[#50B98E] dark:text-[#C3E8C9] font-medium transition-colors duration-300">
                 Step {currentStepIndex + 1} of {STEPS.length}
@@ -310,28 +337,28 @@ export default function Home() {
 
             {/* Steps Navigation */}
             <div className="flex items-center justify-between mt-4 overflow-x-auto pb-2 scrollbar-hide w-full">
-            {STEPS.map((step, index) => (
-              <div key={step.id} className="flex items-center gap-0.5 sm:gap-1 flex-1 min-w-0">
-                <button
-                  onClick={() => handleJumpToStep(step.id)}
-                  disabled={index > furthestStepIndex}
-                  className={`flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 backdrop-blur-sm w-full min-w-fit ${
-                    step.id === currentStep
-                      ? "bg-gradient-to-r from-[#4165D5] to-[#293855] text-white shadow-lg shadow-[#4165D5]/30 scale-100"
-                      : index <= furthestStepIndex
-                        ? "bg-white/50 dark:bg-[#293855]/50 text-[#4165D5] dark:text-[#C3E8C9] hover:bg-white/70 dark:hover:bg-[#293855]/70 cursor-pointer border border-[#4165D5]/20 dark:border-[#4165D5]/30"
-                        : "bg-[#C3E8C9]/20 dark:bg-[#293855]/30 text-[#4165D5]/50 dark:text-[#C3E8C9]/50 cursor-not-allowed border border-[#4165D5]/10 dark:border-[#4165D5]/20"
-                  }`}
-                >
-                  {step.icon}
-                  <span className="hidden sm:inline">{step.label}</span>
-                </button>
-                {index < STEPS.length - 1 && (
-                  <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#50B98E]/30 dark:text-[#C3E8C9]/30 hidden sm:block flex-shrink-0 mx-1" />
-                )}
-              </div>
-            ))}
-          </div>
+              {STEPS.map((step, index) => (
+                <div key={step.id} className="flex items-center gap-0.5 sm:gap-1 flex-1 min-w-0">
+                  <button
+                    onClick={() => handleJumpToStep(step.id)}
+                    disabled={index > furthestStepIndex}
+                    className={`flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-1.5 rounded-lg text-xs sm:text-sm font-medium transition-all duration-300 backdrop-blur-sm w-full min-w-fit ${
+                      step.id === currentStep
+                        ? "bg-gradient-to-r from-[#4165D5] to-[#293855] text-white shadow-lg shadow-[#4165D5]/30 scale-100"
+                        : index <= furthestStepIndex
+                          ? "bg-white/50 dark:bg-[#293855]/50 text-[#4165D5] dark:text-[#C3E8C9] hover:bg-white/70 dark:hover:bg-[#293855]/70 cursor-pointer border border-[#4165D5]/20 dark:border-[#4165D5]/30"
+                          : "bg-[#C3E8C9]/20 dark:bg-[#293855]/30 text-[#4165D5]/50 dark:text-[#C3E8C9]/50 cursor-not-allowed border border-[#4165D5]/10 dark:border-[#4165D5]/20"
+                    }`}
+                  >
+                    {step.icon}
+                    <span className="hidden sm:inline">{step.label}</span>
+                  </button>
+                  {index < STEPS.length - 1 && (
+                    <ChevronRight className="w-3 h-3 sm:w-4 sm:h-4 text-[#50B98E]/30 dark:text-[#C3E8C9]/30 hidden sm:block flex-shrink-0 mx-1" />
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </header>

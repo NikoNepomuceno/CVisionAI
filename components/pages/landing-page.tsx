@@ -106,9 +106,9 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
   if (!mounted) return null
 
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 dark:from-background dark:via-primary/20 dark:to-background flex flex-col transition-colors duration-300">
-      {/* Enhanced Animated Background */}
-      <div className="absolute inset-0">
+    <div className="min-h-screen flex flex-col transition-colors duration-300">
+      {/* Enhanced Animated Background - Now positioned to cover full viewport including behind header */}
+      <div className="fixed inset-0 -z-10 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 dark:from-background dark:via-primary/20 dark:to-background transition-colors duration-300">
         {/* Main Gradient */}
         <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-secondary/10 to-accent/10 dark:from-background dark:via-primary/20 dark:to-background transition-colors duration-300" />
 
@@ -175,8 +175,8 @@ export default function LandingPage({ onGetStarted }: LandingPageProps) {
       </header>
 
       {/* Main Content */}
-      <main className="relative flex-1 flex items-center px-6">
-        <div className="max-w-7xl mx-auto w-full py-12">
+      <main className="relative flex-1 flex items-center px-6 overflow-y-auto">
+        <div className="max-w-7xl mx-auto w-full py-8">
           <div className="grid lg:grid-cols-2 gap-16 items-center">
             {/* Left Column - Hero Content */}
             <div className="space-y-8">
