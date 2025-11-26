@@ -420,8 +420,8 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
           {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-primary/40 mb-3 sm:mb-4">
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-primary" />
-              <span className="text-xs sm:text-sm font-medium text-primary dark:text-primary">AI-Powered Analysis</span>
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-white" />
+              <span className="text-xs sm:text-sm font-medium text-primary dark:text-white">AI-Powered Analysis</span>
             </div>
             <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground dark:text-white mb-2 sm:mb-3">
               AI Analysis & Insights

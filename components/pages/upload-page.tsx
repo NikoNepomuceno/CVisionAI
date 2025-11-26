@@ -154,8 +154,8 @@ export default function UploadPage({ onNext }: UploadPageProps) {
           <div className="text-center mb-4 sm:mb-6">
             <div className="flex justify-center mb-2 sm:mb-1">
               <div className="inline-flex items-center gap-1 px-2 py-0.5 bg-primary/10 rounded-full border border-primary/20 dark:border-slate-900/30">
-                <Sparkles className="w-3 h-3 text-primary dark:text-primary" />
-                <span className="text-xs font-medium text-primary dark:text-primary">AI-Powered Analysis</span>
+                <Sparkles className="w-3 h-3 text-primary dark:text-white" />
+                <span className="text-xs font-medium text-primary dark:text-white">AI-Powered Analysis</span>
               </div>
             </div>
 

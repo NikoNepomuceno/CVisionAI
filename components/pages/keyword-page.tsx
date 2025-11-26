@@ -154,10 +154,8 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
           {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-primary/40 mb-3 sm:mb-4">
-              <Target className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-primary" />
-              <span className="text-xs sm:text-sm font-medium text-primary dark:text-primary">
-                Keyword Optimization
-              </span>
+              <Target className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-white" />
+              <span className="text-xs sm:text-sm font-medium text-primary dark:text-white">Keyword Optimization</span>
             </div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-3">
               Keyword Match Analysis
