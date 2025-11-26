@@ -155,24 +155,24 @@ export default function Home() {
       requestAnimationFrame(() => {
         window.scrollTo({
           top: 0,
-          behavior: "smooth"
-        });
-      });
-    };
+          behavior: "smooth",
+        })
+      })
+    }
 
-    scrollToTop();
+    scrollToTop()
 
     // Also handle browser back/forward navigation
     const handlePopState = () => {
-      scrollToTop();
-    };
+      scrollToTop()
+    }
 
-    window.addEventListener('popstate', handlePopState);
-    
+    window.addEventListener("popstate", handlePopState)
+
     return () => {
-      window.removeEventListener('popstate', handlePopState);
-    };
-  }, [currentStep]);
+      window.removeEventListener("popstate", handlePopState)
+    }
+  }, [currentStep])
 
   const applyTheme = (mode: ThemeMode) => {
     const html = document.documentElement
@@ -205,16 +205,12 @@ export default function Home() {
     }
     if (currentStepIndex < STEPS.length - 1) {
       setCurrentStep(STEPS[currentStepIndex + 1].id)
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
 
   const handlePrevious = () => {
     if (currentStepIndex > 0) {
       setCurrentStep(STEPS[currentStepIndex - 1].id)
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
 
@@ -223,8 +219,6 @@ export default function Home() {
     if (stepIndex === -1) return
     if (stepIndex <= furthestStepIndex) {
       setCurrentStep(stepId)
-      // Scroll to top
-      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
 
@@ -243,13 +237,10 @@ export default function Home() {
       lastAnalyzed: undefined,
       lastAnalyzedKey: undefined,
     })
-    // Scroll to top
-    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const handleLogoClick = () => {
     setShowLanding(true)
-    window.scrollTo({ top: 0, behavior: "smooth" })
     setCurrentStep("upload")
     setFurthestStepIndex(0)
     setResumeData({
@@ -359,7 +350,7 @@ export default function Home() {
             {/* Progress Bar */}
             <div className="w-full bg-[#C3E8C9]/20 dark:bg-[#293855]/50 rounded-full h-2 overflow-hidden backdrop-blur-sm">
               <div
-                className="bg-gradient-to-r from-[#4165D5] via-[#293855] to-[#F1AC20] h-2 rounded-full transition-all duration-700 ease-out shadow-lg shadow-[#4165D5]/20 dark:shadow-[#293855]/30"
+                className="bg-gradient-to-r from-[#4165D5] via-[#293855] to-[#F1AC20] h-2 rounded-full transition-all duration-700 ease-out shadow-lg shadow-[#4165D5]/30 dark:shadow-[#293855]/30"
                 style={{ width: `${((currentStepIndex + 0.5) / STEPS.length) * 100}%` }}
               />
             </div>
