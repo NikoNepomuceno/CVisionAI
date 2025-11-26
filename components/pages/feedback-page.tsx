@@ -150,11 +150,11 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
   const getPriorityColor = (priority: string) => {
     switch (priority) {
       case "high":
-        return "bg-error/10 dark:bg-error/20 text-error dark:text-error/90 border-error/20 dark:border-error/30"
+        return "bg-error/10 dark:bg-error/20 text-error dark:text-white border-error/20 dark:border-error/30"
       case "medium":
-        return "bg-secondary/10 dark:bg-secondary/20 text-secondary dark:text-secondary/90 border-secondary/20 dark:border-secondary/30"
+        return "bg-secondary/10 dark:bg-secondary/20 text-secondary dark:text-white border-secondary/20 dark:border-secondary/30"
       case "low":
-        return "bg-primary/10 dark:bg-primary/20 text-primary dark:text-primary/90 border-primary/20 dark:border-slate-900/30"
+        return "bg-primary/10 dark:bg-primary/20 text-primary dark:text-white border-primary/20 dark:border-slate-900/30"
       default:
         return "bg-muted dark:bg-muted text-muted-foreground dark:text-muted-foreground border-border dark:border-border"
     }
@@ -168,9 +168,7 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
           <div className="text-center animate-fade-in-up">
             <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 dark:bg-primary/20 rounded-full border border-primary/20 dark:border-slate-900/30 mb-3 sm:mb-4">
               <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
-              <span className="text-xs sm:text-sm font-medium text-primary dark:text-slate-900">
-                Actionable Feedback
-              </span>
+              <span className="text-xs sm:text-sm font-medium text-primary dark:text-white">Actionable Feedback</span>
             </div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground dark:text-white mb-2 sm:mb-3">
               Feedback & Suggestions
@@ -295,10 +293,10 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
                     key={item.id}
                     className={`card-base border-l-3 sm:border-l-4 rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300 animate-fade-in-up group overflow-hidden ${
                       item.priority === "high"
-                        ? "border-l-error dark:border-l-error bg-error/5 dark:bg-error/10"
+                        ? "border-l-error dark:border-l-error"
                         : item.priority === "medium"
-                          ? "border-l-secondary dark:border-l-secondary bg-secondary/5 dark:bg-secondary/10"
-                          : "border-l-primary dark:border-l-primary bg-primary/5 dark:bg-primary/10"
+                          ? "border-l-secondary dark:border-l-secondary"
+                          : "border-l-primary dark:border-l-primary"
                     }`}
                     style={{ animationDelay: `${i * 50}ms` }}
                   >
@@ -320,7 +318,7 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
                       </div>
                       <button
                         onClick={() => handleCopy(item.id)}
-                        className="flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-primary dark:text-slate-900 hover:text-primary/80 dark:hover:text-slate-700 transition-colors bg-background/80 dark:bg-background/80 backdrop-blur-sm rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 border border-border dark:border-border hover:border-primary/30 dark:hover:border-slate-900/30 hover:scale-105 transition-transform w-full sm:w-auto"
+                        className="flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-primary dark:text-white hover:text-primary/80 dark:hover:text-slate-100 transition-colors bg-background/80 dark:bg-background/80 backdrop-blur-sm rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 border border-border dark:border-border hover:border-primary/30 dark:hover:border-slate-900/30 hover:scale-105 transition-transform w-full sm:w-auto"
                       >
                         {copiedId === item.id ? (
                           <>
@@ -335,7 +333,7 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
                         )}
                       </button>
                     </div>
-                    <p className="text-muted-foreground dark:text-muted-foreground leading-relaxed text-sm sm:text-base">
+                    <p className="text-foreground dark:text-white leading-relaxed text-sm sm:text-base">
                       {item.description}
                     </p>
                   </div>

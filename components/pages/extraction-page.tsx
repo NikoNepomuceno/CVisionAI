@@ -134,7 +134,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
           <div className="grid grid-cols-3 gap-2 sm:gap-4 animate-fade-in-up" style={{ animationDelay: "100ms" }}>
             <div className="card-base p-2 sm:p-3 text-center border-t-3 sm:border-t-4 border-t-primary">
               <div className="flex flex-col items-center gap-1 mb-1 sm:mb-2">
-                <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
+                <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-white" />
                 <h3 className="font-semibold text-foreground text-xs">Skills</h3>
               </div>
               <p className="text-lg sm:text-xl font-bold text-foreground">{skills.length}</p>
@@ -168,7 +168,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
             >
               <div className="flex items-center gap-2 sm:gap-3">
                 <div className="w-6 h-6 sm:w-8 sm:h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
+                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-white" />
                 </div>
                 <div className="text-left">
                   <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground dark:text-white group-hover:text-primary dark:group-hover:text-slate-100 transition-colors">
@@ -178,7 +178,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                 </div>
               </div>
               <ChevronDown
-                className={`w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-slate-900 transition-all duration-300 ${expandedSections.skills ? "rotate-180" : ""} group-hover:scale-110`}
+                className={`w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-white transition-all duration-300 ${expandedSections.skills ? "rotate-180" : ""} group-hover:scale-110`}
               />
             </button>
             {expandedSections.skills && (
