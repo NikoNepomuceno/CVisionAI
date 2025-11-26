@@ -117,16 +117,21 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
         <div className="max-w-4xl mx-auto px-3 sm:px-4 md:px-6 w-full space-y-4 sm:space-y-6">
           {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-slate-900/30 mb-3 sm:mb-4">
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
-              <span className="text-xs sm:text-sm font-medium text-primary dark:text-slate-900">
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-primary/40 mb-3 sm:mb-4">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-primary" />
+              <span className="text-xs sm:text-sm font-medium text-primary dark:text-primary">
                 AI-Powered Extraction
               </span>
             </div>
-            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2">Extraction Summary</h1>
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto px-2 sm:px-0">
+            <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground dark:text-white mb-2">
+              Extraction Summary
+            </h1>
+            <p className="text-sm text-muted-foreground dark:text-muted-foreground max-w-2xl mx-auto px-2 sm:px-0">
               Review and edit the extracted information from your resume. Add missing details or make corrections as
               needed.
+            </p>
+            <p className="text-xs text-muted-foreground dark:text-muted-foreground leading-relaxed transition-colors duration-300">
+              Flat bicycle register periodically targets forty pages with industry scanning
             </p>
           </div>
 
@@ -138,7 +143,9 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                 <h3 className="font-semibold text-foreground text-xs">Skills</h3>
               </div>
               <p className="text-lg sm:text-xl font-bold text-foreground">{skills.length}</p>
-              <p className="text-xs text-muted-foreground">Extracted</p>
+              <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                {skills.length} skills extracted
+              </p>
             </div>
 
             <div className="card-base p-2 sm:p-3 text-center border-t-3 sm:border-t-4 border-t-secondary">
@@ -171,10 +178,12 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                   <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-white" />
                 </div>
                 <div className="text-left">
-                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground dark:text-white group-hover:text-primary dark:group-hover:text-slate-100 transition-colors">
+                  <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground dark:text-white group-hover:text-primary dark:group-hover:text-primary transition-colors">
                     Skills
                   </h2>
-                  <p className="text-xs text-muted-foreground dark:text-slate-300">{skills.length} skills extracted</p>
+                  <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                    {skills.length} skills extracted
+                  </p>
                 </div>
               </div>
               <ChevronDown
@@ -187,12 +196,12 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                   {skills.map((skill, i) => (
                     <div
                       key={i}
-                      className="bg-primary/10 text-primary dark:text-white px-2 sm:px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 hover:bg-primary/20 transition-all duration-200 border border-primary/20 dark:border-slate-900/30 group relative"
+                      className="bg-primary/10 text-primary dark:text-primary px-2 sm:px-3 py-1 rounded-full text-xs font-medium flex items-center gap-1.5 hover:bg-primary/20 transition-all duration-200 border border-primary/20 dark:border-slate-900/30 group relative"
                     >
                       <span className="max-w-[120px] sm:max-w-none truncate">{skill}</span>
                       <button
                         onClick={() => removeSkill(i)}
-                        className="opacity-0 group-hover:opacity-100 text-primary dark:text-slate-900 dark:hover:text-error transition-all duration-200 flex-shrink-0"
+                        className="opacity-0 group-hover:opacity-100 text-primary dark:text-primary dark:hover:text-error transition-all duration-200 flex-shrink-0"
                       >
                         <Trash2 className="w-3 h-3" />
                       </button>
@@ -261,7 +270,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                       </div>
                       <button
                         onClick={() => removeExperience(i)}
-                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-error transition-all duration-200 flex-shrink-0 ml-2"
+                        className="opacity-0 group-hover:opacity-100 text-primary dark:text-primary dark:hover:text-error transition-all duration-200 flex-shrink-0 ml-2"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -281,7 +290,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                       </h3>
                       <button
                         onClick={() => setShowAddExperience(false)}
-                        className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                        className="text-primary dark:text-primary hover:text-error flex-shrink-0"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -361,7 +370,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                   <h2 className="text-base sm:text-lg md:text-xl font-semibold text-foreground group-hover:text-accent transition-colors">
                     Education
                   </h2>
-                  <p className="text-xs text-muted-foreground">{education.length} institutions extracted</p>
+                  <p className="text-xs text-muted-foreground">Institutions</p>
                 </div>
               </div>
               <ChevronDown
@@ -383,7 +392,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                       </div>
                       <button
                         onClick={() => removeEducation(i)}
-                        className="opacity-0 group-hover:opacity-100 text-muted-foreground hover:text-error transition-all duration-200 flex-shrink-0 ml-2"
+                        className="opacity-0 group-hover:opacity-100 text-primary dark:text-primary dark:hover:text-error transition-all duration-200 flex-shrink-0 ml-2"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -400,7 +409,7 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
                       </h3>
                       <button
                         onClick={() => setShowAddEducation(false)}
-                        className="text-muted-foreground hover:text-foreground flex-shrink-0"
+                        className="text-primary dark:text-primary hover:text-error flex-shrink-0"
                       >
                         <X className="w-4 h-4" />
                       </button>
@@ -472,6 +481,14 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
               Continue to Analysis
               <ArrowRight className="w-4 h-4" />
             </button>
+          </div>
+          <div className="min-w-0 flex-1">
+            <h3 className="font-semibold text-[#293855] dark:text-white text-sm mb-1 transition-colors duration-300">
+              Automated Subtraction
+            </h3>
+            <p className="text-xs text-[#293855] dark:text-[#E3E6EB] leading-relaxed transition-colors duration-300">
+              Subtract infinite opportunities and optimize content for maximum impact
+            </p>
           </div>
         </div>
       </div>

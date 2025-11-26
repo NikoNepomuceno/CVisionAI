@@ -139,7 +139,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
   useEffect(() => {
     if (typeof window !== "undefined") {
       const root = document.documentElement
-      
+
       const updateColors = () => {
         const computedStyle = getComputedStyle(root)
 
@@ -147,9 +147,9 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
         // For foreground, get the computed color value since Recharts doesn't support CSS variables
         // Use a brighter white in dark mode for better visibility
         const isDarkMode = root.classList.contains("dark")
-        const foregroundColor = isDarkMode 
+        const foregroundColor = isDarkMode
           ? "rgb(255, 255, 255)" // Pure white for dark mode
-          : (computedStyle.color || "hsl(222.2, 84%, 4.9%)") // Use computed color for light mode
+          : computedStyle.color || "hsl(222.2, 84%, 4.9%)" // Use computed color for light mode
 
         setThemeColors({
           success: computedStyle.getPropertyValue("--color-success").trim() || "rgb(195, 232, 201)",
@@ -419,16 +419,14 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
         <div className="max-w-6xl mx-auto px-4 sm:px-6 w-full space-y-6">
           {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-slate-900/30 mb-3 sm:mb-4">
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
-              <span className="text-xs sm:text-sm font-medium text-primary dark:text-slate-900">
-                AI-Powered Analysis
-              </span>
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-primary/40 mb-3 sm:mb-4">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-primary" />
+              <span className="text-xs sm:text-sm font-medium text-primary dark:text-primary">AI-Powered Analysis</span>
             </div>
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground mb-2 sm:mb-3">
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground dark:text-white mb-2 sm:mb-3">
               AI Analysis & Insights
             </h1>
-            <p className="text-sm sm:text-lg text-muted-foreground max-w-2xl mx-auto px-2 sm:px-0 leading-relaxed">
+            <p className="text-sm sm:text-lg text-muted-foreground dark:text-muted-foreground max-w-2xl mx-auto px-2 sm:px-0 leading-relaxed">
               We analyzed your resume to surface strengths, gaps, and actionable next steps.
             </p>
           </div>
@@ -476,12 +474,14 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
 
           {/* Loading State */}
           {isLoading && (
-            <div className="card-base animate-fade-in-up border border-dashed border-primary/40 dark:border-slate-900/40 bg-primary/5 flex items-center gap-4 py-6 sm:py-8 px-4 sm:px-6 rounded-xl">
-              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-primary dark:text-slate-900 flex-shrink-0" />
+            <div className="card-base animate-fade-in-up border border-dashed border-primary/40 dark:border-primary/40 bg-primary/5 dark:bg-primary/10 flex items-center gap-4 py-6 sm:py-8 px-4 sm:px-6 rounded-xl">
+              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-primary dark:text-primary flex-shrink-0" />
               <div className="flex-1 min-w-0">
-                <p className="font-semibold text-foreground text-base sm:text-lg mb-1">Generating AI Insights...</p>
-                <p className="text-xs sm:text-sm text-muted-foreground">
-                  We're analyzing your skills, experience, and qualifications to provide personalized recommendations.
+                <p className="font-semibold text-foreground dark:text-white text-base sm:text-lg mb-1">
+                  Generating AI Insights...
+                </p>
+                <p className="text-xs sm:text-sm text-muted-foreground dark:text-muted-foreground">
+                  Analyzing your skills, experience, and qualifications to provide personalized recommendations.
                 </p>
               </div>
             </div>
@@ -512,10 +512,12 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
               {analysis.summary && (
                 <div className="card-base animate-fade-in-up border-t-4 border-t-primary bg-card dark:bg-card rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300">
                   <div className="flex items-center gap-3 mb-4">
-                    <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary dark:text-white" />
-                    <h2 className="text-xl font-bold text-foreground">Executive Summary</h2>
+                    <Target className="w-5 h-5 sm:w-6 sm:h-6 text-primary dark:text-primary" />
+                    <h2 className="text-xl font-bold text-foreground dark:text-white">Executive Summary</h2>
                   </div>
-                  <p className="text-muted-foreground leading-relaxed text-sm sm:text-base">{analysis.summary}</p>
+                  <p className="text-muted-foreground dark:text-muted-foreground leading-relaxed text-sm sm:text-base">
+                    {analysis.summary}
+                  </p>
                 </div>
               )}
 
@@ -539,15 +541,15 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                                 {icon}
                               </div>
                               <div>
-                                <h2 className="text-xl font-bold text-foreground">{title}</h2>
-                                <p className="text-sm text-muted-foreground">{insights.length} insights found</p>
+                                <h3 className="text-base sm:text-lg font-semibold text-foreground dark:text-white">
+                                  {title}
+                                </h3>
+                                <p className="text-xs text-muted-foreground dark:text-muted-foreground">
+                                  {insights.length} insights
+                                </p>
                               </div>
                             </div>
-                            <span
-                              className={`inline-flex items-center gap-1 text-sm font-medium ${metricClass} bg-muted px-3 py-1.5 rounded-full self-start sm:self-auto`}
-                            >
-                              {insights.length} items
-                            </span>
+                            <span className={`text-2xl sm:text-3xl font-bold ${metricClass}`}>{insights.length}</span>
                           </div>
 
                           {insights.length > 0 ? (
@@ -555,7 +557,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                               {renderInsights(insights, borderLeftClass, iconWrapperClass, icon)}
                             </div>
                           ) : (
-                            <div className="text-center py-8 text-muted-foreground">
+                            <div className="text-center py-8 text-muted-foreground dark:text-muted-foreground">
                               <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
                               <p className="text-base">{empty}</p>
                             </div>
@@ -571,8 +573,8 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
               {viewMode === "graph" && chartData.length > 0 && (
                 <div className="card-base animate-fade-in-up border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-lg transition-all duration-300 bg-card dark:bg-card">
                   <div className="flex items-center gap-3 mb-6">
-                    <BarChart3 className="w-6 h-6 text-primary dark:text-white" />
-                    <h2 className="text-xl font-bold text-foreground">Analysis Overview</h2>
+                    <BarChart3 className="w-6 h-6 text-primary dark:text-primary" />
+                    <h2 className="text-xl font-bold text-foreground dark:text-white">Analysis Overview</h2>
                   </div>
 
                   <ChartContainer config={chartConfig} className="h-[300px] sm:h-[400px] w-full">
@@ -682,20 +684,20 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
                     {chartData.map((item) => (
                       <div
                         key={item.name}
-                        className="p-4 rounded-xl border border-border bg-card dark:bg-card hover:shadow-md transition-all duration-300"
+                        className="p-4 rounded-xl border border-border dark:border-border bg-card dark:bg-card hover:shadow-md transition-all duration-300"
                       >
                         <div className="flex items-center gap-3 mb-3">
                           <div className="w-4 h-4 rounded-full" style={{ backgroundColor: item.color }} />
-                          <h3 className="font-semibold text-foreground">{item.name}</h3>
+                          <h3 className="font-semibold text-foreground dark:text-white">{item.name}</h3>
                         </div>
                         <div className="space-y-2 text-sm">
                           <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">Insight Count:</span>
-                            <span className="font-semibold text-foreground">{item.count}</span>
+                            <span className="text-muted-foreground dark:text-muted-foreground">Insight Count:</span>
+                            <span className="font-semibold text-foreground dark:text-white">{item.count}</span>
                           </div>
                           <div className="flex justify-between items-center">
-                            <span className="text-muted-foreground">Avg Confidence:</span>
-                            <span className="font-semibold text-foreground">{item.avgConfidence}%</span>
+                            <span className="text-muted-foreground dark:text-muted-foreground">Avg Confidence:</span>
+                            <span className="font-semibold text-foreground dark:text-white">{item.avgConfidence}%</span>
                           </div>
                         </div>
                       </div>
@@ -705,7 +707,7 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
               )}
 
               {viewMode === "graph" && chartData.length === 0 && (
-                <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 dark:border-muted-foreground/20 bg-muted/30 dark:bg-muted/20 text-muted-foreground rounded-xl p-8 text-center">
+                <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 dark:border-muted-foreground/40 bg-muted/30 dark:bg-muted/30 text-muted-foreground dark:text-muted-foreground rounded-xl p-8 text-center">
                   <BarChart3 className="w-12 h-12 mx-auto mb-3 opacity-50" />
                   <p className="font-medium text-lg mb-2">No data available for graph view</p>
                   <p className="text-sm">Switch to cards view to see detailed insights and recommendations.</p>
@@ -716,10 +718,10 @@ export default function AnalysisPage({ resumeData, onNext, onPrevious, onAnalysi
 
           {/* No Analysis State */}
           {!isLoading && !error && !analysis && (
-            <div className="card-base animate-fade-in-up border border-dashed border-primary/40 dark:border-slate-900/40 bg-primary/5 flex items-center gap-4 py-6 sm:py-8 px-4 sm:px-6 rounded-xl">
+            <div className="card-base animate-fade-in-up border border-dashed border-primary/40 dark:border-primary/40 bg-primary/5 dark:bg-primary/10 flex items-center gap-4 py-6 sm:py-8 px-4 sm:px-6 rounded-xl">
               <Lightbulb className="w-10 h-10 sm:w-12 sm:h-12 mx-auto mb-3 opacity-50" />
               <p className="font-medium text-base sm:text-lg mb-2">No insights available yet</p>
-              <p className="text-sm">
+              <p className="text-sm dark:text-white">
                 We need more details in your resume to generate meaningful analysis. Try expanding your experience or
                 skills sections.
               </p>

@@ -153,16 +153,16 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
         <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 w-full space-y-4 sm:space-y-6">
           {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-slate-900/30 mb-3 sm:mb-4">
-              <Target className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
-              <span className="text-xs sm:text-sm font-medium text-primary dark:text-slate-900">
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 rounded-full border border-primary/20 dark:border-primary/40 mb-3 sm:mb-4">
+              <Target className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-primary" />
+              <span className="text-xs sm:text-sm font-medium text-primary dark:text-primary">
                 Keyword Optimization
               </span>
             </div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground mb-2 sm:mb-3">
               Keyword Match Analysis
             </h1>
-            <p className="text-sm sm:text-base text-muted-foreground max-w-2xl mx-auto px-2 sm:px-0 leading-relaxed">
+            <p className="text-sm sm:text-base text-muted-foreground dark:text-white leading-relaxed">
               Compare your skills with job requirements to optimize your resume for ATS systems.
             </p>
           </div>
@@ -170,7 +170,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
           {/* Job Description Input */}
           <div className="card-base animate-fade-in-up border-t-3 sm:border-t-4 border-t-primary rounded-xl p-4 sm:p-6 hover:shadow-md transition-all duration-300">
             <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
-              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-slate-900 flex-shrink-0" />
+              <Search className="w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-primary flex-shrink-0" />
               <h2 className="text-lg sm:text-xl font-bold text-foreground">Paste Job Description</h2>
             </div>
             <textarea
@@ -249,7 +249,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                               : item.match >= 60
                                 ? "text-secondary dark:text-secondary"
                                 : item.match >= 40
-                                  ? "text-primary dark:text-slate-900"
+                                  ? "text-primary dark:text-primary"
                                   : "text-error dark:text-error"
                           }`}
                         >
@@ -259,7 +259,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                  <div className="text-center py-6 sm:py-8 text-muted-foreground italic">
                     <Zap className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 opacity-50" />
                     <p className="text-xs sm:text-sm">No skills found in your resume.</p>
                   </div>
@@ -273,7 +273,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
               style={{ animationDelay: "200ms" }}
             >
               <div className="flex items-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-slate-900 flex-shrink-0" />
+                <Target className="w-4 h-4 sm:w-5 sm:h-5 text-primary dark:text-primary flex-shrink-0" />
                 <div>
                   <h2 className="text-lg sm:text-xl font-bold text-foreground">Job Keywords</h2>
                   <p className="text-xs sm:text-sm text-muted-foreground">{jobKeywords.length} keywords extracted</p>
@@ -319,7 +319,7 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                     </div>
                   ))
                 ) : (
-                  <div className="text-center py-6 sm:py-8 text-muted-foreground">
+                  <div className="text-center py-6 sm:py-8 text-muted-foreground italic">
                     <Target className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 opacity-50" />
                     <p className="text-xs sm:text-sm">No keywords extracted yet. Analyze a job description first.</p>
                   </div>

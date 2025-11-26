@@ -166,8 +166,8 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
         <div className="max-w-6xl mx-auto px-3 sm:px-4 md:px-6 w-full space-y-4 sm:space-y-6 overflow-hidden">
           {/* Enhanced Header */}
           <div className="text-center animate-fade-in-up">
-            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 dark:bg-primary/20 rounded-full border border-primary/20 dark:border-slate-900/30 mb-3 sm:mb-4">
-              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-slate-900" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 sm:px-4 sm:py-2 bg-primary/10 dark:bg-primary/20 rounded-full border border-primary/20 dark:border-primary/40 mb-3 sm:mb-4">
+              <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-primary dark:text-primary" />
               <span className="text-xs sm:text-sm font-medium text-primary dark:text-white">Actionable Feedback</span>
             </div>
             <h1 className="text-xl sm:text-2xl md:text-3xl font-bold text-foreground dark:text-white mb-2 sm:mb-3">
@@ -227,8 +227,8 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
 
           {/* Loading State */}
           {isLoading && (
-            <div className="card-base animate-fade-in-up border border-dashed border-primary/40 dark:border-slate-900/40 bg-primary/5 dark:bg-primary/10 rounded-xl p-4 sm:p-6 flex items-center gap-3 sm:gap-4 overflow-hidden">
-              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-primary dark:text-slate-900 flex-shrink-0" />
+            <div className="card-base animate-fade-in-up border border-dashed border-primary/40 dark:border-primary/40 bg-primary/5 dark:bg-primary/10 rounded-xl p-4 sm:p-6 flex items-center gap-3 sm:gap-4 overflow-hidden">
+              <Loader2 className="w-6 h-6 sm:w-8 sm:h-8 animate-spin text-primary dark:text-primary flex-shrink-0" />
               <div className="flex-1 min-w-0">
                 <p className="font-semibold text-foreground dark:text-white text-base sm:text-lg mb-1">
                   Generating Feedback...
@@ -306,7 +306,7 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
                           {item.title}
                         </h3>
                         <div className="flex flex-wrap gap-2">
-                          <span className="text-xs font-medium text-primary dark:text-white bg-primary/10 dark:bg-primary/20 px-2 py-1 sm:px-3 sm:py-1 rounded-full border border-primary/20 dark:border-slate-900/30">
+                          <span className="text-xs font-medium text-primary dark:text-white bg-primary/10 dark:bg-primary/20 px-2 py-1 sm:px-3 sm:py-1 rounded-full border border-primary/20 dark:border-primary/30">
                             {item.category}
                           </span>
                           <span
@@ -318,7 +318,7 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
                       </div>
                       <button
                         onClick={() => handleCopy(item.id)}
-                        className="flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-primary dark:text-white hover:text-primary/80 dark:hover:text-slate-100 transition-colors bg-background/80 dark:bg-background/80 backdrop-blur-sm rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 border border-border dark:border-border hover:border-primary/30 dark:hover:border-slate-900/30 hover:scale-105 transition-transform w-full sm:w-auto"
+                        className="flex items-center justify-center gap-1.5 sm:gap-2 text-xs sm:text-sm text-primary dark:text-white hover:text-primary/80 dark:hover:text-white transition-colors bg-background/80 dark:bg-background/80 backdrop-blur-sm rounded-lg px-2.5 py-1.5 sm:px-3 sm:py-2 border border-border dark:border-border hover:border-primary/30 dark:hover:border-white hover:scale-105 transition-transform w-full sm:w-auto"
                       >
                         {copiedId === item.id ? (
                           <>
@@ -344,7 +344,7 @@ export default function FeedbackPage({ resumeData, onNext, onPrevious }: Feedbac
 
           {/* Empty State */}
           {!isLoading && !error && feedbackItems.length === 0 && (
-            <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 dark:border-muted-foreground/30 bg-muted/30 dark:bg-muted/20 text-muted-foreground dark:text-muted-foreground rounded-xl p-6 sm:p-8 text-center overflow-hidden">
+            <div className="card-base animate-fade-in-up border border-dashed border-muted-foreground/30 dark:border-muted-foreground/40 bg-muted/30 dark:bg-muted/30 text-muted-foreground dark:text-muted-foreground rounded-xl p-6 sm:p-8 text-center overflow-hidden">
               <Lightbulb className="w-8 h-8 sm:w-10 sm:h-10 mx-auto mb-2 sm:mb-3 opacity-50" />
               <p className="font-medium text-base sm:text-lg mb-1 sm:mb-2">No feedback available yet</p>
               <p className="text-xs sm:text-sm max-w-md mx-auto">
