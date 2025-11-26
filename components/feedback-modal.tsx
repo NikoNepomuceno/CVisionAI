@@ -14,13 +14,13 @@ interface FeedbackModalProps {
 export default function FeedbackModal({ isOpen, onClose, feedbackItems, onDownload }: FeedbackModalProps) {
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-6xl w-[90vw] max-h-[90vh] overflow-hidden flex flex-col">
+      <DialogContent className="max-w-6xl w-[90vw] max-h-[90vh] overflow-hidden flex flex-col" showCloseButton={false}>
         <DialogHeader className="pb-2">
           <div className="flex items-start justify-between gap-3">
             <DialogTitle className="text-2xl font-bold text-foreground dark:text-white flex-1">
               Feedback & Suggestions
             </DialogTitle>
-            <button onClick={onDownload} className="btn-secondary flex items-center gap-2 text-sm flex-shrink-0 mt-1">
+            <button onClick={onDownload} className="btn-secondary flex items-center gap-2 text-sm flex-shrink-0 mt-1 ml-2">
               <Download className="w-4 h-4" />
               Download
             </button>
