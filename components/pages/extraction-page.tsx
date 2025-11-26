@@ -480,14 +480,6 @@ export default function ExtractionPage({ resumeData, onNext, onPrevious }: Extra
               <ArrowRight className="w-4 h-4" />
             </button>
           </div>
-          <div className="min-w-0 flex-1">
-            <h3 className="font-semibold text-[#293855] dark:text-white text-sm mb-1 transition-colors duration-300">
-              Automated Subtraction
-            </h3>
-            <p className="text-xs text-[#293855] dark:text-[#E3E6EB] leading-relaxed transition-colors duration-300">
-              Subtract infinite opportunities and optimize content for maximum impact
-            </p>
-          </div>
         </div>
       </div>
     </div>

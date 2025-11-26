@@ -149,9 +149,30 @@ export default function Home() {
     }
   }, [])
 
+  // Scroll to top when step changes
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "smooth" })
-  }, [currentStep])
+    const scrollToTop = () => {
+      requestAnimationFrame(() => {
+        window.scrollTo({
+          top: 0,
+          behavior: "smooth"
+        });
+      });
+    };
+
+    scrollToTop();
+
+    // Also handle browser back/forward navigation
+    const handlePopState = () => {
+      scrollToTop();
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+    };
+  }, [currentStep]);
 
   const applyTheme = (mode: ThemeMode) => {
     const html = document.documentElement
@@ -184,12 +205,16 @@ export default function Home() {
     }
     if (currentStepIndex < STEPS.length - 1) {
       setCurrentStep(STEPS[currentStepIndex + 1].id)
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
 
   const handlePrevious = () => {
     if (currentStepIndex > 0) {
       setCurrentStep(STEPS[currentStepIndex - 1].id)
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
 
@@ -198,6 +223,8 @@ export default function Home() {
     if (stepIndex === -1) return
     if (stepIndex <= furthestStepIndex) {
       setCurrentStep(stepId)
+      // Scroll to top
+      window.scrollTo({ top: 0, behavior: "smooth" })
     }
   }
 
@@ -216,6 +243,8 @@ export default function Home() {
       lastAnalyzed: undefined,
       lastAnalyzedKey: undefined,
     })
+    // Scroll to top
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   const handleLogoClick = () => {
