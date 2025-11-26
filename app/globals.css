@@ -295,8 +295,15 @@
     transition: all 0.3s;
   }
 
+  /* Override card background to solid white in light mode for better text readability */
+  .card-base {
+    background: #ffffff;
+  }
+
   .dark .card-base {
     box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.3);
+    /* Set solid background for dark mode */
+    background: #1a1f2e;
   }
 
   .card-base:hover {
