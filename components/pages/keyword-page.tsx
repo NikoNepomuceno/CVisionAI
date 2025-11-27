@@ -298,10 +298,6 @@ export default function KeywordPage({ resumeData, onNext, onPrevious, onPersist 
                           <span className="text-xs sm:text-sm font-medium text-foreground block truncate">
                             {item.keyword}
                           </span>
-                          <span className="text-xs text-muted-foreground">
-                            Mentioned {item.frequency} time
-                            {item.frequency !== 1 ? "s" : ""}
-                          </span>
                         </div>
                       </div>
                       <button

@@ -30,14 +30,13 @@ export type FeedbackItem = {
 
 export type KeywordMatch = {
   keyword: string
-  frequency: number
   matched: boolean
   category?: "skill" | "technology" | "tool" | "certification" | "other"
 }
 
 export type SkillMatch = {
   skill: string
-  match: number // 0-100 percentage
+  match: number
   foundInJob: boolean
 }
 
